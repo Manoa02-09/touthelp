@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tout Help - Accueil</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
     <style>
         .chat-modal {
             display: none;
@@ -102,8 +105,10 @@
             margin-bottom: 15px;
             text-align: center;
         }
+        .hidden { display: none; }
     </style>
 </head>
+
 <body class="bg-gray-50">
 
     <!-- En-tête avec logo et menu -->
@@ -150,19 +155,16 @@
         <div class="chat-header">
             <i class="fas fa-headset mr-2"></i> Avez-vous des questions ?
         </div>
-        <div class="chat-body">
-            @if(session('message_success'))
-                <div class="success-message">
-                    {{ session('message_success') }}
-                </div>
-            @endif
-            <form action="{{ route('contact.send') }}" method="POST">
+        <div class="chat-body" id="chatBody">
+            <div id="chatMessages" class="mb-4 max-h-60 overflow-y-auto space-y-3 hidden"></div>
+            
+            <form id="chatForm">
                 @csrf
-                <input type="text" name="nom" placeholder="Votre nom" class="form-input" required>
-                <input type="email" name="email" placeholder="Votre email" class="form-input" required>
-                <input type="text" name="telephone" placeholder="Votre téléphone" class="form-input">
-                <textarea name="message" rows="3" placeholder="Votre message..." class="form-textarea" required></textarea>
-                <button type="submit" class="btn-send">Envoyer</button>
+                <input type="text" name="nom" id="nom" placeholder="Votre nom" class="form-input" required>
+                <input type="email" name="email" id="email" placeholder="Votre email" class="form-input" required>
+                <input type="text" name="telephone" id="telephone" placeholder="Votre téléphone" class="form-input">
+                <textarea name="message" id="message" rows="3" placeholder="Votre message..." class="form-textarea" required></textarea>
+                <button type="submit" id="sendBtn" class="btn-send">Envoyer</button>
             </form>
         </div>
         <div class="chat-footer">
@@ -170,20 +172,351 @@
         </div>
     </div>
 
-    <script>
-        const robotIcon = document.getElementById('robotIcon');
-        const chatModal = document.getElementById('chatModal');
+    <!-- 1. D'abord charger les assets compilés (app.js avec Echo) -->
+    @vite(['resources/js/app.js'])
 
+    <!-- 2. Ensuite charger Pusher et initialiser Echo manuellement (sécurité) -->
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script>
+        // Attendre que le DOM et les assets soient chargés
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Pusher !== 'undefined' && !window.Echo) {
+                window.Pusher = Pusher;
+                window.Echo = new Echo({
+                    broadcaster: 'reverb',
+                    key: '{{ env("REVERB_APP_KEY") }}',
+                    wsHost: '{{ env("REVERB_HOST", "localhost") }}',
+                    wsPort: {{ env("REVERB_PORT", 8080) }},
+                    forceTLS: false,
+                    enabledTransports: ['ws', 'wss']
+                });
+                console.log('Echo initialisé manuellement');
+            }
+        });
+    </script>
+
+    <!-- 3. Enfin le script principal du chat -->
+    <script>
+    // Éléments DOM
+    const robotIcon = document.getElementById('robotIcon');
+    const chatModal = document.getElementById('chatModal');
+    const chatForm = document.getElementById('chatForm');
+    const chatBody = document.getElementById('chatBody');
+    const messagesContainer = document.getElementById('chatMessages');
+    
+    let currentEmail = '';
+    let currentNom = '';
+    let pollingInterval = null;
+    let webSocketSetup = false;
+
+    // Écoute globale sur le canal public (pour recevoir les messages en temps réel)
+    // On attend que window.Echo soit prêt
+    function initGlobalEcho() {
+        if (window.Echo) {
+            window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
+                console.log('Nouveau message reçu en temps réel:', event);
+                
+                // Si le message est pour l'email actuel, recharge les messages
+                if (currentEmail === event.email_client) {
+                    loadMessages(currentEmail, true);
+                    showNotification('📩 Nouvelle réponse du support !');
+                }
+            });
+        } else {
+            // Réessayer dans 1 seconde
+            setTimeout(initGlobalEcho, 1000);
+        }
+    }
+    
+    // Démarrer l'écoute globale quand la page est prête
+    document.addEventListener('DOMContentLoaded', initGlobalEcho);
+
+    // Ouvrir/fermer le modal
+    if (robotIcon && chatModal) {
         robotIcon.addEventListener('click', function() {
             chatModal.classList.toggle('active');
+            if (chatModal.classList.contains('active') && currentEmail) {
+                loadMessages(currentEmail);
+                startPolling(currentEmail);
+            } else if (!chatModal.classList.contains('active')) {
+                stopPolling();
+            }
         });
 
-        // Fermer le modal si on clique en dehors (optionnel)
         window.addEventListener('click', function(e) {
             if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
                 chatModal.classList.remove('active');
+                stopPolling();
             }
         });
+    }
+
+    // Démarrer le polling
+    function startPolling(email) {
+        if (pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(() => {
+            if (currentEmail && chatModal.classList.contains('active')) {
+                loadMessages(currentEmail, true);
+            }
+        }, 5000);
+    }
+
+    function stopPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
+
+    // Configuration WebSocket pour canal privé
+    function setupWebSocket(email, nom) {
+        if (webSocketSetup) return;
+        if (!email || !window.Echo) {
+            console.log('Echo non disponible');
+            return;
+        }
+        
+        const channelHash = CryptoJS.MD5(email).toString();
+        
+        window.Echo.private(`chat.${channelHash}`)
+            .listen('NewMessageReceived', (event) => {
+                console.log('Event reçu sur canal privé:', event);
+                if (currentEmail === email || !currentEmail) {
+                    loadMessages(email, true);
+                    showNotification('📩 Nouvelle réponse du support !');
+                }
+            });
+        
+        webSocketSetup = true;
+        console.log('WebSocket connecté pour:', email);
+    }
+
+    // Charger les messages
+    async function loadMessages(email, silent = false) {
+        if (!email) return;
+        
+        try {
+            const response = await fetch(`/api/messages?email=${encodeURIComponent(email)}`);
+            const messages = await response.json();
+            
+            if (messages.length > 0 && messagesContainer) {
+                messagesContainer.classList.remove('hidden');
+                
+                let html = '';
+                messages.forEach((msg) => {
+                    html += `
+                        <div class="bg-gray-100 p-3 rounded-lg">
+                            <div class="flex justify-between items-start mb-2">
+                                <strong class="text-sm">${escapeHtml(msg.nom_complet)}</strong>
+                                <small class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleString()}</small>
+                            </div>
+                            <p class="text-sm text-gray-700">${escapeHtml(msg.message)}</p>
+                            ${msg.reponse_admin ? `
+                                <div class="mt-2 p-2 bg-green-50 rounded text-sm text-green-800">
+                                    <i class="fas fa-reply mr-1"></i> <strong>Support :</strong> ${escapeHtml(msg.reponse_admin)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                
+                messagesContainer.innerHTML = html;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Basculer en vue conversation
+                switchToConversationView(email, messages[0].nom_complet);
+                setupWebSocket(email, messages[0].nom_complet);
+            }
+        } catch (error) {
+            console.error('Erreur chargement messages:', error);
+        }
+    }
+
+    // Basculer en vue conversation
+    function switchToConversationView(email, nom) {
+        currentEmail = email;
+        currentNom = nom;
+        
+        if (chatForm) {
+            chatForm.style.display = 'none';
+        }
+        
+        let quickForm = document.getElementById('quickForm');
+        if (!quickForm) {
+            quickForm = document.createElement('div');
+            quickForm.id = 'quickForm';
+            quickForm.className = 'mt-3';
+            quickForm.innerHTML = `
+                <div class="flex gap-2">
+                    <textarea id="quickMessage" rows="2" placeholder="Votre message..." class="flex-1 p-2 border rounded-lg text-sm" style="resize: none;"></textarea>
+                    <button id="quickSendBtn" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            `;
+            chatBody.appendChild(quickForm);
+            
+            document.getElementById('quickSendBtn').addEventListener('click', sendQuickMessage);
+            document.getElementById('quickMessage').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendQuickMessage();
+                }
+            });
+        }
+        
+        let changeIdentityBtn = document.getElementById('changeIdentity');
+        if (!changeIdentityBtn) {
+            changeIdentityBtn = document.createElement('button');
+            changeIdentityBtn.id = 'changeIdentity';
+            changeIdentityBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block';
+            changeIdentityBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité';
+            changeIdentityBtn.onclick = resetToFullForm;
+            chatBody.appendChild(changeIdentityBtn);
+        }
+        
+        quickForm.style.display = 'block';
+        changeIdentityBtn.style.display = 'block';
+    }
+    
+    // Envoyer message rapide
+    async function sendQuickMessage() {
+        const messageInput = document.getElementById('quickMessage');
+        const message = messageInput.value.trim();
+        
+        if (!message || !currentEmail) {
+            showNotification('Veuillez écrire un message', 'error');
+            return;
+        }
+        
+        const sendBtn = document.getElementById('quickSendBtn');
+        const originalHtml = sendBtn.innerHTML;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        sendBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/contact/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    nom: currentNom,
+                    email: currentEmail,
+                    telephone: document.getElementById('telephone')?.value || '',
+                    message: message
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                messageInput.value = '';
+                await loadMessages(currentEmail);
+                setupWebSocket(currentEmail, currentNom);
+                showNotification('Message envoyé !');
+            }
+        } catch (error) {
+            showNotification('Erreur de connexion', 'error');
+        } finally {
+            sendBtn.innerHTML = originalHtml;
+            sendBtn.disabled = false;
+        }
+    }
+    
+    // Revenir au formulaire complet
+    function resetToFullForm() {
+        currentEmail = '';
+        currentNom = '';
+        webSocketSetup = false;
+        stopPolling();
+        if (chatForm) chatForm.style.display = 'block';
+        const quickForm = document.getElementById('quickForm');
+        const changeIdentity = document.getElementById('changeIdentity');
+        if (quickForm) quickForm.style.display = 'none';
+        if (changeIdentity) changeIdentity.style.display = 'none';
+        if (messagesContainer) messagesContainer.innerHTML = '';
+        messagesContainer.classList.add('hidden');
+    }
+
+    // Formulaire complet
+    if (chatForm) {
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nom = document.getElementById('nom').value;
+            const email = document.getElementById('email').value;
+            const telephone = document.getElementById('telephone').value;
+            const message = document.getElementById('message').value;
+            
+            if (!nom || !email || !message) {
+                showNotification('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            const submitBtn = chatForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/contact/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        nom: nom,
+                        email: email,
+                        telephone: telephone,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    await loadMessages(email);
+                    setupWebSocket(email, nom);
+                    showNotification('Message envoyé !');
+                }
+            } catch (error) {
+                showNotification('Erreur lors de l\'envoi', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+    
+    // Utilitaires
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function showNotification(msg, type = 'success') {
+        let notif = document.getElementById('chatNotification');
+        if (!notif) {
+            notif = document.createElement('div');
+            notif.id = 'chatNotification';
+            notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px;border-radius:8px;z-index:1002;transition:opacity 0.3s;font-size:14px;background:#333;color:white';
+            document.body.appendChild(notif);
+        }
+        notif.textContent = msg;
+        notif.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+        notif.style.opacity = '1';
+        
+        setTimeout(() => {
+            notif.style.opacity = '0';
+        }, 3000);
+    }
     </script>
 </body>
 </html>
