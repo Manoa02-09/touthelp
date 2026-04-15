@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Events\NewMessageReceived;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class ContactController extends Controller
             'repondu' => false,
         ]);
 
-        Log::info('4 - broadcast() exécuté dans ContactController pour: ' . $request->email);
+        Log::info('Message créé - broadcast pour: ' . $request->email);
         broadcast(new NewMessageReceived($message));
 
         if ($request->ajax() || $request->wantsJson()) {
@@ -79,7 +80,7 @@ class ContactController extends Controller
         $message->repondu = true;
         $message->save();
 
-        Log::info('4 - broadcast() exécuté dans ContactController (repondre) pour: ' . $message->email_client);
+        Log::info('Réponse envoyée - broadcast pour: ' . $message->email_client);
         broadcast(new NewMessageReceived($message));
 
         return redirect()->back()->with('success', '✅ Réponse envoyée !');
@@ -110,12 +111,37 @@ class ContactController extends Controller
             $message->repondu = true;
             $message->save();
             
-            Log::info('4 - broadcast() exécuté dans ContactController (replyFromModal) pour: ' . $request->email_client);
+            Log::info('Réponse modal - broadcast pour: ' . $request->email_client);
             broadcast(new NewMessageReceived($message));
             
             return response()->json(['success' => true]);
         }
         
-        return response()->json(['success' => false], 404);
+        return response()->json(['success' => false, 'message' => 'Aucun message trouvé pour cet email'], 404);
+    }
+
+    public function markAsRead($id)
+    {
+        $message = Message::findOrFail($id);
+        $message->lu = true;
+        $message->save();
+        
+        return response()->json(['success' => true]);
+    }
+
+    public function toggleCloseConversation(Request $request)
+    {
+        $request->validate([
+            'email_client' => 'required|email',
+            'closed' => 'required|boolean'
+        ]);
+        
+        $user = User::where('email', $request->email_client)->first();
+        if ($user) {
+            $user->conversation_closed = $request->closed;
+            $user->save();
+        }
+        
+        return response()->json(['success' => true]);
     }
 }

@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-public function up(): void
+public function up()
 {
-    Schema::table('expertises', function (Blueprint $table) {
-        $table->integer('ordre')->default(0)->after('icone');
-    });
+    if (!Schema::hasColumn('expertises', 'ordre')) {
+        Schema::table('expertises', function (Blueprint $table) {
+            $table->integer('ordre')->default(0);
+        });
+    }
 }
 
 public function down(): void

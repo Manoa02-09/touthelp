@@ -48,5 +48,6 @@ Route::middleware(['auth'])->group(function () {
 // NOUVELLES ROUTES POUR L'API ADMIN
 Route::get('/admin/messages/conversation/{email}', [ContactController::class, 'getConversation']);
 Route::post('/admin/messages/reply', [ContactController::class, 'replyFromModal']);
+Route::post('/admin/messages/toggle-close', [ContactController::class, 'toggleCloseConversation'])->middleware(['auth', 'admin']);
 
 require __DIR__.'/auth.php';

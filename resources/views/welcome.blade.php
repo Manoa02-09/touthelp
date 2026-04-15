@@ -10,12 +10,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .chat-modal {
             display: none;
             position: fixed;
             bottom: 100px;
             right: 20px;
-            width: 350px;
+            width: 380px;
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
@@ -45,6 +51,8 @@
         }
         .chat-body {
             padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
         }
         .chat-footer {
             background: #f3f4f6;
@@ -53,10 +61,13 @@
             font-size: 12px;
             color: gray;
         }
+        
+        /* Robot flottant - CORRIGÉ */
         .robot-icon {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            left: auto !important;
             background: #1a3c34;
             width: 60px;
             height: 60px;
@@ -66,15 +77,34 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-            z-index: 999;
+            transition: all 0.3s ease;
+            z-index: 9999;
         }
         .robot-icon:hover {
             transform: scale(1.1);
+            background: #0f2b24;
         }
         .robot-icon i {
             font-size: 30px;
             color: white;
+        }
+        .robot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: 2px solid white;
         }
         .form-input, .form-textarea {
             width: 100%;
@@ -83,6 +113,11 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
+            transition: border 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #1a3c34;
         }
         .btn-send {
             background: #1a3c34;
@@ -93,19 +128,39 @@
             cursor: pointer;
             width: 100%;
             font-weight: bold;
+            transition: background 0.2s;
         }
         .btn-send:hover {
             background: #0f2b24;
         }
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
+        .btn-send:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message-item {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .hidden { display: none; }
+        
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 
@@ -148,15 +203,16 @@
     <!-- Icône robot flottant -->
     <div class="robot-icon" id="robotIcon">
         <i class="fas fa-robot"></i>
+        <span id="robotBadge" class="robot-badge hidden">0</span>
     </div>
 
     <!-- Modal de chat -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
-            <i class="fas fa-headset mr-2"></i> Avez-vous des questions ?
+            <i class="fas fa-headset mr-2"></i> Support client
         </div>
         <div class="chat-body" id="chatBody">
-            <div id="chatMessages" class="mb-4 max-h-60 overflow-y-auto space-y-3 hidden"></div>
+            <div id="chatMessages" class="mb-4 space-y-3 hidden"></div>
             
             <form id="chatForm">
                 @csrf
@@ -172,32 +228,26 @@
         </div>
     </div>
 
-    <!-- 1. D'abord charger les assets compilés (app.js avec Echo) -->
     @vite(['resources/js/app.js'])
-
-    <!-- 2. Ensuite charger Pusher et initialiser Echo manuellement (sécurité) -->
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    
     <script>
-        // Attendre que le DOM et les assets soient chargés
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Pusher !== 'undefined' && !window.Echo) {
-                window.Pusher = Pusher;
-                window.Echo = new Echo({
-                    broadcaster: 'reverb',
-                    key: '{{ env("REVERB_APP_KEY") }}',
-                    wsHost: '{{ env("REVERB_HOST", "localhost") }}',
-                    wsPort: {{ env("REVERB_PORT", 8080) }},
-                    forceTLS: false,
-                    enabledTransports: ['ws', 'wss']
-                });
-                console.log('Echo initialisé manuellement');
-            }
-        });
-    </script>
+    // Configuration Echo
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof Pusher !== 'undefined' && !window.Echo) {
+            window.Pusher = Pusher;
+            window.Echo = new Echo({
+                broadcaster: 'reverb',
+                key: '{{ env("REVERB_APP_KEY") }}',
+                wsHost: '{{ env("REVERB_HOST", "localhost") }}',
+                wsPort: {{ env("REVERB_PORT", 8080) }},
+                forceTLS: false,
+                enabledTransports: ['ws', 'wss']
+            });
+        }
+    });
 
-    <!-- 3. Enfin le script principal du chat -->
-    <script>
-    // Éléments DOM
+    // DOM Elements
     const robotIcon = document.getElementById('robotIcon');
     const chatModal = document.getElementById('chatModal');
     const chatForm = document.getElementById('chatForm');
@@ -206,92 +256,118 @@
     
     let currentEmail = '';
     let currentNom = '';
-    let pollingInterval = null;
     let webSocketSetup = false;
+    let unreadMessages = new Set();
 
-    // Écoute globale sur le canal public (pour recevoir les messages en temps réel)
-    // On attend que window.Echo soit prêt
-    function initGlobalEcho() {
-        if (window.Echo) {
-            window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
-                console.log('Nouveau message reçu en temps réel:', event);
-                
-                // Si le message est pour l'email actuel, recharge les messages
-                if (currentEmail === event.email_client) {
-                    loadMessages(currentEmail, true);
-                    showNotification('📩 Nouvelle réponse du support !');
-                }
-            });
-        } else {
-            // Réessayer dans 1 seconde
-            setTimeout(initGlobalEcho, 1000);
+    // Fonction de notification sonore améliorée
+    let audioUnlocked = false;
+    
+    function unlockAudio() {
+        if (audioUnlocked) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            ctx.resume();
+            audioUnlocked = true;
+            console.log('Audio débloqué');
+        } catch(e) {}
+    }
+    
+    function playNotificationSound() {
+        try {
+            // Tenter de débloquer l'audio au premier appel
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') {
+                ctx.resume().then(() => {
+                    playBeep(ctx);
+                });
+            } else {
+                playBeep(ctx);
+            }
+        } catch(e) {
+            console.log('Son non supporté');
         }
     }
     
-    // Démarrer l'écoute globale quand la page est prête
-    document.addEventListener('DOMContentLoaded', initGlobalEcho);
-
-    // Ouvrir/fermer le modal
-    if (robotIcon && chatModal) {
-        robotIcon.addEventListener('click', function() {
-            chatModal.classList.toggle('active');
-            if (chatModal.classList.contains('active') && currentEmail) {
-                loadMessages(currentEmail);
-                startPolling(currentEmail);
-            } else if (!chatModal.classList.contains('active')) {
-                stopPolling();
-            }
-        });
-
-        window.addEventListener('click', function(e) {
-            if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
-                chatModal.classList.remove('active');
-                stopPolling();
-            }
-        });
+    function playBeep(ctx) {
+        try {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            oscillator.frequency.value = 880;
+            gainNode.gain.value = 0.2;
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
+            oscillator.stop(ctx.currentTime + 0.3);
+        } catch(e) {}
     }
 
-    // Démarrer le polling
-    function startPolling(email) {
-        if (pollingInterval) clearInterval(pollingInterval);
-        pollingInterval = setInterval(() => {
-            if (currentEmail && chatModal.classList.contains('active')) {
-                loadMessages(currentEmail, true);
-            }
-        }, 5000);
-    }
+    // Débloquer l'audio au premier clic sur la page
+    document.body.addEventListener('click', unlockAudio, { once: true });
+    robotIcon.addEventListener('click', unlockAudio);
 
-    function stopPolling() {
-        if (pollingInterval) {
-            clearInterval(pollingInterval);
-            pollingInterval = null;
+    // Badge management
+    function updateRobotBadge() {
+        const badge = document.getElementById('robotBadge');
+        if (badge) {
+            const count = unreadMessages.size;
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
     }
 
-    // Configuration WebSocket pour canal privé
-    function setupWebSocket(email, nom) {
-        if (webSocketSetup) return;
-        if (!email || !window.Echo) {
-            console.log('Echo non disponible');
-            return;
+    function incrementUnreadCount(messageId) {
+        if (!unreadMessages.has(messageId)) {
+            unreadMessages.add(messageId);
+            updateRobotBadge();
         }
+    }
+
+    function resetUnreadCount() {
+        unreadMessages.clear();
+        updateRobotBadge();
+    }
+
+    // Modal controls
+    robotIcon.addEventListener('click', () => {
+        chatModal.classList.toggle('active');
+        if (chatModal.classList.contains('active')){
+            resetUnreadCount();
+            if (currentEmail) loadMessages(currentEmail);
+        }
+    });
+
+    window.addEventListener('click', (e) => {
+        if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
+            chatModal.classList.remove('active');
+        }
+    });
+
+    // WebSocket setup
+    function setupWebSocket(email) {
+        if (webSocketSetup || !email || !window.Echo) return;
         
         const channelHash = CryptoJS.MD5(email).toString();
         
         window.Echo.private(`chat.${channelHash}`)
             .listen('NewMessageReceived', (event) => {
-                console.log('Event reçu sur canal privé:', event);
-                if (currentEmail === email || !currentEmail) {
-                    loadMessages(email, true);
-                    showNotification('📩 Nouvelle réponse du support !');
+                if (!chatModal.classList.contains('active') || currentEmail !== event.email_client) {
+                    incrementUnreadCount(event.id);
+                    playNotificationSound();
+                }
+                if (currentEmail === event.email_client) {
+                    loadMessages(currentEmail, true);
                 }
             });
         
         webSocketSetup = true;
-        console.log('WebSocket connecté pour:', email);
     }
 
-    // Charger les messages
+    // Load messages
     async function loadMessages(email, silent = false) {
         if (!email) return;
         
@@ -305,7 +381,7 @@
                 let html = '';
                 messages.forEach((msg) => {
                     html += `
-                        <div class="bg-gray-100 p-3 rounded-lg">
+                        <div class="message-item bg-gray-100 p-3 rounded-lg">
                             <div class="flex justify-between items-start mb-2">
                                 <strong class="text-sm">${escapeHtml(msg.nom_complet)}</strong>
                                 <small class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleString()}</small>
@@ -322,24 +398,20 @@
                 
                 messagesContainer.innerHTML = html;
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
-                // Basculer en vue conversation
                 switchToConversationView(email, messages[0].nom_complet);
-                setupWebSocket(email, messages[0].nom_complet);
+                setupWebSocket(email);
             }
         } catch (error) {
-            console.error('Erreur chargement messages:', error);
+            console.error('Erreur:', error);
         }
     }
 
-    // Basculer en vue conversation
+    // Switch to conversation view
     function switchToConversationView(email, nom) {
         currentEmail = email;
         currentNom = nom;
         
-        if (chatForm) {
-            chatForm.style.display = 'none';
-        }
+        if (chatForm) chatForm.style.display = 'none';
         
         let quickForm = document.getElementById('quickForm');
         if (!quickForm) {
@@ -348,16 +420,15 @@
             quickForm.className = 'mt-3';
             quickForm.innerHTML = `
                 <div class="flex gap-2">
-                    <textarea id="quickMessage" rows="2" placeholder="Votre message..." class="flex-1 p-2 border rounded-lg text-sm" style="resize: none;"></textarea>
-                    <button id="quickSendBtn" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800">
+                    <textarea id="quickMessage" rows="2" placeholder="Écrivez votre message..." class="flex-1 p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" style="resize: none;"></textarea>
+                    <button id="quickSendBtn" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             `;
             chatBody.appendChild(quickForm);
-            
             document.getElementById('quickSendBtn').addEventListener('click', sendQuickMessage);
-            document.getElementById('quickMessage').addEventListener('keypress', function(e) {
+            document.getElementById('quickMessage').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendQuickMessage();
@@ -369,7 +440,7 @@
         if (!changeIdentityBtn) {
             changeIdentityBtn = document.createElement('button');
             changeIdentityBtn.id = 'changeIdentity';
-            changeIdentityBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block';
+            changeIdentityBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block transition';
             changeIdentityBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité';
             changeIdentityBtn.onclick = resetToFullForm;
             chatBody.appendChild(changeIdentityBtn);
@@ -379,7 +450,7 @@
         changeIdentityBtn.style.display = 'block';
     }
     
-    // Envoyer message rapide
+    // Send quick message
     async function sendQuickMessage() {
         const messageInput = document.getElementById('quickMessage');
         const message = messageInput.value.trim();
@@ -411,11 +482,9 @@
             });
             
             const data = await response.json();
-            
             if (data.success) {
                 messageInput.value = '';
                 await loadMessages(currentEmail);
-                setupWebSocket(currentEmail, currentNom);
                 showNotification('Message envoyé !');
             }
         } catch (error) {
@@ -426,24 +495,26 @@
         }
     }
     
-    // Revenir au formulaire complet
+    // Reset to full form
     function resetToFullForm() {
         currentEmail = '';
         currentNom = '';
         webSocketSetup = false;
-        stopPolling();
         if (chatForm) chatForm.style.display = 'block';
         const quickForm = document.getElementById('quickForm');
         const changeIdentity = document.getElementById('changeIdentity');
         if (quickForm) quickForm.style.display = 'none';
         if (changeIdentity) changeIdentity.style.display = 'none';
-        if (messagesContainer) messagesContainer.innerHTML = '';
-        messagesContainer.classList.add('hidden');
+        if (messagesContainer) {
+            messagesContainer.innerHTML = '';
+            messagesContainer.classList.add('hidden');
+        }
+        resetUnreadCount();
     }
 
-    // Formulaire complet
+    // Full form submit
     if (chatForm) {
-        chatForm.addEventListener('submit', async function(e) {
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const nom = document.getElementById('nom').value;
@@ -456,7 +527,7 @@
                 return;
             }
             
-            const submitBtn = chatForm.querySelector('button[type="submit"]');
+            const submitBtn = chatForm.querySelector('button');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
             submitBtn.disabled = true;
@@ -469,23 +540,17 @@
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({
-                        nom: nom,
-                        email: email,
-                        telephone: telephone,
-                        message: message
-                    })
+                    body: JSON.stringify({ nom, email, telephone, message })
                 });
                 
                 const data = await response.json();
-                
                 if (data.success) {
                     await loadMessages(email);
-                    setupWebSocket(email, nom);
+                    setupWebSocket(email);
                     showNotification('Message envoyé !');
                 }
             } catch (error) {
-                showNotification('Erreur lors de l\'envoi', 'error');
+                showNotification('Erreur', 'error');
             } finally {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -493,7 +558,6 @@
         });
     }
     
-    // Utilitaires
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -506,16 +570,13 @@
         if (!notif) {
             notif = document.createElement('div');
             notif.id = 'chatNotification';
-            notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px;border-radius:8px;z-index:1002;transition:opacity 0.3s;font-size:14px;background:#333;color:white';
+            notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px 15px;border-radius:8px;z-index:1002;font-size:13px;background:#333;color:white;animation:fadeInUp 0.3s ease';
             document.body.appendChild(notif);
         }
         notif.textContent = msg;
         notif.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-        notif.style.opacity = '1';
-        
-        setTimeout(() => {
-            notif.style.opacity = '0';
-        }, 3000);
+        notif.style.display = 'block';
+        setTimeout(() => notif.style.display = 'none', 3000);
     }
     </script>
 </body>
