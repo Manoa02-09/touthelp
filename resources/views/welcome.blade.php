@@ -62,7 +62,6 @@
             color: gray;
         }
         
-        /* Robot flottant - CORRIGÉ */
         .robot-icon {
             position: fixed;
             bottom: 20px;
@@ -146,7 +145,6 @@
         }
         .hidden { display: none; }
         
-        /* Scrollbar personnalisée */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -166,7 +164,6 @@
 
 <body class="bg-gray-50">
 
-    <!-- En-tête avec logo et menu -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -187,7 +184,6 @@
         </div>
     </header>
 
-    <!-- Section héro -->
     <section class="relative bg-cover bg-center h-[500px]" style="background-image: url('{{ asset('images/krae0EbF.jpg') }}');">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
         <div class="relative container mx-auto px-4 h-full flex flex-col justify-center text-white">
@@ -200,13 +196,11 @@
         </div>
     </section>
 
-    <!-- Icône robot flottant -->
     <div class="robot-icon" id="robotIcon">
         <i class="fas fa-robot"></i>
         <span id="robotBadge" class="robot-badge hidden">0</span>
     </div>
 
-    <!-- Modal de chat -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
             <i class="fas fa-headset mr-2"></i> Support client
@@ -259,7 +253,7 @@
     let webSocketSetup = false;
     let unreadMessages = new Set();
 
-    // Fonction de notification sonore améliorée
+    // Son
     let audioUnlocked = false;
     
     function unlockAudio() {
@@ -268,24 +262,18 @@
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             ctx.resume();
             audioUnlocked = true;
-            console.log('Audio débloqué');
         } catch(e) {}
     }
     
     function playNotificationSound() {
         try {
-            // Tenter de débloquer l'audio au premier appel
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             if (ctx.state === 'suspended') {
-                ctx.resume().then(() => {
-                    playBeep(ctx);
-                });
+                ctx.resume().then(() => playBeep(ctx));
             } else {
                 playBeep(ctx);
             }
-        } catch(e) {
-            console.log('Son non supporté');
-        }
+        } catch(e) {}
     }
     
     function playBeep(ctx) {
@@ -302,11 +290,10 @@
         } catch(e) {}
     }
 
-    // Débloquer l'audio au premier clic sur la page
     document.body.addEventListener('click', unlockAudio, { once: true });
-    robotIcon.addEventListener('click', unlockAudio);
+    if (robotIcon) robotIcon.addEventListener('click', unlockAudio);
 
-    // Badge management
+    // Badge
     function updateRobotBadge() {
         const badge = document.getElementById('robotBadge');
         if (badge) {
@@ -333,28 +320,65 @@
     }
 
     // Modal controls
-    robotIcon.addEventListener('click', () => {
-        chatModal.classList.toggle('active');
-        if (chatModal.classList.contains('active')){
-            resetUnreadCount();
-            if (currentEmail) loadMessages(currentEmail);
-        }
-    });
+    if (robotIcon && chatModal) {
+        robotIcon.addEventListener('click', () => {
+            chatModal.classList.toggle('active');
+            if (chatModal.classList.contains('active')){
+                resetUnreadCount();
+                if (currentEmail) loadMessages(currentEmail);
+            }
+        });
 
-    window.addEventListener('click', (e) => {
-        if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
-            chatModal.classList.remove('active');
-        }
-    });
+        window.addEventListener('click', (e) => {
+            if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
+                chatModal.classList.remove('active');
+            }
+        });
+    }
 
-    // WebSocket setup
+    // ========== ÉCOUTE GLOBALE (CANAL PUBLIC) - CORRECTION IMPORTANTE ==========
+    function initGlobalEcho() {
+        if (window.Echo) {
+            console.log('✅ Echo chargé, écoute globale activée');
+            
+            window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
+                console.log('📩 Nouveau message reçu en temps réel:', event);
+                
+                // Si l'email correspond à la conversation actuelle
+                if (currentEmail === event.email_client) {
+                    loadMessages(currentEmail, true);
+                    showNotification('📩 Nouvelle réponse du support !');
+                    playNotificationSound();
+                } else if (!currentEmail) {
+                    // Pas de conversation active
+                    showNotification('📩 Nouveau message de ' + event.nom_complet);
+                    playNotificationSound();
+                    incrementUnreadCount(event.id);
+                } else {
+                    // Autre conversation
+                    incrementUnreadCount(event.id);
+                    playNotificationSound();
+                }
+            });
+        } else {
+            console.log('⏳ Echo pas encore chargé, réessai...');
+            setTimeout(initGlobalEcho, 1000);
+        }
+    }
+    
+    // Démarrer l'écoute globale
+    setTimeout(initGlobalEcho, 500);
+
+    // WebSocket privé
     function setupWebSocket(email) {
         if (webSocketSetup || !email || !window.Echo) return;
         
         const channelHash = CryptoJS.MD5(email).toString();
+        console.log('🔐 Connexion canal privé:', channelHash);
         
         window.Echo.private(`chat.${channelHash}`)
             .listen('NewMessageReceived', (event) => {
+                console.log('🔑 Message reçu sur canal privé:', event);
                 if (!chatModal.classList.contains('active') || currentEmail !== event.email_client) {
                     incrementUnreadCount(event.id);
                     playNotificationSound();
@@ -402,7 +426,7 @@
                 setupWebSocket(email);
             }
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('Erreur chargement messages:', error);
         }
     }
 
