@@ -28,6 +28,7 @@ class ContactController extends Controller
             'date_envoi' => now(),
             'lu' => false,
             'repondu' => false,
+            'closed' => false,
         ]);
 
         Log::info('Message créé - broadcast pour: ' . $request->email);
@@ -65,6 +66,14 @@ class ContactController extends Controller
             ->groupBy('email_client', 'nom_complet')
             ->orderBy('last_message_at', 'desc')
             ->get();
+        
+        foreach ($conversations as $conv) {
+            $lastMessage = Message::where('email_client', $conv->email_client)->latest()->first();
+            $conv->closed = $lastMessage->closed ?? false;
+            $conv->unread_count = Message::where('email_client', $conv->email_client)
+                ->where('lu', false)
+                ->count();
+        }
         
         return view('admin.messages', compact('conversations'));
     }
@@ -136,12 +145,19 @@ class ContactController extends Controller
             'closed' => 'required|boolean'
         ]);
         
+        // Mettre à jour tous les messages de cette conversation
+        Message::where('email_client', $request->email_client)
+            ->update(['closed' => $request->closed]);
+        
+        // Mettre à jour l'utilisateur si existe
         $user = User::where('email', $request->email_client)->first();
         if ($user) {
             $user->conversation_closed = $request->closed;
             $user->save();
         }
         
-        return response()->json(['success' => true]);
+        // PAS DE BROADCAST - Pas besoin de notifier pour la clôture
+        
+        return response()->json(['success' => true, 'closed' => $request->closed]);
     }
 }

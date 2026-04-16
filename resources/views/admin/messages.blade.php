@@ -20,12 +20,22 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
+                    <!-- Barre de recherche -->
+                    <div class="mb-4">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="searchConversation" 
+                                   placeholder="Rechercher par nom, email ou message..." 
+                                   class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
                     <!-- Filtres -->
                     <div class="flex gap-2 mb-4 pb-4 border-b flex-wrap">
-                        <button onclick="filterConversations('all')" id="filterAll" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Toutes</button>
-                        <button onclick="filterConversations('unread')" id="filterUnread" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Non lues</button>
-                        <button onclick="filterConversations('unanswered')" id="filterUnanswered" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Sans réponse</button>
-                        <button onclick="filterConversations('closed')" id="filterClosed" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Clôturées</button>
+                        <button onclick="filterConversations('all')" id="filterAll" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700 hover:bg-gray-300 transition">📋 Toutes</button>
+                        <button onclick="filterConversations('unread')" id="filterUnread" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">🔴 Non lues</button>
+                        <button onclick="filterConversations('unanswered')" id="filterUnanswered" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">⏳ Sans réponse</button>
+                        <button onclick="filterConversations('closed')" id="filterClosed" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition">🔒 Clôturées</button>
                     </div>
 
                     @if($conversations->count() > 0)
@@ -48,7 +58,7 @@
                                     
                                     <div class="flex justify-between items-center">
                                         <div class="flex-1">
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-full 
                                                     {{ $isUnread ? 'bg-red-100' : ($isClosed ? 'bg-gray-200' : ($hasResponse ? 'bg-green-100' : 'bg-yellow-100')) }} 
                                                     flex items-center justify-center">
@@ -189,6 +199,18 @@
             }
         });
 
+        // ========== RECHERCHE ==========
+        const searchInput = document.getElementById('searchConversation');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+        }
+
         // ========== NOTIFICATION SONORE ==========
         let audioUnlocked = false;
         
@@ -290,8 +312,6 @@
 
         // ========== GESTION DES CONVERSATIONS CLÔTURÉES ==========
         function toggleCloseConversation(email, close) {
-            console.log('Tentative de clôture:', email, close);
-            
             fetch('/admin/messages/toggle-close', {
                 method: 'POST',
                 headers: {
@@ -302,7 +322,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Réponse serveur:', data);
                 if (data.success) {
                     if (close) {
                         closedConversations.add(email);
@@ -311,6 +330,7 @@
                         closedConversations.delete(email);
                         showAdminNotification('🔓 Conversation rouverte');
                     }
+                    // Rafraîchir la liste sans incrémenter le badge
                     refreshConversationsList();
                 } else {
                     showAdminNotification('Erreur: ' + (data.message || 'Inconnue'), 'error');
@@ -410,6 +430,9 @@
                 const response = await fetch(`/admin/messages/conversation/${encodeURIComponent(email)}`);
                 const messages = await response.json();
                 
+                // Reset le badge quand on ouvre la conversation
+                resetUnreadBadge(email);
+                
                 const container = document.getElementById('modalMessages');
                 const isClosed = closedConversations.has(email);
                 const replyContainer = document.getElementById('replyContainer');
@@ -478,12 +501,17 @@
                     document.getElementById('replyText').value = '';
                     await loadConversation(currentEmail);
                     
-                    // Mettre à jour le statut "répondu" dans la liste
+                    // Reset le badge après réponse
+                    resetUnreadBadge(currentEmail);
+                    
                     const item = document.querySelector(`.conversation-item[data-email="${currentEmail}"]`);
                     if (item) {
                         item.dataset.hasResponse = 'true';
                         item.classList.remove('border-l-yellow-500', 'bg-yellow-50');
                         item.classList.add('border-l-green-500', 'bg-green-50');
+                        
+                        const badge = item.querySelector('.badge-unread');
+                        if (badge) badge.style.display = 'none';
                     }
                     showAdminNotification('✅ Réponse envoyée !');
                     refreshConversationsList();
@@ -540,7 +568,6 @@
                         attachConversationEvents();
                         filterConversations(currentFilter);
                         
-                        // Recharger les closedConversations depuis les attributs data-closed
                         document.querySelectorAll('.conversation-item').forEach(item => {
                             const email = item.dataset.email;
                             if (item.dataset.closed === 'true') {
@@ -576,17 +603,14 @@
         attachConversationEvents();
         initAdminEcho();
         
-        // Auto-refresh toutes les 10 secondes
         setInterval(() => refreshConversationsList(), 10000);
         
-        // Raccourci clavier ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && document.getElementById('conversationModal').classList.contains('flex')) {
                 closeModal();
             }
         });
         
-        // Filtre par défaut
         filterConversations('all');
     </script>
 </x-app-layout>
