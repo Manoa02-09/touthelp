@@ -10,12 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         .chat-modal {
             display: none;
             position: fixed;
@@ -28,45 +23,20 @@
             z-index: 1000;
             overflow: hidden;
         }
-        .chat-modal.active {
-            display: block;
-            animation: fadeInUp 0.3s ease;
-        }
+        .chat-modal.active { display: block; animation: fadeInUp 0.3s ease; }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .chat-header {
-            background: #1a3c34;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .chat-body {
-            padding: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .chat-footer {
-            background: #f3f4f6;
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
-            color: gray;
-        }
+        .chat-header { background: #1a3c34; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .chat-body { padding: 20px; max-height: 500px; overflow-y: auto; }
+        .chat-footer { background: #f3f4f6; padding: 10px; text-align: center; font-size: 12px; color: gray; }
         
+        /* Robot à DROITE */
         .robot-icon {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            left: auto !important;
             background: #1a3c34;
             width: 60px;
             height: 60px;
@@ -79,14 +49,8 @@
             transition: all 0.3s ease;
             z-index: 9999;
         }
-        .robot-icon:hover {
-            transform: scale(1.1);
-            background: #0f2b24;
-        }
-        .robot-icon i {
-            font-size: 30px;
-            color: white;
-        }
+        .robot-icon:hover { transform: scale(1.1); background: #0f2b24; }
+        .robot-icon i { font-size: 30px; color: white; }
         .robot-badge {
             position: absolute;
             top: -5px;
@@ -112,12 +76,8 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
-            transition: border 0.2s;
         }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #1a3c34;
-        }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #1a3c34; }
         .btn-send {
             background: #1a3c34;
             color: white;
@@ -127,38 +87,20 @@
             cursor: pointer;
             width: 100%;
             font-weight: bold;
-            transition: background 0.2s;
         }
-        .btn-send:hover {
-            background: #0f2b24;
-        }
-        .btn-send:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .message-item {
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
+        .btn-send:hover { background: #0f2b24; }
+        .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
+        .hidden { display: none; }
+        
+        @keyframes messageAppear {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .hidden { display: none; }
+        .chat-message { animation: messageAppear 0.2s ease-out; }
         
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
     </style>
 </head>
 
@@ -206,7 +148,7 @@
             <i class="fas fa-headset mr-2"></i> Support client
         </div>
         <div class="chat-body" id="chatBody">
-            <div id="chatMessages" class="mb-4 space-y-3 hidden"></div>
+            <div id="chatMessages" class="mb-4 space-y-3"></div>
             
             <form id="chatForm">
                 @csrf
@@ -227,8 +169,11 @@
     
     <script>
     // Configuration Echo
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof Pusher !== 'undefined' && !window.Echo) {
+    let echoInitialized = false;
+    let echoReady = false;
+    
+    function initEcho() {
+        if (typeof Pusher !== 'undefined' && !window.Echo && !echoInitialized) {
             window.Pusher = Pusher;
             window.Echo = new Echo({
                 broadcaster: 'reverb',
@@ -238,10 +183,41 @@
                 forceTLS: false,
                 enabledTransports: ['ws', 'wss']
             });
+            echoInitialized = true;
+            console.log('✅ Echo initialisé');
+            
+            setTimeout(() => {
+                echoReady = true;
+                setupGlobalListener();
+            }, 1000);
+        } else if (!window.Echo) {
+            setTimeout(initEcho, 500);
+        } else {
+            echoReady = true;
+            setupGlobalListener();
         }
-    });
+    }
+    
+    function setupGlobalListener() {
+        if (!echoReady || !window.Echo) return;
+        
+        window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
+            console.log('📩 Message reçu en temps réel:', event);
+            if (currentEmail === event.email_client) {
+                loadMessages(currentEmail);
+                playNotificationSound();
+                if (!chatModal.classList.contains('active')) {
+                    incrementUnread();
+                    showNotification('📩 Nouvelle réponse du support');
+                }
+            }
+        });
+        console.log('✅ Écoute globale activée');
+    }
+    
+    document.addEventListener('DOMContentLoaded', initEcho);
 
-    // DOM Elements
+    // ========== ÉLÉMENTS DOM ==========
     const robotIcon = document.getElementById('robotIcon');
     const chatModal = document.getElementById('chatModal');
     const chatForm = document.getElementById('chatForm');
@@ -250,56 +226,45 @@
     
     let currentEmail = '';
     let currentNom = '';
-    let webSocketSetup = false;
-    let unreadMessages = new Set();
+    let unreadCount = 0;
 
-    // Son
-    let audioUnlocked = false;
+    // ========== NOTIFICATION SONORE ==========
+    let audioContext = null;
     
-    function unlockAudio() {
-        if (audioUnlocked) return;
+    function initAudio() {
+        if (audioContext) return;
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            ctx.resume();
-            audioUnlocked = true;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext.resume();
         } catch(e) {}
     }
     
     function playNotificationSound() {
+        initAudio();
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            if (ctx.state === 'suspended') {
-                ctx.resume().then(() => playBeep(ctx));
-            } else {
-                playBeep(ctx);
+            if (audioContext && audioContext.state === 'running') {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                oscillator.stop(audioContext.currentTime + 0.3);
             }
         } catch(e) {}
     }
     
-    function playBeep(ctx) {
-        try {
-            const oscillator = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            oscillator.frequency.value = 880;
-            gainNode.gain.value = 0.2;
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
-            oscillator.stop(ctx.currentTime + 0.3);
-        } catch(e) {}
-    }
+    document.body.addEventListener('click', initAudio);
+    robotIcon.addEventListener('click', initAudio);
 
-    document.body.addEventListener('click', unlockAudio, { once: true });
-    if (robotIcon) robotIcon.addEventListener('click', unlockAudio);
-
-    // Badge
+    // ========== BADGE ==========
     function updateRobotBadge() {
         const badge = document.getElementById('robotBadge');
         if (badge) {
-            const count = unreadMessages.size;
-            if (count > 0) {
-                badge.textContent = count > 99 ? '99+' : count;
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
@@ -307,135 +272,101 @@
         }
     }
 
-    function incrementUnreadCount(messageId) {
-        if (!unreadMessages.has(messageId)) {
-            unreadMessages.add(messageId);
-            updateRobotBadge();
-        }
-    }
-
-    function resetUnreadCount() {
-        unreadMessages.clear();
+    function incrementUnread() {
+        unreadCount++;
         updateRobotBadge();
     }
 
-    // Modal controls
-    if (robotIcon && chatModal) {
-        robotIcon.addEventListener('click', () => {
-            chatModal.classList.toggle('active');
-            if (chatModal.classList.contains('active')){
-                resetUnreadCount();
-                if (currentEmail) loadMessages(currentEmail);
-            }
-        });
-
-        window.addEventListener('click', (e) => {
-            if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
-                chatModal.classList.remove('active');
-            }
-        });
+    function resetUnread() {
+        unreadCount = 0;
+        updateRobotBadge();
     }
 
-    // ========== ÉCOUTE GLOBALE (CANAL PUBLIC) - CORRECTION IMPORTANTE ==========
-    function initGlobalEcho() {
-        if (window.Echo) {
-            console.log('✅ Echo chargé, écoute globale activée');
-            
-            window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
-                console.log('📩 Nouveau message reçu en temps réel:', event);
-                
-                // Si l'email correspond à la conversation actuelle
-                if (currentEmail === event.email_client) {
-                    loadMessages(currentEmail, true);
-                    showNotification('📩 Nouvelle réponse du support !');
-                    playNotificationSound();
-                } else if (!currentEmail) {
-                    // Pas de conversation active
-                    showNotification('📩 Nouveau message de ' + event.nom_complet);
-                    playNotificationSound();
-                    incrementUnreadCount(event.id);
-                } else {
-                    // Autre conversation
-                    incrementUnreadCount(event.id);
-                    playNotificationSound();
-                }
-            });
-        } else {
-            console.log('⏳ Echo pas encore chargé, réessai...');
-            setTimeout(initGlobalEcho, 1000);
+    // ========== AFFICHAGE DES MESSAGES ==========
+    // Message envoyé (client) à DROITE en vert
+    // Message reçu (support) à GAUCHE en gris
+    function displayMessages(messages) {
+        if (!messagesContainer) return;
+        
+        if (!messages || messages.length === 0) {
+            messagesContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Aucun message</div>';
+            return;
         }
+        
+        let html = '';
+        for (let msg of messages) {
+            // Message du client (ENVOYÉ) - à droite en vert
+            html += `
+                <div class="chat-message flex justify-end mb-3">
+                    <div class="max-w-[75%] bg-[#1a3c34] text-white rounded-2xl px-4 py-2 shadow-sm">
+                        <div class="flex items-center justify-end gap-2 mb-1">
+                            <small class="text-xs text-green-200">${new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+                            <strong class="text-xs text-green-200">Moi</strong>
+                        </div>
+                        <p class="text-sm break-words text-right">${escapeHtml(msg.message)}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Réponse du support (REÇU) - à gauche en gris
+            if (msg.reponse_admin && msg.reponse_admin.trim() !== '') {
+                html += `
+                    <div class="chat-message flex justify-start mb-3">
+                        <div class="max-w-[75%] bg-gray-200 text-gray-800 rounded-2xl px-4 py-2 shadow-sm">
+                            <div class="flex items-center gap-2 mb-1">
+                                <strong class="text-xs text-gray-600">Support</strong>
+                                <small class="text-xs text-gray-500">${new Date(msg.updated_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+                            </div>
+                            <p class="text-sm break-words">${escapeHtml(msg.reponse_admin)}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        messagesContainer.innerHTML = html;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-    
-    // Démarrer l'écoute globale
-    setTimeout(initGlobalEcho, 500);
 
-    // WebSocket privé
-    function setupWebSocket(email) {
-        if (webSocketSetup || !email || !window.Echo) return;
-        
-        const channelHash = CryptoJS.MD5(email).toString();
-        console.log('🔐 Connexion canal privé:', channelHash);
-        
-        window.Echo.private(`chat.${channelHash}`)
-            .listen('NewMessageReceived', (event) => {
-                console.log('🔑 Message reçu sur canal privé:', event);
-                if (!chatModal.classList.contains('active') || currentEmail !== event.email_client) {
-                    incrementUnreadCount(event.id);
-                    playNotificationSound();
-                }
-                if (currentEmail === event.email_client) {
-                    loadMessages(currentEmail, true);
-                }
-            });
-        
-        webSocketSetup = true;
-    }
-
-    // Load messages
-    async function loadMessages(email, silent = false) {
-        if (!email) return;
+    // ========== CHARGER LES MESSAGES ==========
+    async function loadMessages(email) {
+        if (!email) return [];
         
         try {
             const response = await fetch(`/api/messages?email=${encodeURIComponent(email)}`);
             const messages = await response.json();
-            
-            if (messages.length > 0 && messagesContainer) {
-                messagesContainer.classList.remove('hidden');
-                
-                let html = '';
-                messages.forEach((msg) => {
-                    html += `
-                        <div class="message-item bg-gray-100 p-3 rounded-lg">
-                            <div class="flex justify-between items-start mb-2">
-                                <strong class="text-sm">${escapeHtml(msg.nom_complet)}</strong>
-                                <small class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleString()}</small>
-                            </div>
-                            <p class="text-sm text-gray-700">${escapeHtml(msg.message)}</p>
-                            ${msg.reponse_admin ? `
-                                <div class="mt-2 p-2 bg-green-50 rounded text-sm text-green-800">
-                                    <i class="fas fa-reply mr-1"></i> <strong>Support :</strong> ${escapeHtml(msg.reponse_admin)}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-                
-                messagesContainer.innerHTML = html;
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                switchToConversationView(email, messages[0].nom_complet);
-                setupWebSocket(email);
-            }
+            displayMessages(messages);
+            return messages;
         } catch (error) {
-            console.error('Erreur chargement messages:', error);
+            console.error('Erreur:', error);
+            return [];
         }
     }
 
-    // Switch to conversation view
-    function switchToConversationView(email, nom) {
+    // ========== ENVOYER UN MESSAGE ==========
+    async function sendMessage(email, nom, telephone, message) {
+        try {
+            const response = await fetch('/contact/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ nom, email, telephone, message })
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false };
+        }
+    }
+
+    // ========== SWITCH VUE CONVERSATION ==========
+    function switchToConversation(email, nom) {
         currentEmail = email;
         currentNom = nom;
         
-        if (chatForm) chatForm.style.display = 'none';
+        chatForm.style.display = 'none';
         
         let quickForm = document.getElementById('quickForm');
         if (!quickForm) {
@@ -451,137 +382,107 @@
                 </div>
             `;
             chatBody.appendChild(quickForm);
-            document.getElementById('quickSendBtn').addEventListener('click', sendQuickMessage);
+            
+            document.getElementById('quickSendBtn').onclick = async () => {
+                const msg = document.getElementById('quickMessage').value.trim();
+                if (!msg) return;
+                
+                const btn = document.getElementById('quickSendBtn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                
+                const result = await sendMessage(currentEmail, currentNom, '', msg);
+                if (result.success) {
+                    document.getElementById('quickMessage').value = '';
+                    await loadMessages(currentEmail);
+                    showNotification('Message envoyé');
+                }
+                
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                btn.disabled = false;
+            };
+            
             document.getElementById('quickMessage').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendQuickMessage();
+                    document.getElementById('quickSendBtn').click();
                 }
             });
         }
         
-        let changeIdentityBtn = document.getElementById('changeIdentity');
-        if (!changeIdentityBtn) {
-            changeIdentityBtn = document.createElement('button');
-            changeIdentityBtn.id = 'changeIdentity';
-            changeIdentityBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block transition';
-            changeIdentityBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité';
-            changeIdentityBtn.onclick = resetToFullForm;
-            chatBody.appendChild(changeIdentityBtn);
+        let changeBtn = document.getElementById('changeIdentity');
+        if (!changeBtn) {
+            changeBtn = document.createElement('button');
+            changeBtn.id = 'changeIdentity';
+            changeBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block transition';
+            changeBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité';
+            changeBtn.onclick = () => {
+                currentEmail = '';
+                currentNom = '';
+                chatForm.style.display = 'block';
+                quickForm.style.display = 'none';
+                changeBtn.style.display = 'none';
+                messagesContainer.innerHTML = '';
+            };
+            chatBody.appendChild(changeBtn);
         }
         
         quickForm.style.display = 'block';
-        changeIdentityBtn.style.display = 'block';
+        changeBtn.style.display = 'block';
     }
-    
-    // Send quick message
-    async function sendQuickMessage() {
-        const messageInput = document.getElementById('quickMessage');
-        const message = messageInput.value.trim();
+
+    // ========== ÉVÉNEMENTS ==========
+    robotIcon.onclick = async () => {
+        chatModal.classList.toggle('active');
+        if (chatModal.classList.contains('active')) {
+            resetUnread();
+            if (currentEmail) {
+                await loadMessages(currentEmail);
+            }
+        }
+    };
+
+    window.onclick = (e) => {
+        if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
+            chatModal.classList.remove('active');
+        }
+    };
+
+    chatForm.onsubmit = async (e) => {
+        e.preventDefault();
         
-        if (!message || !currentEmail) {
-            showNotification('Veuillez écrire un message', 'error');
+        const nom = document.getElementById('nom').value;
+        const email = document.getElementById('email').value;
+        const telephone = document.getElementById('telephone').value;
+        const message = document.getElementById('message').value;
+        
+        if (!nom || !email || !message) {
+            showNotification('Tous les champs sont requis', 'error');
             return;
         }
         
-        const sendBtn = document.getElementById('quickSendBtn');
-        const originalHtml = sendBtn.innerHTML;
-        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        sendBtn.disabled = true;
+        const btn = document.getElementById('sendBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+        btn.disabled = true;
         
-        try {
-            const response = await fetch('/contact/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    nom: currentNom,
-                    email: currentEmail,
-                    telephone: document.getElementById('telephone')?.value || '',
-                    message: message
-                })
-            });
-            
-            const data = await response.json();
-            if (data.success) {
-                messageInput.value = '';
-                await loadMessages(currentEmail);
-                showNotification('Message envoyé !');
+        const result = await sendMessage(email, nom, telephone, message);
+        
+        if (result.success) {
+            document.getElementById('message').value = '';
+            const messages = await loadMessages(email);
+            if (messages.length > 0) {
+                switchToConversation(email, nom);
             }
-        } catch (error) {
-            showNotification('Erreur de connexion', 'error');
-        } finally {
-            sendBtn.innerHTML = originalHtml;
-            sendBtn.disabled = false;
+            showNotification('Message envoyé !');
+        } else {
+            showNotification('Erreur', 'error');
         }
-    }
-    
-    // Reset to full form
-    function resetToFullForm() {
-        currentEmail = '';
-        currentNom = '';
-        webSocketSetup = false;
-        if (chatForm) chatForm.style.display = 'block';
-        const quickForm = document.getElementById('quickForm');
-        const changeIdentity = document.getElementById('changeIdentity');
-        if (quickForm) quickForm.style.display = 'none';
-        if (changeIdentity) changeIdentity.style.display = 'none';
-        if (messagesContainer) {
-            messagesContainer.innerHTML = '';
-            messagesContainer.classList.add('hidden');
-        }
-        resetUnreadCount();
-    }
+        
+        btn.innerHTML = 'Envoyer';
+        btn.disabled = false;
+    };
 
-    // Full form submit
-    if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const nom = document.getElementById('nom').value;
-            const email = document.getElementById('email').value;
-            const telephone = document.getElementById('telephone').value;
-            const message = document.getElementById('message').value;
-            
-            if (!nom || !email || !message) {
-                showNotification('Veuillez remplir tous les champs', 'error');
-                return;
-            }
-            
-            const submitBtn = chatForm.querySelector('button');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
-            submitBtn.disabled = true;
-            
-            try {
-                const response = await fetch('/contact/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ nom, email, telephone, message })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    await loadMessages(email);
-                    setupWebSocket(email);
-                    showNotification('Message envoyé !');
-                }
-            } catch (error) {
-                showNotification('Erreur', 'error');
-            } finally {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-        });
-    }
-    
+    // ========== UTILITAIRES ==========
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -594,7 +495,7 @@
         if (!notif) {
             notif = document.createElement('div');
             notif.id = 'chatNotification';
-            notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px 15px;border-radius:8px;z-index:1002;font-size:13px;background:#333;color:white;animation:fadeInUp 0.3s ease';
+            notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px 15px;border-radius:8px;z-index:1002;font-size:13px;background:#333;color:white;z-index:10001';
             document.body.appendChild(notif);
         }
         notif.textContent = msg;
