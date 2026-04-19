@@ -66,6 +66,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('profile.destroy');
 });
 
+// ==================== API POUR LES CATALOGUES (MODALE) ====================
 Route::get('/api/catalogue/{id}', function ($id) {
     $catalogue = App\Models\Catalogue::findOrFail($id);
     return response()->json([
