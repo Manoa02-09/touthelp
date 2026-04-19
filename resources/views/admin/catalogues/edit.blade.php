@@ -8,55 +8,29 @@
         @csrf
         @method('PUT')
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Titre du catalogue</label>
-            <input type="text" name="titre" value="{{ old('titre', $catalogue->titre) }}" class="w-full border border-gray-300 rounded px-3 py-2" required>
-            @error('titre') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Description</label>
-            <textarea name="description" rows="4" class="w-full border border-gray-300 rounded px-3 py-2">{{ old('description', $catalogue->description) }}</textarea>
-            @error('description') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Expertises liées</label>
-            <div class="space-y-2">
-                @foreach($expertises as $expertise)
-                    <label class="inline-flex items-center mr-4">
-                        <input type="checkbox" name="expertises[]" value="{{ $expertise->id }}" 
-                            {{ $catalogue->expertises->contains($expertise->id) ? 'checked' : '' }} class="mr-2">
-                        {{ $expertise->nom }}
-                    </label>
-                @endforeach
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block font-bold mb-2">Titre</label><input type="text" name="titre" value="{{ old('titre', $catalogue->titre) }}" class="w-full border rounded px-3 py-2" required></div>
+            <div><label class="block font-bold mb-2">Ordre</label><input type="number" name="ordre" value="{{ old('ordre', $catalogue->ordre) }}" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block font-bold mb-2">Actif</label><input type="checkbox" name="actif" value="1" {{ $catalogue->actif ? 'checked' : '' }}> Oui</div>
+            <div>
+                <label class="block font-bold mb-2">Fichier actuel</label>
+                @if($catalogue->fichier_pdf)
+                    <p><a href="{{ asset('storage/'.$catalogue->fichier_pdf) }}" target="_blank" class="text-blue-600">Voir le fichier</a></p>
+                @else
+                    <p class="text-gray-500">Aucun fichier</p>
+                @endif
+                <input type="file" name="fichier_pdf" accept=".pdf,.doc,.docx" class="w-full border rounded px-3 py-2 mt-2">
+                <p class="text-sm text-gray-500">Laissez vide pour conserver le fichier actuel.</p>
             </div>
+            <div class="col-span-2"><label class="block font-bold mb-2">Description</label><textarea name="description" rows="3" class="w-full border rounded px-3 py-2">{{ old('description', $catalogue->description) }}</textarea></div>
+            <div class="col-span-2"><label class="block font-bold mb-2">Objectifs</label><textarea name="objectifs" rows="3" class="w-full border rounded px-3 py-2">{{ old('objectifs', $catalogue->objectifs) }}</textarea></div>
+            <div class="col-span-2"><label class="block font-bold mb-2">Public visé</label><textarea name="public_vise" rows="3" class="w-full border rounded px-3 py-2">{{ old('public_vise', $catalogue->public_vise) }}</textarea></div>
+            <div class="col-span-2"><label class="block font-bold mb-2">Programme (HTML)</label><textarea name="programme" rows="8" class="w-full border rounded px-3 py-2">{{ old('programme', $catalogue->programme) }}</textarea></div>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Fichier PDF actuel</label>
-            @if($catalogue->fichier_pdf)
-                <p class="text-sm text-gray-600 mb-2">
-                    Fichier : <a href="{{ asset('storage/' . $catalogue->fichier_pdf) }}" target="_blank" class="text-blue-600">Voir le PDF</a>
-                </p>
-            @else
-                <p class="text-sm text-gray-500 mb-2">Aucun fichier</p>
-            @endif
-            <input type="file" name="fichier_pdf" accept=".pdf" class="w-full">
-            <p class="text-sm text-gray-500 mt-1">Laissez vide pour conserver le fichier actuel.</p>
-            @error('fichier_pdf') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div class="mb-4">
-            <label class="inline-flex items-center">
-                <input type="checkbox" name="actif" value="1" {{ $catalogue->actif ? 'checked' : '' }} class="mr-2">
-                <span class="text-gray-700">Actif</span>
-            </label>
-        </div>
-
-        <div class="flex justify-end">
-            <a href="{{ route('admin.catalogues.index') }}" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 mr-2">Annuler</a>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Mettre à jour</button>
+        <div class="mt-6 flex justify-end">
+            <a href="{{ route('admin.catalogues.index') }}" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">Annuler</a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Mettre à jour</button>
         </div>
     </form>
 </div>

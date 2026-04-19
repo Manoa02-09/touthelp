@@ -1,66 +1,51 @@
 @extends('layouts.admin')
 
 @section('content')
-<div style="padding: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="font-size: 24px; font-weight: bold;">Gestion des catalogues</h2>
-        <a href="{{ url('/admin/catalogues/create') }}" style="background-color: blue; color: white; padding: 8px 16px; text-decoration: none; border-radius: 5px;">
-            + Nouveau catalogue
-        </a>
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Catalogues</h2>
+        <a href="{{ route('admin.catalogues.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded">+ Nouveau</a>
     </div>
 
     @if(session('success'))
-        <div style="background-color: lightgreen; padding: 10px; margin-bottom: 15px;">
-            {{ session('success') }}
-        </div>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
     @endif
 
-    <table style="width: 100%; background-color: white; border-collapse: collapse;">
-        <thead>
-            <tr style="background-color: #f3f4f6;">
-                <th style="padding: 12px; text-align: left;">Titre</th>
-                <th style="padding: 12px; text-align: left;">Expertises</th>
-                <th style="padding: 12px; text-align: left;">Fichier</th>
-                <th style="padding: 12px; text-align: left;">Actif</th>
-                <th style="padding: 12px; text-align: left;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($catalogues as $catalogue)
-            <tr style="border-bottom: 1px solid #e5e7eb;">
-                <td style="padding: 12px;">{{ $catalogue->titre }}</td>
-                <td style="padding: 12px;">
-                    @foreach($catalogue->expertises as $expertise)
-                        <span style="background-color: #e5e7eb; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">
-                            {{ $expertise->nom }}
-                        </span>
-                    @endforeach
-                </td>
-                <td style="padding: 12px;">
-                    @if($catalogue->fichier_pdf)
-                        <a href="{{ asset('storage/' . $catalogue->fichier_pdf) }}" target="_blank" style="color: blue;">Voir PDF</a>
-                    @else
-                        <span style="color: gray;">Aucun</span>
-                    @endif
-                </td>
-                <td style="padding: 12px;">
-                    @if($catalogue->actif)
-                        <span style="background-color: lightgreen; padding: 2px 8px; border-radius: 12px;">Actif</span>
-                    @else
-                        <span style="background-color: lightcoral; padding: 2px 8px; border-radius: 12px;">Inactif</span>
-                    @endif
-                </td>
-                <td style="padding: 12px;">
-                    <a href="{{ url('/admin/catalogues/' . $catalogue->id . '/edit') }}" style="color: blue; margin-right: 10px;">Modifier</a>
-                    <form action="{{ url('/admin/catalogues/' . $catalogue->id) }}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" style="color: red;" onclick="return confirm('Supprimer ?')">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="bg-white rounded shadow overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3">Titre</th>
+                    <th class="px-6 py-3">Fichier</th>
+                    <th class="px-6 py-3">Actif</th>
+                    <th class="px-6 py-3">Ordre</th>
+                    <th class="px-6 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($catalogues as $catalogue)
+                <tr class="border-t">
+                    <td class="px-6 py-4">{{ $catalogue->titre }}</td>
+                    <td class="px-6 py-4">
+                        @if($catalogue->fichier_pdf)
+                            <a href="{{ asset('storage/'.$catalogue->fichier_pdf) }}" target="_blank">Télécharger</a>
+                        @else
+                            <span class="text-gray-400">Aucun</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4">{{ $catalogue->actif ? 'Oui' : 'Non' }}</td>
+                    <td class="px-6 py-4">{{ $catalogue->ordre }}</td>
+                    <td class="px-6 py-4">
+                        <a href="{{ route('admin.catalogues.edit', $catalogue) }}" class="text-blue-600 mr-3">Modifier</a>
+                        <form action="{{ route('admin.catalogues.destroy', $catalogue) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-600">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

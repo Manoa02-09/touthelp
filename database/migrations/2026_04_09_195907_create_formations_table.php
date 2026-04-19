@@ -12,20 +12,21 @@ return new class extends Migration
 public function up(): void
 {
     Schema::create('formations', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('catalogue_id')->constrained()->onDelete('cascade');
-        $table->string('titre', 200);
-        $table->text('description')->nullable();
-        $table->date('date_debut');
-        $table->date('date_fin')->nullable();
-        $table->time('heure')->nullable();
-        $table->string('lieu', 255);
-        $table->decimal('prix', 10, 0)->nullable();
-        $table->integer('places_max')->nullable();
-        $table->enum('type', ['inter', 'intra'])->default('inter');
-        $table->boolean('actif')->default(true);
-        $table->timestamps();
-    });
+    $table->id();
+    $table->string('titre');
+    $table->string('image')->nullable();
+    $table->text('description')->nullable();
+    $table->text('description_courte')->nullable();
+    $table->date('date_debut');
+    $table->date('date_fin')->nullable();
+    $table->time('heure')->nullable();
+    $table->string('lieu');
+    $table->decimal('prix', 10, 0)->nullable();
+    $table->integer('places_max')->nullable();
+    $table->string('lien_inscription')->nullable();
+    $table->boolean('actif')->default(true);
+    $table->timestamps();
+});
 }
 
     /**

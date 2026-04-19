@@ -4,141 +4,96 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalogue;
-use App\Models\Expertise;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CatalogueController extends Controller
 {
-    /**
-     * Afficher la liste des catalogues.
-     */
     public function index()
     {
-        $catalogues = Catalogue::with('expertises')->get();
+        $catalogues = Catalogue::orderBy('ordre')->get();
         return view('admin.catalogues.index', compact('catalogues'));
     }
 
-    /**
-     * Afficher le formulaire de création.
-     */
     public function create()
     {
-        $expertises = Expertise::all();
-        return view('admin.catalogues.create', compact('expertises'));
+        return view('admin.catalogues.create');
     }
 
-    /**
-     * Enregistrer un nouveau catalogue.
-     */
     public function store(Request $request)
     {
-        // Validation des données
         $request->validate([
             'titre' => 'required|string|max:200',
             'description' => 'nullable|string',
-            'fichier_pdf' => 'nullable|file|mimes:pdf|max:5120',
-            'expertises' => 'nullable|array',
-            'expertises.*' => 'exists:expertises,id',
+            'objectifs' => 'nullable|string',
+            'public_vise' => 'nullable|string',
+            'programme' => 'nullable|string',
+            'fichier_pdf' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'actif' => 'nullable|boolean',
+            'ordre' => 'nullable|integer',
         ]);
 
-        // Création du catalogue
         $catalogue = Catalogue::create([
             'titre' => $request->titre,
             'description' => $request->description,
-            'actif' => $request->has('actif') ? true : false,
-            'ordre' => 0,
+            'objectifs' => $request->objectifs,
+            'public_vise' => $request->public_vise,
+            'programme' => $request->programme,
+            'actif' => $request->has('actif'),
+            'ordre' => $request->ordre ?? 0,
         ]);
 
-        // Gestion du fichier PDF
         if ($request->hasFile('fichier_pdf')) {
             $path = $request->file('fichier_pdf')->store('catalogues', 'public');
-            $catalogue->update(['fichier_pdf' => $path]);
+            $catalogue->fichier_pdf = $path;
+            $catalogue->save();
         }
 
-        // Attacher les expertises
-        if ($request->has('expertises')) {
-            $catalogue->expertises()->attach($request->expertises);
-        }
-
-        // Redirection avec message de succès
-        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue créé avec succès.');
+        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue ajouté.');
     }
 
-    /**
-     * Afficher un catalogue spécifique.
-     */
-    public function show(Catalogue $catalogue)
-    {
-        return view('admin.catalogues.show', compact('catalogue'));
-    }
-
-    /**
-     * Afficher le formulaire d'édition.
-     */
     public function edit(Catalogue $catalogue)
     {
-        $expertises = Expertise::all();
-        return view('admin.catalogues.edit', compact('catalogue', 'expertises'));
+        return view('admin.catalogues.edit', compact('catalogue'));
     }
 
-    /**
-     * Mettre à jour un catalogue.
-     */
     public function update(Request $request, Catalogue $catalogue)
     {
-        // Validation des données
         $request->validate([
             'titre' => 'required|string|max:200',
             'description' => 'nullable|string',
-            'fichier_pdf' => 'nullable|file|mimes:pdf|max:5120',
-            'expertises' => 'nullable|array',
-            'expertises.*' => 'exists:expertises,id',
+            'objectifs' => 'nullable|string',
+            'public_vise' => 'nullable|string',
+            'programme' => 'nullable|string',
+            'fichier_pdf' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'actif' => 'nullable|boolean',
+            'ordre' => 'nullable|integer',
         ]);
 
-        // Mise à jour du catalogue
         $catalogue->update([
             'titre' => $request->titre,
             'description' => $request->description,
-            'actif' => $request->has('actif') ? true : false,
+            'objectifs' => $request->objectifs,
+            'public_vise' => $request->public_vise,
+            'programme' => $request->programme,
+            'actif' => $request->has('actif'),
+            'ordre' => $request->ordre ?? 0,
         ]);
 
-        // Gestion du fichier PDF
         if ($request->hasFile('fichier_pdf')) {
-            // Supprimer l'ancien fichier
-            if ($catalogue->fichier_pdf && Storage::disk('public')->exists($catalogue->fichier_pdf)) {
-                Storage::disk('public')->delete($catalogue->fichier_pdf);
-            }
+            if ($catalogue->fichier_pdf) Storage::disk('public')->delete($catalogue->fichier_pdf);
             $path = $request->file('fichier_pdf')->store('catalogues', 'public');
-            $catalogue->update(['fichier_pdf' => $path]);
+            $catalogue->fichier_pdf = $path;
+            $catalogue->save();
         }
 
-        // Synchroniser les expertises
-        $catalogue->expertises()->sync($request->expertises ?? []);
-
-        // Redirection avec message de succès
-        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue mis à jour avec succès.');
+        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue mis à jour.');
     }
 
-    /**
-     * Supprimer un catalogue.
-     */
     public function destroy(Catalogue $catalogue)
     {
-        // Supprimer le fichier PDF associé
-        if ($catalogue->fichier_pdf && Storage::disk('public')->exists($catalogue->fichier_pdf)) {
-            Storage::disk('public')->delete($catalogue->fichier_pdf);
-        }
-
-        // Supprimer les relations avec les expertises
-        $catalogue->expertises()->detach();
-
-        // Supprimer le catalogue
+        if ($catalogue->fichier_pdf) Storage::disk('public')->delete($catalogue->fichier_pdf);
         $catalogue->delete();
-
-        // Redirection avec message de succès
-        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue supprimé avec succès.');
+        return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue supprimé.');
     }
 }

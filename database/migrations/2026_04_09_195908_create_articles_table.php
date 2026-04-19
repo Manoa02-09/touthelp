@@ -11,21 +11,19 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::create('articles', function (Blueprint $table) {
-        $table->id();
-        $table->string('titre', 200);
-        $table->string('slug', 200)->unique();
-        $table->enum('type', ['blog', 'reussite', 'partenariat']);
-        $table->longText('contenu');
-        $table->text('extrait')->nullable();
-        $table->string('image_une', 255)->nullable();
-        $table->string('auteur', 100)->nullable();
-        $table->date('date_publication');
-        $table->boolean('mis_en_avant')->default(false);
-        $table->integer('vu_compteur')->default(0);
-        $table->boolean('publie')->default(false);
-        $table->timestamps();
-    });
+   Schema::create('articles', function (Blueprint $table) {
+    $table->id();
+    $table->string('titre');
+    $table->string('slug')->unique();
+    $table->text('contenu');
+    $table->text('extrait')->nullable();
+    $table->string('image_une')->nullable();
+    $table->date('date_publication');
+    $table->enum('type', ['blog', 'reussite', 'partenariat'])->default('blog');
+    $table->boolean('publie')->default(false);
+    $table->integer('vu_compteur')->default(0);
+    $table->timestamps();
+});
 }
 
     /**
