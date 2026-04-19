@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        /* ========== STYLES EXISTANTS (CHAT - NE PAS MODIFIER) ========== */
+        /* ========== STYLES EXISTANTS (CHAT - CONSERVÉS) ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         .chat-modal { display: none; position: fixed; bottom: 100px; right: 20px; width: 380px; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
         .chat-modal.active { display: block; animation: fadeInUp 0.3s ease; }
@@ -34,6 +34,9 @@
         .modal-expertise { transition: opacity 0.3s ease; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Animation pour les messages */
+        .chat-message { animation: messageAppear 0.2s ease-out; }
+        @keyframes messageAppear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-white">
@@ -290,7 +293,7 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION PARTENAIRES (toujours affichée) ==================== -->
+    <!-- ==================== SECTION PARTENAIRES ==================== -->
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -325,7 +328,7 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION AVIS CLIENTS (toujours affichée) ==================== -->
+    <!-- ==================== SECTION AVIS CLIENTS ==================== -->
     <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -423,7 +426,7 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-header"><i class="fas fa-headset mr-2"></i> Support client</div>
         <div class="chat-body" id="chatBody">
-            <div id="chatMessages" class="mb-4 space-y-3 hidden"></div>
+            <div id="chatMessages" class="mb-4 space-y-3"></div>
             <form id="chatForm">
                 @csrf
                 <input type="text" name="nom" id="nom" placeholder="Votre nom" class="form-input" required>
@@ -450,9 +453,13 @@
     @vite(['resources/js/app.js'])
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script>
-        // ========== SCRIPT CHAT EXISTANT (NE PAS MODIFIER) ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Pusher !== 'undefined' && !window.Echo) {
+        // ========== SCRIPT CHAT (VERSION AMÉLIORÉE DE TON AMI) ==========
+        // Configuration Echo
+        let echoInitialized = false;
+        let echoReady = false;
+        
+        function initEcho() {
+            if (typeof Pusher !== 'undefined' && !window.Echo && !echoInitialized) {
                 window.Pusher = Pusher;
                 window.Echo = new Echo({
                     broadcaster: 'reverb',
@@ -462,63 +469,324 @@
                     forceTLS: false,
                     enabledTransports: ['ws', 'wss']
                 });
+                echoInitialized = true;
+                console.log('✅ Echo initialisé');
+                
+                setTimeout(() => {
+                    echoReady = true;
+                    setupGlobalListener();
+                }, 1000);
+            } else if (!window.Echo) {
+                setTimeout(initEcho, 500);
+            } else {
+                echoReady = true;
+                setupGlobalListener();
             }
-        });
-
+        }
+        
+        function setupGlobalListener() {
+            if (!echoReady || !window.Echo) return;
+            
+            window.Echo.channel('new-messages').listen('NewMessageReceived', (event) => {
+                console.log('📩 Message reçu en temps réel:', event);
+                if (currentEmail === event.email_client) {
+                    loadMessages(currentEmail);
+                    playNotificationSound();
+                    if (!chatModal.classList.contains('active')) {
+                        incrementUnread();
+                        showNotification('📩 Nouvelle réponse du support');
+                    }
+                }
+            });
+            console.log('✅ Écoute globale activée');
+        }
+        
+        document.addEventListener('DOMContentLoaded', initEcho);
+    
+        // ========== ÉLÉMENTS DOM ==========
         const robotIcon = document.getElementById('robotIcon');
         const chatModal = document.getElementById('chatModal');
         const chatForm = document.getElementById('chatForm');
         const chatBody = document.getElementById('chatBody');
         const messagesContainer = document.getElementById('chatMessages');
-        let currentEmail = '', currentNom = '', webSocketSetup = false;
-        let unreadMessages = new Set();
-        let audioUnlocked = false;
         
-        function unlockAudio() { if (audioUnlocked) return; try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); ctx.resume(); audioUnlocked = true; } catch(e) {} }
-        function playNotificationSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') { ctx.resume().then(() => { playBeep(ctx); }); } else { playBeep(ctx); } } catch(e) {} }
-        function playBeep(ctx) { try { const oscillator = ctx.createOscillator(); const gainNode = ctx.createGain(); oscillator.connect(gainNode); gainNode.connect(ctx.destination); oscillator.frequency.value = 880; gainNode.gain.value = 0.2; oscillator.start(); gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3); oscillator.stop(ctx.currentTime + 0.3); } catch(e) {} }
-        document.body.addEventListener('click', unlockAudio, { once: true });
-        robotIcon.addEventListener('click', unlockAudio);
-        function updateRobotBadge() { const badge = document.getElementById('robotBadge'); if (badge) { const count = unreadMessages.size; if (count > 0) { badge.textContent = count > 99 ? '99+' : count; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } } }
-        function incrementUnreadCount(messageId) { if (!unreadMessages.has(messageId)) { unreadMessages.add(messageId); updateRobotBadge(); } }
-        function resetUnreadCount() { unreadMessages.clear(); updateRobotBadge(); }
-        robotIcon.addEventListener('click', () => { chatModal.classList.toggle('active'); if (chatModal.classList.contains('active')){ resetUnreadCount(); if (currentEmail) loadMessages(currentEmail); } });
-        window.addEventListener('click', (e) => { if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) { chatModal.classList.remove('active'); } });
-        function setupWebSocket(email) { if (webSocketSetup || !email || !window.Echo) return; const channelHash = CryptoJS.MD5(email).toString(); window.Echo.private(`chat.${channelHash}`).listen('NewMessageReceived', (event) => { if (!chatModal.classList.contains('active') || currentEmail !== event.email_client) { incrementUnreadCount(event.id); playNotificationSound(); } if (currentEmail === event.email_client) { loadMessages(currentEmail, true); } }); webSocketSetup = true; }
-        async function loadMessages(email, silent = false) { if (!email) return; try { const response = await fetch(`/api/messages?email=${encodeURIComponent(email)}`); const messages = await response.json(); if (messages.length > 0 && messagesContainer) { messagesContainer.classList.remove('hidden'); let html = ''; messages.forEach((msg) => { html += `<div class="message-item bg-gray-100 p-3 rounded-lg"><div class="flex justify-between items-start mb-2"><strong class="text-sm">${escapeHtml(msg.nom_complet)}</strong><small class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleString()}</small></div><p class="text-sm text-gray-700">${escapeHtml(msg.message)}</p>${msg.reponse_admin ? `<div class="mt-2 p-2 bg-green-50 rounded text-sm text-green-800"><i class="fas fa-reply mr-1"></i> <strong>Support :</strong> ${escapeHtml(msg.reponse_admin)}</div>` : ''}</div>`; }); messagesContainer.innerHTML = html; messagesContainer.scrollTop = messagesContainer.scrollHeight; switchToConversationView(email, messages[0].nom_complet); setupWebSocket(email); } } catch (error) { console.error('Erreur:', error); } }
-        function switchToConversationView(email, nom) { currentEmail = email; currentNom = nom; if (chatForm) chatForm.style.display = 'none'; let quickForm = document.getElementById('quickForm'); if (!quickForm) { quickForm = document.createElement('div'); quickForm.id = 'quickForm'; quickForm.className = 'mt-3'; quickForm.innerHTML = `<div class="flex gap-2"><textarea id="quickMessage" rows="2" placeholder="Écrivez votre message..." class="flex-1 p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" style="resize: none;"></textarea><button id="quickSendBtn" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition"><i class="fas fa-paper-plane"></i></button></div>`; chatBody.appendChild(quickForm); document.getElementById('quickSendBtn').addEventListener('click', sendQuickMessage); document.getElementById('quickMessage').addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuickMessage(); } }); } let changeIdentityBtn = document.getElementById('changeIdentity'); if (!changeIdentityBtn) { changeIdentityBtn = document.createElement('button'); changeIdentityBtn.id = 'changeIdentity'; changeIdentityBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block transition'; changeIdentityBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité'; changeIdentityBtn.onclick = resetToFullForm; chatBody.appendChild(changeIdentityBtn); } quickForm.style.display = 'block'; changeIdentityBtn.style.display = 'block'; }
-        async function sendQuickMessage() { const messageInput = document.getElementById('quickMessage'); const message = messageInput.value.trim(); if (!message || !currentEmail) { showNotification('Veuillez écrire un message', 'error'); return; } const sendBtn = document.getElementById('quickSendBtn'); const originalHtml = sendBtn.innerHTML; sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; sendBtn.disabled = true; try { const response = await fetch('/contact/send', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'X-Requested-With': 'XMLHttpRequest' }, body: JSON.stringify({ nom: currentNom, email: currentEmail, telephone: document.getElementById('telephone')?.value || '', message: message }) }); const data = await response.json(); if (data.success) { messageInput.value = ''; await loadMessages(currentEmail); showNotification('Message envoyé !'); } } catch (error) { showNotification('Erreur de connexion', 'error'); } finally { sendBtn.innerHTML = originalHtml; sendBtn.disabled = false; } }
-        function resetToFullForm() { currentEmail = ''; currentNom = ''; webSocketSetup = false; if (chatForm) chatForm.style.display = 'block'; const quickForm = document.getElementById('quickForm'); const changeIdentity = document.getElementById('changeIdentity'); if (quickForm) quickForm.style.display = 'none'; if (changeIdentity) changeIdentity.style.display = 'none'; if (messagesContainer) { messagesContainer.innerHTML = ''; messagesContainer.classList.add('hidden'); } resetUnreadCount(); }
-        if (chatForm) { chatForm.addEventListener('submit', async (e) => { e.preventDefault(); const nom = document.getElementById('nom').value; const email = document.getElementById('email').value; const telephone = document.getElementById('telephone').value; const message = document.getElementById('message').value; if (!nom || !email || !message) { showNotification('Veuillez remplir tous les champs', 'error'); return; } const submitBtn = chatForm.querySelector('button'); const originalText = submitBtn.innerHTML; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...'; submitBtn.disabled = true; try { const response = await fetch('/contact/send', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'X-Requested-With': 'XMLHttpRequest' }, body: JSON.stringify({ nom, email, telephone, message }) }); const data = await response.json(); if (data.success) { await loadMessages(email); setupWebSocket(email); showNotification('Message envoyé !'); } } catch (error) { showNotification('Erreur', 'error'); } finally { submitBtn.innerHTML = originalText; submitBtn.disabled = false; } }); }
-        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-        function showNotification(msg, type = 'success') { let notif = document.getElementById('chatNotification'); if (!notif) { notif = document.createElement('div'); notif.id = 'chatNotification'; notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px 15px;border-radius:8px;z-index:1002;font-size:13px;background:#333;color:white;animation:fadeInUp 0.3s ease'; document.body.appendChild(notif); } notif.textContent = msg; notif.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336'; notif.style.display = 'block'; setTimeout(() => notif.style.display = 'none', 3000); }
-
-        // Formulaire de contact
-        document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nom = document.getElementById('contact_nom').value;
-            const email = document.getElementById('contact_email').value;
-            const telephone = document.getElementById('contact_telephone').value;
-            const message = document.getElementById('contact_message').value;
-            const submitBtn = e.target.querySelector('button');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
-            submitBtn.disabled = true;
+        let currentEmail = '';
+        let currentNom = '';
+        let unreadCount = 0;
+    
+        // ========== NOTIFICATION SONORE ==========
+        let audioContext = null;
+        
+        function initAudio() {
+            if (audioContext) return;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContext.resume();
+            } catch(e) {}
+        }
+        
+        function playNotificationSound() {
+            initAudio();
+            try {
+                if (audioContext && audioContext.state === 'running') {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.value = 880;
+                    gainNode.gain.value = 0.2;
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                }
+            } catch(e) {}
+        }
+        
+        document.body.addEventListener('click', initAudio);
+        robotIcon.addEventListener('click', initAudio);
+    
+        // ========== BADGE ==========
+        function updateRobotBadge() {
+            const badge = document.getElementById('robotBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+    
+        function incrementUnread() {
+            unreadCount++;
+            updateRobotBadge();
+        }
+    
+        function resetUnread() {
+            unreadCount = 0;
+            updateRobotBadge();
+        }
+    
+        // ========== AFFICHAGE DES MESSAGES (bulles gauche/droite) ==========
+        function displayMessages(messages) {
+            if (!messagesContainer) return;
+            
+            if (!messages || messages.length === 0) {
+                messagesContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Aucun message</div>';
+                return;
+            }
+            
+            let html = '';
+            for (let msg of messages) {
+                // Message du client (ENVOYÉ) - à droite en vert
+                html += `
+                    <div class="chat-message flex justify-end mb-3">
+                        <div class="max-w-[75%] bg-[#1a3c34] text-white rounded-2xl px-4 py-2 shadow-sm">
+                            <div class="flex items-center justify-end gap-2 mb-1">
+                                <small class="text-xs text-green-200">${new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+                                <strong class="text-xs text-green-200">Moi</strong>
+                            </div>
+                            <p class="text-sm break-words text-right">${escapeHtml(msg.message)}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Réponse du support (REÇU) - à gauche en gris
+                if (msg.reponse_admin && msg.reponse_admin.trim() !== '') {
+                    html += `
+                        <div class="chat-message flex justify-start mb-3">
+                            <div class="max-w-[75%] bg-gray-200 text-gray-800 rounded-2xl px-4 py-2 shadow-sm">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <strong class="text-xs text-gray-600">Support</strong>
+                                    <small class="text-xs text-gray-500">${new Date(msg.updated_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
+                                </div>
+                                <p class="text-sm break-words">${escapeHtml(msg.reponse_admin)}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            messagesContainer.innerHTML = html;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    
+        // ========== CHARGER LES MESSAGES ==========
+        async function loadMessages(email) {
+            if (!email) return [];
+            
+            try {
+                const response = await fetch(`/api/messages?email=${encodeURIComponent(email)}`);
+                const messages = await response.json();
+                displayMessages(messages);
+                return messages;
+            } catch (error) {
+                console.error('Erreur:', error);
+                return [];
+            }
+        }
+    
+        // ========== ENVOYER UN MESSAGE ==========
+        async function sendMessage(email, nom, telephone, message) {
             try {
                 const response = await fetch('/contact/send', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify({ nom, email, telephone, message })
                 });
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('contactSuccess').classList.remove('hidden');
-                    document.getElementById('contactForm').reset();
-                    setTimeout(() => document.getElementById('contactSuccess').classList.add('hidden'), 5000);
-                } else { document.getElementById('contactError').classList.remove('hidden'); setTimeout(() => document.getElementById('contactError').classList.add('hidden'), 5000); }
-            } catch (error) { document.getElementById('contactError').classList.remove('hidden'); setTimeout(() => document.getElementById('contactError').classList.add('hidden'), 5000); }
-            finally { submitBtn.innerHTML = originalText; submitBtn.disabled = false; }
-        });
+                return await response.json();
+            } catch (error) {
+                return { success: false };
+            }
+        }
+    
+        // ========== SWITCH VUE CONVERSATION ==========
+        function switchToConversation(email, nom) {
+            currentEmail = email;
+            currentNom = nom;
+            
+            chatForm.style.display = 'none';
+            
+            let quickForm = document.getElementById('quickForm');
+            if (!quickForm) {
+                quickForm = document.createElement('div');
+                quickForm.id = 'quickForm';
+                quickForm.className = 'mt-3';
+                quickForm.innerHTML = `
+                    <div class="flex gap-2">
+                        <textarea id="quickMessage" rows="2" placeholder="Écrivez votre message..." class="flex-1 p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" style="resize: none;"></textarea>
+                        <button id="quickSendBtn" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                `;
+                chatBody.appendChild(quickForm);
+                
+                document.getElementById('quickSendBtn').onclick = async () => {
+                    const msg = document.getElementById('quickMessage').value.trim();
+                    if (!msg) return;
+                    
+                    const btn = document.getElementById('quickSendBtn');
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
+                    
+                    const result = await sendMessage(currentEmail, currentNom, '', msg);
+                    if (result.success) {
+                        document.getElementById('quickMessage').value = '';
+                        await loadMessages(currentEmail);
+                        showNotification('Message envoyé');
+                    }
+                    
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    btn.disabled = false;
+                };
+                
+                document.getElementById('quickMessage').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        document.getElementById('quickSendBtn').click();
+                    }
+                });
+            }
+            
+            let changeBtn = document.getElementById('changeIdentity');
+            if (!changeBtn) {
+                changeBtn = document.createElement('button');
+                changeBtn.id = 'changeIdentity';
+                changeBtn.className = 'text-xs text-gray-500 mt-2 hover:text-gray-700 block transition';
+                changeBtn.innerHTML = '<i class="fas fa-user-edit"></i> Changer d\'identité';
+                changeBtn.onclick = () => {
+                    currentEmail = '';
+                    currentNom = '';
+                    chatForm.style.display = 'block';
+                    quickForm.style.display = 'none';
+                    changeBtn.style.display = 'none';
+                    messagesContainer.innerHTML = '';
+                };
+                chatBody.appendChild(changeBtn);
+            }
+            
+            quickForm.style.display = 'block';
+            changeBtn.style.display = 'block';
+        }
+    
+        // ========== ÉVÉNEMENTS ==========
+        robotIcon.onclick = async () => {
+            chatModal.classList.toggle('active');
+            if (chatModal.classList.contains('active')) {
+                resetUnread();
+                if (currentEmail) {
+                    await loadMessages(currentEmail);
+                }
+            }
+        };
+    
+        window.onclick = (e) => {
+            if (!chatModal.contains(e.target) && !robotIcon.contains(e.target)) {
+                chatModal.classList.remove('active');
+            }
+        };
+    
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const nom = document.getElementById('nom').value;
+            const email = document.getElementById('email').value;
+            const telephone = document.getElementById('telephone').value;
+            const message = document.getElementById('message').value;
+            
+            if (!nom || !email || !message) {
+                showNotification('Tous les champs sont requis', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('sendBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            btn.disabled = true;
+            
+            const result = await sendMessage(email, nom, telephone, message);
+            
+            if (result.success) {
+                document.getElementById('message').value = '';
+                const messages = await loadMessages(email);
+                if (messages.length > 0) {
+                    switchToConversation(email, nom);
+                }
+                showNotification('Message envoyé !');
+            } else {
+                showNotification('Erreur', 'error');
+            }
+            
+            btn.innerHTML = 'Envoyer';
+            btn.disabled = false;
+        };
+    
+        // ========== UTILITAIRES ==========
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showNotification(msg, type = 'success') {
+            let notif = document.getElementById('chatNotification');
+            if (!notif) {
+                notif = document.createElement('div');
+                notif.id = 'chatNotification';
+                notif.style.cssText = 'position:fixed;bottom:100px;right:20px;padding:10px 15px;border-radius:8px;z-index:1002;font-size:13px;background:#333;color:white;z-index:10001';
+                document.body.appendChild(notif);
+            }
+            notif.textContent = msg;
+            notif.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            notif.style.display = 'block';
+            setTimeout(() => notif.style.display = 'none', 3000);
+        }
 
         // ========== FONCTIONS POUR LES MODALES D'EXPERTISE ==========
         function openExpertiseModal(type) {
@@ -538,29 +806,19 @@
             if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
         }
 
-        // ========== NOUVELLE FONCTION POUR LE BOUTON "DISCUTER DE VOTRE BESOIN" ==========
+        // ========== FONCTION POUR LE BOUTON "DISCUTER DE VOTRE BESOIN" ==========
         function openChatForIntra() {
-            // 1. Fermer la modale d'expertise intra
             closeExpertiseModal('intra');
-            
-            // 2. Ouvrir le chat (robot)
             const robotIconElem = document.getElementById('robotIcon');
             if (robotIconElem) robotIconElem.click();
-            
-            // 3. Pré‑remplir le message (délai pour laisser le chat s'ouvrir)
             setTimeout(() => {
-                // Essayer d'abord le champ de message rapide (quickMessage)
                 let messageField = document.getElementById('quickMessage');
+                if (!messageField) {
+                    messageField = document.getElementById('message');
+                }
                 if (messageField) {
                     messageField.value = "Bonjour, je souhaite discuter d'une formation intra-entreprise personnalisée. Pouvez-vous me contacter ?";
                     messageField.focus();
-                } else {
-                    // Sinon, utiliser le champ du formulaire initial
-                    messageField = document.getElementById('message');
-                    if (messageField) {
-                        messageField.value = "Bonjour, je souhaite discuter d'une formation intra-entreprise personnalisée. Pouvez-vous me contacter ?";
-                        messageField.focus();
-                    }
                 }
             }, 300);
         }
