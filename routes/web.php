@@ -3,7 +3,12 @@
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Admin\FormationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AvisController;
+use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\PartenaireController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AvisClientController;
 use App\Models\Catalogue;
 use App\Models\Formation;
 use App\Models\Article;
@@ -20,6 +25,16 @@ Route::get('/', function () {
 
     return view('welcome', compact('catalogues', 'articles', 'partenaires', 'avis'));
 })->name('accueil');
+
+// ==================== FORMULAIRE PUBLIC D'AVIS ====================
+Route::get('/avis', [AvisClientController::class, 'create'])->name('avis.create');
+Route::post('/avis', [AvisClientController::class, 'store'])->name('avis.store');
+
+// ==================== DÉTAIL D'UN ARTICLE (BLOG) ====================
+Route::get('/article/{slug}', function ($slug) {
+    $article = Article::where('slug', $slug)->where('publie', true)->firstOrFail();
+    return view('site.article.show', compact('article'));
+})->name('blog.show');
 
 // ==================== CALENDRIER ====================
 Route::get('/calendrier', function () {
@@ -46,6 +61,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/messages/{id}/repondre', [ContactController::class, 'repondre'])->name('messages.repondre');
     Route::resource('catalogues', CatalogueController::class);
     Route::resource('formations', FormationController::class);
+    Route::resource('avis', AvisController::class);
+    // Route pour accepter un avis (publication rapide)
+    Route::patch('/avis/{avi}/accept', [AvisController::class, 'accept'])->name('avis.accept');
+    Route::resource('articles', ArticleController::class);
+    Route::resource('partenaires', PartenaireController::class);
+
+    // Paramètres (email de contact)
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 // ==================== API ADMIN (MESSAGERIE) ====================

@@ -39,24 +39,32 @@ class AvisController extends Controller
         ]);
         $data['mis_en_avant'] = $request->has('mis_en_avant');
         $data['date_soumission'] = now();
-
         if ($request->statut == 'publie') {
             $data['date_publication'] = now();
         }
-
         if ($request->hasFile('logo_entreprise')) {
             $path = $request->file('logo_entreprise')->store('avis', 'public');
             $data['logo_entreprise'] = $path;
         }
 
         Avis::create($data);
-
         return redirect()->route('admin.avis.index')->with('success', 'Avis ajouté.');
     }
 
     public function edit(Avis $avi)
     {
         return view('admin.avis.edit', compact('avi'));
+    }
+
+    public function accept(Avis $avi)
+    {
+        $avi->update([
+            'statut' => 'publie',
+            'date_publication' => now(),
+        ]);
+
+        return redirect()->route('admin.avis.index')
+            ->with('success', 'Avis publié avec succès.');
     }
 
     public function update(Request $request, Avis $avi)
@@ -77,11 +85,9 @@ class AvisController extends Controller
             'note', 'contenu', 'statut'
         ]);
         $data['mis_en_avant'] = $request->has('mis_en_avant');
-
         if ($request->statut == 'publie' && !$avi->date_publication) {
             $data['date_publication'] = now();
         }
-
         if ($request->hasFile('logo_entreprise')) {
             if ($avi->logo_entreprise) Storage::disk('public')->delete($avi->logo_entreprise);
             $path = $request->file('logo_entreprise')->store('avis', 'public');
@@ -89,7 +95,6 @@ class AvisController extends Controller
         }
 
         $avi->update($data);
-
         return redirect()->route('admin.avis.index')->with('success', 'Avis modifié.');
     }
 

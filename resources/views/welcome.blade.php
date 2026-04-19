@@ -58,24 +58,37 @@
         </div>
     </header>
 
-    <!-- SECTION ACCUEIL -->
-    <section id="accueil" class="hero-gradient text-white py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 text-sm mb-6">🔥 Formation - Accompagnement - Audit</div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">ENSEMBLE FAISONS DE LA<br>PERFORMANCE UNE CULTURE</h1>
-                <p class="text-xl md:text-2xl mb-8 text-green-100">Expert en <span class="font-semibold">Solutions RH</span> et <span class="font-semibold">Accompagnement sur-mesure</span> à Madagascar.</p>
-                <div class="flex flex-wrap gap-4 justify-center">
-                    <div class="relative">
-                        <input type="text" placeholder="Trouver une formation..." class="px-6 py-3 rounded-full w-80 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                    <button class="bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full transition font-semibold">Rechercher</button>
-                </div>
+   <section id="accueil" class="relative bg-white pt-16 pb-20 overflow-hidden">
+    <div class="container mx-auto px-4 flex flex-col lg:flex-row items-center">
+        
+        <div class="lg:w-1/2 z-10">
+            <div class="inline-flex items-center space-x-2 bg-gray-100 px-4 py-1 rounded-full text-[10px] font-bold text-gray-500 mb-8 tracking-widest uppercase">
+                <i class="fas fa-shield-alt text-blue-500"></i>
+                <span>Formation • Accompagnement • Audit</span>
             </div>
-        </div>
-    </section>
 
+            <h1 class="text-5xl md:text-7xl font-black text-[#0f2439] leading-[0.9] mb-4">
+                ENSEMBLE<br>
+                FAISONS DE LA<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">PERFORMANCE</span><br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-500 to-orange-400">UNE CULTURE</span>
+            </h1>
+
+            <p class="text-lg text-gray-600 max-w-lg mb-10 border-l-4 border-orange-500 pl-4">
+                Expert en <span class="text-blue-600 font-bold">Solutions RH</span> et <span class="text-blue-600 font-bold">Accompagnement sur-mesure</span> à Madagascar.
+            </p>
+
+            <!-- Suppression du champ de recherche et des boutons -->
+        </div>
+
+        <div class="lg:w-1/2 relative mt-12 lg:mt-0">
+            <div class="relative z-10">
+                <img src="{{ asset('images/accueil.png') }}" alt="Expertise Tout Help" class="w-full h-auto">
+            </div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-50 rounded-full filter blur-3xl opacity-50 -z-10"></div>
+        </div>
+    </div>
+</section>
     <!-- ==================== SECTION EXPERTISE (3 cartes) ==================== -->
     <section id="expertise" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -328,127 +341,157 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION AVIS CLIENTS ==================== -->
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Ce qu'ils disent de nous</h2>
-                <p class="text-gray-500 text-sm uppercase tracking-wide">Témoignages de nos clients</p>
-            </div>
-            @if(isset($avis) && $avis->count())
-            <div class="relative overflow-hidden group">
-                <div class="flex overflow-x-auto scrollbar-hide gap-6 py-4 px-2 scroll-smooth" id="avisScroll">
-                    @foreach($avis as $a)
-                    <div class="flex-shrink-0 w-80 bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
-                        <div class="flex text-yellow-500 mb-3">
-                            @for($i=1;$i<=5;$i++)
-                                @if($i<=$a->note)★@else☆@endif
-                            @endfor
-                        </div>
-                        <p class="text-gray-600 italic mb-4">"{{ Str::limit($a->contenu, 150) }}"</p>
-                        <div class="flex items-center gap-3">
-                            @if($a->logo_entreprise)
-                                <img src="{{ asset('storage/' . $a->logo_entreprise) }}" class="w-10 h-10 rounded-full object-cover">
+   <!-- ==================== SECTION AVIS CLIENTS (améliorée) ==================== -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Ce qu'ils disent de nous</h2>
+            <p class="text-gray-500 text-sm uppercase tracking-wide">Témoignages de nos clients</p>
+        </div>
+
+        @if(isset($avis) && $avis->count())
+        <div class="relative overflow-hidden group">
+            <div class="flex overflow-x-auto scrollbar-hide gap-6 py-4 px-2 scroll-smooth" id="avisScroll">
+                @foreach($avis as $a)
+                <div class="flex-shrink-0 w-80 bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition flex flex-col justify-between">
+                    <!-- Étoiles -->
+                    <div class="flex text-yellow-500 mb-3">
+                        @for($i=1; $i<=5; $i++)
+                            @if($i <= $a->note)
+                                <i class="fas fa-star"></i>
+                            @else
+                                <i class="far fa-star"></i>
                             @endif
-                            <div>
-                                <p class="font-bold text-gray-800">{{ $a->entreprise_nom }}</p>
-                                <p class="text-sm text-gray-500">{{ $a->contact_fonction ?? 'Client' }}</p>
+                        @endfor
+                    </div>
+
+                    <!-- Texte de l'avis (limité) -->
+                    <p class="text-gray-600 italic mb-4 line-clamp-4">
+                        "{{ Str::limit($a->contenu, 120) }}"
+                    </p>
+
+                    <!-- Info client -->
+                    <div class="flex items-center gap-3 mt-2">
+                        @if($a->logo_entreprise)
+                            <img src="{{ asset('storage/'.$a->logo_entreprise) }}" class="w-10 h-10 rounded-full object-cover">
+                        @else
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                                {{ substr($a->entreprise_nom, 0, 1) }}
                             </div>
+                        @endif
+                        <div>
+                            <p class="font-bold text-gray-800">{{ Str::limit($a->entreprise_nom, 25) }}</p>
+                            <p class="text-sm text-gray-500">{{ $a->contact_fonction ?? 'Client' }}</p>
                         </div>
                     </div>
-                    @endforeach
                 </div>
-                <button onclick="scrollAvis('left')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <button onclick="scrollAvis('right')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
+                @endforeach
             </div>
-            @else
-            <div class="text-center py-12 bg-white rounded-lg">
-                <p class="text-gray-500">Aucun avis pour le moment.</p>
-            </div>
-            @endif
-        </div>
-    </section>
 
-    <!-- SECTION BLOG -->
-    <section id="blog" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Blog & Actualités</h2>
-            <p class="text-center text-gray-600 mb-12">Retrouvez nos conseils, actualités et études de cas</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @forelse($articles as $article)
-                <div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
-                    <div class="p-6">
-                        <div class="mb-3">@if($article->type=='blog')<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">📝 Blog</span>@elseif($article->type=='reussite')<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">🏆 Réussite</span>@else<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">🤝 Partenariat</span>@endif</div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{{ $article->titre }}</h3>
-                        <p class="text-gray-500 text-sm mb-3"><i class="far fa-calendar-alt mr-1"></i> {{ $article->date_publication->format('d/m/Y') }}</p>
-                        <p class="text-gray-600 mb-4 line-clamp-3">{{ Str::limit($article->extrait ?? $article->contenu, 100) }}</p>
-                        <a href="#" class="inline-flex items-center gap-2 text-green-700 font-semibold hover:text-green-800">Lire la suite <i class="fas fa-arrow-right text-sm"></i></a>
+            <!-- Boutons de défilement -->
+            <button onclick="scrollAvis('left')" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <button onclick="scrollAvis('right')" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Bouton "Donnez votre avis" -->
+        <div class="text-center mt-10">
+            <a href="{{ route('avis.create') }}" class="inline-block bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-lg transition shadow-md">
+                ✍️ Donnez votre avis
+            </a>
+        </div>
+
+        @else
+        <div class="text-center py-12 bg-white rounded-lg">
+            <p class="text-gray-500">Aucun avis pour le moment.</p>
+        </div>
+        @endif
+    </div>
+</section>
+
+   <!-- SECTION BLOG -->
+<section id="blog" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Blog & Actualités</h2>
+        <p class="text-center text-gray-600 mb-12">Retrouvez nos conseils, actualités et études de cas</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @forelse($articles as $article)
+            <div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                @if($article->image_une)
+                    <img src="{{ asset('storage/'.$article->image_une) }}" alt="{{ $article->titre }}" class="w-full h-48 object-cover">
+                @endif
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{{ $article->titre }}</h3>
+                    <p class="text-gray-500 text-sm mb-3"><i class="far fa-calendar-alt mr-1"></i> {{ $article->date_publication->format('d/m/Y') }}</p>
+                    <p class="text-gray-600 mb-4 line-clamp-3">{{ Str::limit($article->extrait ?? $article->contenu, 100) }}</p>
+                    <a href="{{ route('blog.show', $article->slug) }}" class="inline-flex items-center gap-2 text-green-700 font-semibold hover:text-green-800">
+                        Lire la suite <i class="fas fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-12">
+                <p class="text-gray-500">Aucun article publié pour le moment.</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<!-- Footer arrondi, couleur plus claire, formulaire avec message -->
+<footer id="contact" class="bg-rose-500 text-white w-full rounded-2xl overflow-hidden shadow-xl">
+    <div class="container-fluid px-8 py-20 md:px-16 lg:px-24">
+        <div class="flex flex-col lg:flex-row items-center gap-12">
+            <!-- Colonne gauche : Grande image -->
+            <div class="lg:w-1/2 flex justify-center">
+                <img src="{{ asset('images/dame.png') }}" alt="Silhouette" class="w-full max-w-2xl h-auto object-contain">
+            </div>
+
+            <!-- Colonne droite : Formulaire complet + réseaux -->
+            <div class="lg:w-1/2 w-full">
+                <h3 class="text-4xl font-bold mb-8 text-center lg:text-left">Nous contacter</h3>
+                <form id="footerContactForm">
+                    @csrf
+                    <div class="mb-6">
+                        <input type="text" name="nom" placeholder="Nom complet" class="w-full px-6 py-4 text-lg rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-4 focus:ring-yellow-400" required>
+                    </div>
+                    <div class="mb-6">
+                        <input type="email" name="email" placeholder="Email" class="w-full px-6 py-4 text-lg rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-4 focus:ring-yellow-400" required>
+                    </div>
+                    <div class="mb-6">
+                        <input type="text" name="telephone" placeholder="Téléphone" class="w-full px-6 py-4 text-lg rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-4 focus:ring-yellow-400">
+                    </div>
+                    <div class="mb-8">
+                        <textarea name="message" rows="4" placeholder="Votre message..." class="w-full px-6 py-4 text-lg rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-4 focus:ring-yellow-400" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-rose-800 font-bold py-4 rounded-xl transition text-xl">
+                        Envoyer le message
+                    </button>
+                </form>
+                <div id="footerContactSuccess" class="hidden mt-4 text-green-300 text-base text-center"></div>
+                <div id="footerContactError" class="hidden mt-4 text-red-300 text-base text-center"></div>
+
+                <!-- Liens Facebook et Email -->
+                <div class="mt-10 flex flex-col sm:flex-row justify-center lg:justify-start gap-6">
+                    <a href="https://www.facebook.com/ToutHelp" target="_blank" class="flex items-center gap-3 bg-[#1877F2] hover:bg-[#0e63cf] px-5 py-3 rounded-full transition">
+                        <i class="fab fa-facebook-f text-2xl"></i>
+                        <span class="text-lg font-semibold">Tout help</span>
+                    </a>
+                    @php
+                        $contactEmail = \App\Models\Setting::get('contact_email', 'contact@touthelp.com');
+                    @endphp
+                    <div class="flex items-center gap-3 bg-white/10 px-5 py-3 rounded-full">
+                        <i class="fas fa-envelope text-2xl text-red-400"></i>
+                        <span class="text-lg">{{ $contactEmail }}</span>
                     </div>
                 </div>
-                @empty
-                <div class="col-span-full text-center py-12"><p class="text-gray-500">Aucun article publié pour le moment.</p></div>
-                @endforelse
             </div>
-        </div>
-    </section>
-
-    <!-- SECTION CONTACT -->
-    <section id="contact" class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Nous contacter</h2>
-            <p class="text-center text-gray-600 mb-12">Une question ? Un projet ? Écrivez-nous !</p>
-            <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                <form id="contactForm">
-                    @csrf
-                    <div class="mb-4"><label class="block text-gray-700 font-bold mb-2">Nom complet</label><input type="text" name="nom" id="contact_nom" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required></div>
-                    <div class="mb-4"><label class="block text-gray-700 font-bold mb-2">Email</label><input type="email" name="email" id="contact_email" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required></div>
-                    <div class="mb-4"><label class="block text-gray-700 font-bold mb-2">Téléphone</label><input type="text" name="telephone" id="contact_telephone" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"></div>
-                    <div class="mb-4"><label class="block text-gray-700 font-bold mb-2">Message</label><textarea name="message" id="contact_message" rows="5" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea></div>
-                    <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-lg transition">Envoyer le message</button>
-                </form>
-                <div id="contactSuccess" class="hidden mt-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">Message envoyé avec succès !</div>
-                <div id="contactError" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">Erreur lors de l'envoi.</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8"><div class="container mx-auto px-4 text-center"><p>&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p></div></footer>
-
-    <!-- Robot chat (NE PAS MODIFIER) -->
-    <div class="robot-icon" id="robotIcon"><i class="fas fa-robot"></i><span id="robotBadge" class="robot-badge hidden">0</span></div>
-
-    <!-- Modal de chat (NE PAS MODIFIER) -->
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header"><i class="fas fa-headset mr-2"></i> Support client</div>
-        <div class="chat-body" id="chatBody">
-            <div id="chatMessages" class="mb-4 space-y-3"></div>
-            <form id="chatForm">
-                @csrf
-                <input type="text" name="nom" id="nom" placeholder="Votre nom" class="form-input" required>
-                <input type="email" name="email" id="email" placeholder="Votre email" class="form-input" required>
-                <input type="text" name="telephone" id="telephone" placeholder="Votre téléphone" class="form-input">
-                <textarea name="message" id="message" rows="3" placeholder="Votre message..." class="form-textarea" required></textarea>
-                <button type="submit" id="sendBtn" class="btn-send">Envoyer</button>
-            </form>
-        </div>
-        <div class="chat-footer">Nous vous répondrons dans les plus brefs délais.</div>
-    </div>
-
-    <!-- Modale de détail du syllabus (catalogue) -->
-    <div id="syllabusModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
-                <h3 id="modalTitle" class="text-2xl font-bold text-gray-800">Détail du syllabus</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="modalContent" class="p-6"></div>
         </div>
     </div>
+</footer>
 
     @vite(['resources/js/app.js'])
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>

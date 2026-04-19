@@ -16,16 +16,6 @@
             </div>
 
             <div>
-                <label class="block font-bold mb-2">Type</label>
-                <select name="type" class="w-full border rounded px-3 py-2" required>
-                    <option value="blog" {{ old('type', $article->type) == 'blog' ? 'selected' : '' }}>Blog</option>
-                    <option value="reussite" {{ old('type', $article->type) == 'reussite' ? 'selected' : '' }}>Réussite</option>
-                    <option value="partenariat" {{ old('type', $article->type) == 'partenariat' ? 'selected' : '' }}>Partenariat</option>
-                </select>
-                @error('type') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
                 <label class="block font-bold mb-2">Date de publication</label>
                 <input type="date" name="date_publication" value="{{ old('date_publication', $article->date_publication ? $article->date_publication->format('Y-m-d') : '') }}" class="w-full border rounded px-3 py-2" required>
                 @error('date_publication') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror

@@ -15,6 +15,7 @@ class Avis extends Model
     ];
 
     protected $casts = [
+        'note' => 'integer',
         'mis_en_avant' => 'boolean',
         'date_soumission' => 'datetime',
         'date_publication' => 'date',

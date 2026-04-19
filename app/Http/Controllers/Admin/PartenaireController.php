@@ -33,14 +33,11 @@ class PartenaireController extends Controller
 
         $data = $request->only(['nom_entreprise', 'site_web', 'description', 'ordre_affichage']);
         $data['actif'] = $request->has('actif');
-
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('partenaires', 'public');
             $data['logo'] = $path;
         }
-
         Partenaire::create($data);
-
         return redirect()->route('admin.partenaires.index')->with('success', 'Partenaire ajouté.');
     }
 
@@ -62,15 +59,12 @@ class PartenaireController extends Controller
 
         $data = $request->only(['nom_entreprise', 'site_web', 'description', 'ordre_affichage']);
         $data['actif'] = $request->has('actif');
-
         if ($request->hasFile('logo')) {
             if ($partenaire->logo) Storage::disk('public')->delete($partenaire->logo);
             $path = $request->file('logo')->store('partenaires', 'public');
             $data['logo'] = $path;
         }
-
         $partenaire->update($data);
-
         return redirect()->route('admin.partenaires.index')->with('success', 'Partenaire modifié.');
     }
 

@@ -9,7 +9,7 @@
             <div><label class="block font-bold">Entreprise</label><input type="text" name="entreprise_nom" class="w-full border rounded p-2" required></div>
             <div><label class="block font-bold">Contact (optionnel)</label><input type="text" name="contact_nom" class="w-full border rounded p-2"></div>
             <div><label class="block font-bold">Fonction</label><input type="text" name="contact_fonction" class="w-full border rounded p-2"></div>
-            <div><label class="block font-bold">Logo (image)</label><input type="file" name="logo_entreprise" accept="image/*" class="w-full border rounded p-2"></div>
+            <div><label class="block font-bold">Logo</label><input type="file" name="logo_entreprise" accept="image/*" class="w-full border rounded p-2"></div>
             <div><label class="block font-bold">Note /5</label><input type="number" name="note" min="1" max="5" class="w-full border rounded p-2" required></div>
             <div><label class="block font-bold">Statut</label>
                 <select name="statut" class="w-full border rounded p-2">

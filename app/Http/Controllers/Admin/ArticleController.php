@@ -29,11 +29,11 @@ class ArticleController extends Controller
             'extrait' => 'nullable|string',
             'image_une' => 'nullable|image|max:2048',
             'date_publication' => 'required|date',
-            'type' => 'required|in:blog,reussite,partenariat',
             'publie' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication', 'type']);
+        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication']);
+        $data['type'] = 'blog'; // forcé
         $data['slug'] = Str::slug($request->titre) . '-' . uniqid();
         $data['publie'] = $request->has('publie');
 
@@ -43,7 +43,6 @@ class ArticleController extends Controller
         }
 
         Article::create($data);
-
         return redirect()->route('admin.articles.index')->with('success', 'Article créé.');
     }
 
@@ -60,12 +59,12 @@ class ArticleController extends Controller
             'extrait' => 'nullable|string',
             'image_une' => 'nullable|image|max:2048',
             'date_publication' => 'required|date',
-            'type' => 'required|in:blog,reussite,partenariat',
             'publie' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication', 'type']);
+        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication']);
         $data['publie'] = $request->has('publie');
+        // Ne pas modifier le type (reste 'blog')
         if ($request->titre != $article->titre) {
             $data['slug'] = Str::slug($request->titre) . '-' . uniqid();
         }
@@ -77,7 +76,6 @@ class ArticleController extends Controller
         }
 
         $article->update($data);
-
         return redirect()->route('admin.articles.index')->with('success', 'Article mis à jour.');
     }
 
