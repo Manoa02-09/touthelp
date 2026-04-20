@@ -51,7 +51,7 @@ Route::get('/api/messages', [ContactController::class, 'getMessages']);
 
 // ==================== DASHBOARD ====================
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect('/admin');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // ==================== ADMIN ====================
@@ -106,5 +106,10 @@ Route::get('/api/catalogue/{id}', function ($id) {
         'fichier_url' => $catalogue->fichier_pdf ? asset('storage/' . $catalogue->fichier_pdf) : null,
     ]);
 });
+Route::get('/admin/discu', [App\Http\Controllers\ContactController::class, 'adminIndex'])->name('admin.discu');
+
+Route::get('/apropos', function () {
+    return view('apropos');
+})->name('apropos');
 
 require __DIR__.'/auth.php';
