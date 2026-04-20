@@ -248,6 +248,7 @@
                 <a href="#expertise" class="text-gray-700 hover:text-green-800 font-medium text-lg">EXPERTISE</a>
                 <a href="#catalogue" class="text-gray-700 hover:text-green-800 font-medium text-lg">CATALOGUE</a>
                 <a href="#blog" class="text-gray-700 hover:text-green-800 font-medium text-lg">BLOG</a>
+                <a href="/apropos" class="text-gray-700 hover:text-green-800 font-medium">À PROPOS</a>
                 <a href="#contact" class="text-gray-700 hover:text-green-800 font-medium text-lg">CONTACT</a>
             </nav>
         </div>
