@@ -75,7 +75,8 @@ class ContactController extends Controller
                 ->count();
         }
         
-        return view('admin.messages', compact('conversations'));
+        // Changement ici : utilise 'admin.discu' au lieu de 'admin.messages'
+        return view('admin.discu', compact('conversations'));
     }
 
     public function repondre(Request $request, $id)
