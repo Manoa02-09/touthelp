@@ -289,8 +289,8 @@
 <style>
     /* ===== CONTAINER ===== */
     .whatsapp-container {
-        height: calc(100vh - 230px);
-        min-height: 480px;
+        height: calc(100vh - 200px);
+        min-height: 580px;
         display: flex;
         flex-direction: column;
         border-radius: 14px;
@@ -302,7 +302,7 @@
 
     /* ===== HEADER ===== */
     .wa-header {
-        padding: 12px 20px;
+        padding: 14px 22px;
         background: #f8f9fa;
         border-bottom: 1px solid #e9ecef;
         display: flex;
@@ -311,27 +311,27 @@
         flex-shrink: 0;
     }
     .wa-title {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: #1f2937;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
     .wa-header-badge {
         background: #fef3c7;
         color: #b45309;
         font-size: 11px;
         font-weight: 600;
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 20px;
     }
     .wa-count {
         background: #e5e7eb;
         color: #6b7280;
-        padding: 3px 10px;
+        padding: 4px 12px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
     }
 
@@ -340,7 +340,7 @@
 
     /* ===== SIDEBAR ===== */
     .wa-sidebar {
-        width: 300px;
+        width: 340px;
         background: #fff;
         border-right: 1px solid #e9ecef;
         display: flex;
@@ -352,18 +352,18 @@
     /* ===== TABS ===== */
     .wa-tabs {
         display: flex;
-        gap: 4px;
-        margin: 10px 12px 4px;
+        gap: 6px;
+        margin: 12px 14px 6px;
         background: #f3f4f6;
-        border-radius: 20px;
-        padding: 3px;
+        border-radius: 24px;
+        padding: 4px;
     }
     .wa-tab {
         flex: 1;
         text-align: center;
-        padding: 5px 4px;
-        border-radius: 16px;
-        font-size: 12px;
+        padding: 7px 6px;
+        border-radius: 20px;
+        font-size: 13px;
         font-weight: 500;
         cursor: pointer;
         color: #6b7280;
@@ -371,7 +371,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
+        gap: 6px;
     }
     .wa-tab.active { background: white; color: #1a3c34; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .wa-tab-badge {
@@ -379,7 +379,7 @@
         color: white;
         font-size: 10px;
         font-weight: 700;
-        padding: 1px 5px;
+        padding: 2px 6px;
         border-radius: 20px;
         line-height: 1.4;
     }
@@ -387,13 +387,13 @@
 
     /* ===== SEARCH ===== */
     .wa-search {
-        margin: 6px 10px;
+        margin: 8px 12px;
         background: #f3f4f6;
-        border-radius: 20px;
+        border-radius: 22px;
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 7px 12px;
+        padding: 8px 14px;
         color: #9ca3af;
         transition: box-shadow 0.2s;
     }
@@ -418,33 +418,33 @@
     .wa-clear-search:hover { color: #1a3c34; }
     .wa-search-count {
         font-size: 11px; color: #1a3c34;
-        padding: 2px 12px 4px; font-weight: 500;
+        padding: 2px 14px 6px; font-weight: 500;
     }
 
     /* ===== LISTE CONVERSATIONS ===== */
-    .wa-conversations { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .wa-conversations { flex: 1; overflow-y: auto; padding: 6px 0; }
 
     .wa-empty-conversations {
         display: flex; flex-direction: column; align-items: center;
         justify-content: center; text-align: center;
-        padding: 60px 20px; color: #9ca3af;
+        padding: 80px 20px; color: #9ca3af;
     }
     .wa-empty-icon { opacity: 0.4; margin-bottom: 12px; }
 
     .wa-conv-item {
-        display: flex; align-items: center; gap: 10px;
-        padding: 9px 12px; cursor: pointer;
-        border-radius: 10px; margin: 2px 6px;
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 14px; cursor: pointer;
+        border-radius: 12px; margin: 3px 8px;
         transition: background 0.15s;
         border: 1px solid transparent; position: relative;
     }
     .wa-conv-item:hover  { background: #f3f4f6; }
-    .wa-conv-item.active { background: #ecfdf5; border-color: rgba(26,60,52,0.12); }
+    .wa-conv-item.active { background: #ecfdf5; border-color: rgba(26,60,52,0.15); }
 
     /* Non répondu = surligné ambre */
     .wa-conv-item.is-unread {
         background: #fffbeb;
-        border-color: rgba(245,158,11,0.25);
+        border-color: rgba(245,158,11,0.3);
     }
     .wa-conv-item.is-unread .wa-conv-name { font-weight: 700; color: #1f2937; }
     .wa-conv-item.is-unread .wa-conv-msg  { color: #6b7280; }
@@ -452,13 +452,13 @@
     /* Non lu dynamique (JS — nouveau message temps réel) */
     .wa-conv-item.has-unread {
         background: #f0fdf4;
-        border-color: rgba(26,60,52,0.2);
+        border-color: rgba(26,60,52,0.25);
     }
     .wa-conv-item.has-unread .wa-conv-name { font-weight: 700; color: #1a3c34; }
 
     /* Dot pulsant statique (Blade — sans réponse) */
     .wa-unread-dot {
-        width: 8px; height: 8px; border-radius: 50%;
+        width: 9px; height: 9px; border-radius: 50%;
         background: #f59e0b; flex-shrink: 0;
         animation: pulse-dot 1.8s ease-in-out infinite;
     }
@@ -466,29 +466,29 @@
     /* Dot pulsant dynamique (JS — nouveau message) */
     .wa-new-badge {
         position: absolute; top: 6px; left: 6px;
-        width: 9px; height: 9px; border-radius: 50%;
+        width: 10px; height: 10px; border-radius: 50%;
         background: #1a3c34; border: 2px solid white;
         animation: pulse-dot 1.8s ease-in-out infinite;
     }
 
     @keyframes pulse-dot {
         0%,100% { transform: scale(1); opacity: 1; }
-        50%      { transform: scale(1.45); opacity: 0.6; }
+        50%      { transform: scale(1.5); opacity: 0.6; }
     }
 
     .wa-avatar {
-        width: 44px; height: 44px; border-radius: 50%;
+        width: 48px; height: 48px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 14px; font-weight: 600; flex-shrink: 0;
+        color: white; font-size: 16px; font-weight: 600; flex-shrink: 0;
     }
     .wa-conv-info { flex: 1; min-width: 0; }
-    .wa-conv-name { font-size: 13px; font-weight: 500; color: #1f2937; }
-    .wa-conv-msg  { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-    .wa-conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-    .wa-time      { font-size: 10px; color: #9ca3af; }
+    .wa-conv-name { font-size: 14px; font-weight: 500; color: #1f2937; margin-bottom: 2px; }
+    .wa-conv-msg  { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .wa-conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .wa-time      { font-size: 11px; color: #9ca3af; }
 
     /* ===== BADGES ===== */
-    .wa-badge           { font-size: 9px; padding: 2px 7px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+    .wa-badge           { font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
     .wa-badge.unanswered { background: #fef3c7; color: #b45309; }
     .wa-badge.replied    { background: #dcfce7; color: #15803d; }
     .wa-badge.archived   { background: #f3f4f6; color: #6b7280; }
@@ -511,40 +511,40 @@
     .wa-placeholder {
         flex: 1; display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        color: #9ca3af; gap: 8px;
+        color: #9ca3af; gap: 10px;
     }
     .wa-placeholder-icon { opacity: 0.3; }
-    .wa-placeholder p    { font-size: 14px; font-weight: 500; color: #6b7280; }
-    .wa-placeholder-hint { font-size: 12px; color: #b45309; background: #fef3c7; padding: 3px 10px; border-radius: 20px; }
+    .wa-placeholder p    { font-size: 15px; font-weight: 500; color: #6b7280; }
+    .wa-placeholder-hint { font-size: 12px; color: #b45309; background: #fef3c7; padding: 4px 12px; border-radius: 20px; }
 
     .wa-active { display: flex; flex-direction: column; height: 100%; }
 
     /* ===== CHAT HEADER ===== */
     .wa-chat-header {
-        background: #fff; padding: 10px 16px;
-        display: flex; align-items: center; gap: 10px;
+        background: #fff; padding: 12px 20px;
+        display: flex; align-items: center; gap: 12px;
         border-bottom: 1px solid #e9ecef; flex-shrink: 0;
     }
     .wa-back {
         display: none; background: #f3f4f6; border: none;
-        width: 34px; height: 34px; border-radius: 50%;
+        width: 36px; height: 36px; border-radius: 50%;
         cursor: pointer; color: #1f2937;
         align-items: center; justify-content: center; flex-shrink: 0;
     }
     .wa-back:hover { background: #e5e7eb; }
-    .wa-contact { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .wa-contact { display: flex; align-items: center; gap: 12px; flex: 1; }
     .wa-contact-avatar {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 44px; height: 44px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 14px; font-weight: 500; flex-shrink: 0;
+        color: white; font-size: 16px; font-weight: 500; flex-shrink: 0;
     }
-    .wa-contact-name   { font-size: 14px; font-weight: 600; color: #1f2937; }
-    .wa-contact-status { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 4px; }
-    .wa-status-dot     { width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block; }
-    .wa-header-actions { display: flex; gap: 6px; }
+    .wa-contact-name   { font-size: 15px; font-weight: 600; color: #1f2937; }
+    .wa-contact-status { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 5px; }
+    .wa-status-dot     { width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block; }
+    .wa-header-actions { display: flex; gap: 8px; }
 
     .wa-icon-btn {
-        width: 34px; height: 34px; border-radius: 8px;
+        width: 36px; height: 36px; border-radius: 8px;
         background: #f3f4f6; border: none; cursor: pointer;
         color: #6b7280; display: flex; align-items: center;
         justify-content: center; transition: all 0.15s;
@@ -554,54 +554,54 @@
 
     /* ===== MESSAGES ===== */
     .wa-messages {
-        flex: 1; overflow-y: auto; padding: 16px;
-        display: flex; flex-direction: column; gap: 10px;
+        flex: 1; overflow-y: auto; padding: 20px;
+        display: flex; flex-direction: column; gap: 12px;
     }
     .msg-left  { display: flex; justify-content: flex-start; }
     .msg-right { display: flex; justify-content: flex-end; }
     .bubble-left {
         background: white; border-radius: 18px 18px 18px 4px;
-        padding: 9px 13px; max-width: 65%;
+        padding: 10px 15px; max-width: 65%;
         box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     }
     .bubble-right {
         background: #1a3c34; border-radius: 18px 18px 4px 18px;
-        padding: 9px 13px; max-width: 65%;
+        padding: 10px 15px; max-width: 65%;
         box-shadow: 0 1px 3px rgba(26,60,52,0.2);
     }
-    .msg-name       { font-size: 10px; font-weight: 600; margin-bottom: 3px; color: #1a3c34; }
-    .msg-name-right { font-size: 10px; font-weight: 600; margin-bottom: 3px; color: rgba(255,255,255,0.75); }
-    .msg-text       { font-size: 13px; color: #1f2937; line-height: 1.45; }
-    .msg-text-right { font-size: 13px; color: white; line-height: 1.45; }
-    .msg-time       { font-size: 10px; margin-top: 4px; text-align: right; color: #9ca3af; }
-    .msg-time-right { font-size: 10px; margin-top: 4px; text-align: right; color: rgba(255,255,255,0.6); }
+    .msg-name       { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #1a3c34; }
+    .msg-name-right { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: rgba(255,255,255,0.75); }
+    .msg-text       { font-size: 14px; color: #1f2937; line-height: 1.45; }
+    .msg-text-right { font-size: 14px; color: white; line-height: 1.45; }
+    .msg-time       { font-size: 10px; margin-top: 5px; text-align: right; color: #9ca3af; }
+    .msg-time-right { font-size: 10px; margin-top: 5px; text-align: right; color: rgba(255,255,255,0.6); }
 
     /* ===== INPUT ===== */
     .wa-input {
-        background: #fff; padding: 10px 14px;
-        display: flex; gap: 10px; align-items: center;
+        background: #fff; padding: 12px 16px;
+        display: flex; gap: 12px; align-items: center;
         border-top: 1px solid #e9ecef; flex-shrink: 0;
     }
     .wa-input textarea {
         flex: 1; border: 1px solid #e9ecef;
-        background: #f9fafb; padding: 9px 14px;
-        border-radius: 20px; font-size: 13px; resize: none;
+        background: #f9fafb; padding: 10px 16px;
+        border-radius: 24px; font-size: 14px; resize: none;
         outline: none; color: #1f2937; max-height: 120px;
         transition: border-color 0.2s;
     }
     .wa-input textarea:focus { border-color: #1a3c34; background: white; }
     .wa-send {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 44px; height: 44px; border-radius: 50%;
         background: #1a3c34; border: none; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0; transition: transform 0.15s, opacity 0.15s; color: white;
     }
-    .wa-send:hover  { opacity: 0.88; }
-    .wa-send:active { transform: scale(0.92); }
+    .wa-send:hover  { opacity: 0.88; transform: scale(1.02); }
+    .wa-send:active { transform: scale(0.95); }
 
     /* ===== INFO PANEL ===== */
     .wa-info-panel {
-        position: fixed; top: 0; right: 0; height: 100%; width: 280px;
+        position: fixed; top: 0; right: 0; height: 100%; width: 320px;
         background: white; transform: translateX(100%);
         transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
         z-index: 1000; display: flex; flex-direction: column;
@@ -614,40 +614,40 @@
     }
     .wa-info-overlay.open { display: block; }
     .wa-info-panel-head {
-        background: #1a3c34; padding: 16px 18px;
+        background: #1a3c34; padding: 18px 20px;
         display: flex; justify-content: space-between;
-        align-items: center; color: white; font-size: 14px; font-weight: 500;
+        align-items: center; color: white; font-size: 15px; font-weight: 500;
     }
     .wa-info-panel-head button {
         background: rgba(255,255,255,0.15); border: none;
-        color: white; font-size: 16px; cursor: pointer;
-        width: 26px; height: 26px; border-radius: 50%;
+        color: white; font-size: 18px; cursor: pointer;
+        width: 28px; height: 28px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
     }
     .wa-info-panel-body {
-        padding: 20px; display: flex; flex-direction: column;
+        padding: 24px; display: flex; flex-direction: column;
         align-items: center; overflow-y: auto;
     }
     .wa-info-avatar-large {
-        width: 68px; height: 68px; border-radius: 50%;
+        width: 80px; height: 80px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 22px; font-weight: 500; margin-bottom: 12px;
+        color: white; font-size: 26px; font-weight: 500; margin-bottom: 14px;
     }
-    .wa-info-name-block { text-align: center; margin-bottom: 16px; }
-    .wa-info-fullname   { font-size: 16px; font-weight: 600; color: #1f2937; }
-    .wa-info-sub        { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+    .wa-info-name-block { text-align: center; margin-bottom: 20px; }
+    .wa-info-fullname   { font-size: 17px; font-weight: 600; color: #1f2937; }
+    .wa-info-sub        { font-size: 12px; color: #9ca3af; margin-top: 3px; }
     .wa-info-rows       { width: 100%; }
-    .wa-info-row        { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
-    .wa-info-dot        { width: 8px; height: 8px; border-radius: 50%; background: #1a3c34; flex-shrink: 0; margin-top: 4px; }
-    .wa-info-label      { font-size: 11px; color: #9ca3af; margin-bottom: 2px; }
-    .wa-info-val        { font-size: 13px; color: #1f2937; font-weight: 500; word-break: break-all; }
+    .wa-info-row        { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f2f5; }
+    .wa-info-dot        { width: 8px; height: 8px; border-radius: 50%; background: #1a3c34; flex-shrink: 0; margin-top: 5px; }
+    .wa-info-label      { font-size: 11px; color: #9ca3af; margin-bottom: 3px; }
+    .wa-info-val        { font-size: 14px; color: #1f2937; font-weight: 500; word-break: break-all; }
 
     /* ===== TOAST ===== */
     .wa-toast {
         position: fixed; bottom: 24px; right: 24px;
         background: #1a3c34; border-radius: 14px;
         display: flex; align-items: center; gap: 12px;
-        padding: 12px 14px; z-index: 2000; max-width: 320px;
+        padding: 12px 16px; z-index: 2000; max-width: 340px;
         transform: translateY(120%) scale(0.95); opacity: 0;
         transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
         pointer-events: none; color: white;
@@ -655,14 +655,14 @@
     }
     .wa-toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
     .wa-toast-avatar {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 44px; height: 44px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-size: 14px; font-weight: 600; flex-shrink: 0;
+        font-size: 16px; font-weight: 600; flex-shrink: 0;
     }
     .wa-toast-body  { flex: 1; min-width: 0; }
-    .wa-toast-name  { font-size: 13px; font-weight: 600; }
-    .wa-toast-msg   { font-size: 12px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-    .wa-toast-close { background: rgba(255,255,255,0.15); border: none; cursor: pointer; color: white; font-size: 13px; padding: 3px 7px; border-radius: 6px; }
+    .wa-toast-name  { font-size: 14px; font-weight: 600; }
+    .wa-toast-msg   { font-size: 12px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+    .wa-toast-close { background: rgba(255,255,255,0.15); border: none; cursor: pointer; color: white; font-size: 14px; padding: 4px 8px; border-radius: 8px; }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
@@ -677,16 +677,18 @@
         .wa-toast { bottom: 12px; right: 12px; left: 12px; max-width: none; }
     }
     @media (max-width: 480px) {
-        .wa-header { padding: 10px 12px; }
-        .wa-messages { padding: 12px 10px; }
-        .bubble-left, .bubble-right { max-width: 80%; }
+        .wa-header { padding: 12px 16px; }
+        .wa-messages { padding: 14px 12px; }
+        .bubble-left, .bubble-right { max-width: 85%; }
     }
 
     /* ===== SCROLLBAR ===== */
     .wa-conversations::-webkit-scrollbar,
-    .wa-messages::-webkit-scrollbar { width: 4px; }
+    .wa-messages::-webkit-scrollbar { width: 5px; }
     .wa-conversations::-webkit-scrollbar-thumb,
-    .wa-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .wa-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
+    .wa-conversations::-webkit-scrollbar-thumb:hover,
+    .wa-messages::-webkit-scrollbar-thumb:hover { background: #1a3c34; }
 </style>
 
 <script>
@@ -710,34 +712,78 @@
     window.addEventListener('resize', () => { isMobile = window.innerWidth <= 768; });
 
     /* ============================================================
-       AUDIO
+       AUDIO - NOTIFICATION SONORE AMÉLIORÉE
        ============================================================ */
     function initAudio() {
         if (!audioCtx) {
-            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+            try { 
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+            } catch(e) {
+                console.warn('Web Audio API non supportée');
+            }
         }
     }
-    function playBeep() {
+
+    function playNotificationSound() {
         if (!soundEnabled) return;
+        
         try {
             initAudio();
             if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Reprendre l'audio context si suspendu
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(e => console.warn('Audio resume failed:', e));
+            }
+            
             const now = audioCtx.currentTime;
-            const o1 = audioCtx.createOscillator(), g1 = audioCtx.createGain();
-            o1.connect(g1); g1.connect(audioCtx.destination);
-            o1.type = 'sine'; o1.frequency.value = 880;
-            g1.gain.setValueAtTime(0.22, now);
-            g1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-            o1.start(now); o1.stop(now + 0.4);
-            const o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
-            o2.connect(g2); g2.connect(audioCtx.destination);
-            o2.type = 'sine'; o2.frequency.value = 1100;
-            g2.gain.setValueAtTime(0.14, now + 0.12);
-            g2.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
-            o2.start(now + 0.12); o2.stop(now + 0.52);
-        } catch(e) {}
+            
+            // Premier bip (aigu) - notification
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.type = 'sine';
+            osc1.frequency.value = 880;
+            gain1.gain.setValueAtTime(0.25, now);
+            gain1.gain.exponentialRampToValueAtTime(0.00001, now + 0.3);
+            osc1.start(now);
+            osc1.stop(now + 0.3);
+            
+            // Deuxième bip (plus grave) - notification
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.type = 'sine';
+            osc2.frequency.value = 660;
+            gain2.gain.setValueAtTime(0.2, now + 0.12);
+            gain2.gain.exponentialRampToValueAtTime(0.00001, now + 0.42);
+            osc2.start(now + 0.12);
+            osc2.stop(now + 0.42);
+            
+            // Petit "clic" de fin optionnel pour le fun
+            setTimeout(() => {
+                if (audioCtx && audioCtx.state === 'running') {
+                    const osc3 = audioCtx.createOscillator();
+                    const gain3 = audioCtx.createGain();
+                    osc3.connect(gain3);
+                    gain3.connect(audioCtx.destination);
+                    osc3.type = 'triangle';
+                    osc3.frequency.value = 440;
+                    gain3.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain3.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                    osc3.start();
+                    osc3.stop(audioCtx.currentTime + 0.15);
+                }
+            }, 250);
+            
+        } catch(e) {
+            console.warn('Erreur lecture son:', e);
+        }
     }
+
+    // Activer l'audio au premier clic utilisateur
     document.addEventListener('click', initAudio, { once: true });
 
     /* ============================================================
@@ -750,17 +796,25 @@
             updateNotifBtn();
         });
     }
+    
     function updateNotifBtn() {
         const btn = document.getElementById('waNotifBtn');
         if (!btn) return;
         btn.classList.toggle('notif-on', notifEnabled);
         btn.title = notifEnabled
-            ? (soundEnabled ? 'Notifications activées' : 'Son coupé')
-            : 'Activer les notifications';
+            ? (soundEnabled ? '🔔 Notifications activées' : '🔕 Son désactivé')
+            : '🔕 Activer les notifications';
     }
+    
     function sendBrowserNotif(name, message) {
         if (!notifEnabled || document.hasFocus()) return;
-        try { new Notification(`💬 ${name}`, { body: message, tag: 'wa-msg', renotify: true }); } catch(e) {}
+        try { 
+            new Notification(`💬 Nouveau message de ${name}`, { 
+                body: message.length > 60 ? message.substring(0, 60) + '...' : message,
+                tag: 'wa-msg',
+                icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a3c34"%3E%3Cpath d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z"/%3E%3C/svg%3E'
+            }); 
+        } catch(e) {}
     }
 
     /* ============================================================
@@ -769,15 +823,22 @@
     function showToast(name, message, initials, color) {
         const toast = document.getElementById('waToast');
         document.getElementById('waToastName').textContent = name;
-        document.getElementById('waToastMsg').textContent  = message;
+        document.getElementById('waToastMsg').textContent  = message.length > 50 ? message.substring(0, 50) + '...' : message;
         const av = document.getElementById('waToastAvatar');
         av.textContent      = initials;
         av.style.background = `linear-gradient(${color})`;
         toast.classList.add('show');
+        
+        // Jouer le son de notification
+        playNotificationSound();
+        
         clearTimeout(toastTimer);
         toastTimer = setTimeout(hideToast, 5000);
     }
-    function hideToast() { document.getElementById('waToast').classList.remove('show'); }
+    
+    function hideToast() { 
+        document.getElementById('waToast').classList.remove('show'); 
+    }
 
     /* ============================================================
        RECHERCHE AVEC SURBRILLANCE
@@ -788,7 +849,11 @@
         div.textContent = str;
         return div.innerHTML;
     }
-    function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    
+    function escapeRegex(str) { 
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+    }
+    
     function highlightText(text, term) {
         if (!term || term.trim().length < 1) return escapeHtml(text);
         return escapeHtml(text).replace(
@@ -845,6 +910,7 @@
             item.prepend(dot);
         }
     }
+    
     function clearUnread(email) {
         unreadSet.delete(email);
         const item = document.querySelector(`.wa-conv-item[data-email="${CSS.escape(email)}"]`);
@@ -861,7 +927,11 @@
     document.getElementById('waInfoBtn').onclick   = () => { infoPanel.classList.add('open'); infoOverlay.classList.add('open'); };
     document.getElementById('waCloseInfo').onclick = closeInfo;
     infoOverlay.onclick = closeInfo;
-    function closeInfo() { infoPanel.classList.remove('open'); infoOverlay.classList.remove('open'); }
+    
+    function closeInfo() { 
+        infoPanel.classList.remove('open'); 
+        infoOverlay.classList.remove('open'); 
+    }
 
     /* ============================================================
        BOUTON NOTIF
@@ -870,6 +940,10 @@
         if (notifEnabled) {
             soundEnabled = !soundEnabled;
             updateNotifBtn();
+            // Petit retour sonore pour la bascule
+            if (soundEnabled) {
+                playNotificationSound();
+            }
         } else {
             requestNotifPermission();
             soundEnabled = true;
@@ -883,6 +957,7 @@
         if (!currentEmail) return;
         archiveConv(currentEmail, !currentArchived);
     };
+    
     function archiveConv(email, archive) {
         fetch('/admin/messages/toggle-close', {
             method: 'POST',
@@ -898,10 +973,11 @@
             }
         });
     }
+    
     function updateArchiveBtn() {
         const btn = document.getElementById('waArchiveBtn');
         if (!btn) return;
-        btn.title            = currentArchived ? 'Désarchiver' : 'Archiver';
+        btn.title            = currentArchived ? '📂 Désarchiver' : '📁 Archiver';
         btn.style.background = currentArchived ? '#fef2f2' : '#f3f4f6';
         btn.style.color      = currentArchived ? '#dc2626'  : '#6b7280';
     }
@@ -916,7 +992,7 @@
             const container = document.getElementById('waMessages');
 
             if (!messages.length) {
-                container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px;font-size:13px">Aucun message</div>';
+                container.innerHTML = '<div style="text-align:center;color:#aaa;padding:50px;font-size:14px">💬 Aucun message pour l\'instant</div>';
                 return;
             }
 
@@ -928,41 +1004,70 @@
                 html += `<div class="msg-left"><div class="bubble-left">
                     <div class="msg-name">${escapeHtml(msg.nom_complet)}</div>
                     <div class="msg-text">${escapeHtml(msg.message)}</div>
-                    <div class="msg-time">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="msg-time">📅 ${new Date(msg.created_at).toLocaleDateString()} à ${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                 </div></div>`;
 
                 if (msg.reponse_admin && msg.reponse_admin.trim()) {
                     html += `<div class="msg-right"><div class="bubble-right">
-                        <div class="msg-name-right">Vous</div>
+                        <div class="msg-name-right">👤 Vous (Admin)</div>
                         <div class="msg-text-right">${escapeHtml(msg.reponse_admin)}</div>
-                        <div class="msg-time-right">${new Date(msg.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        <div class="msg-time-right">✓ ${new Date(msg.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div></div>`;
                 }
             }
             container.innerHTML = html;
             container.scrollTop = container.scrollHeight;
             if (currentPhone) document.getElementById('waInfoPhone').innerText = currentPhone;
-        } catch(e) { console.error('loadConv:', e); }
+        } catch(e) { 
+            console.error('loadConv:', e); 
+        }
     }
 
     /* ============================================================
        ENVOYER MESSAGE
        ============================================================ */
     async function sendMsg() {
-        if (archivedSet.has(currentEmail)) return;
+        if (archivedSet.has(currentEmail)) {
+            alert('Cette conversation est archivée. Désarchivez-la pour envoyer un message.');
+            return;
+        }
         const input = document.getElementById('waMessageInput');
         const msg   = input.value.trim();
         if (!msg) return;
+        
         input.value = '';
         input.style.height = 'auto';
+        
         try {
             const res = await fetch('/admin/messages/reply', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify({ email_client: currentEmail, reponse_admin: msg })
             });
-            if (res.ok) { await loadConv(currentEmail); refreshList(); }
-        } catch(e) { console.error('sendMsg:', e); }
+            if (res.ok) { 
+                await loadConv(currentEmail); 
+                refreshList();
+                
+                // Petit son de confirmation d'envoi
+                try {
+                    initAudio();
+                    if (audioCtx && audioCtx.state === 'running') {
+                        const beep = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        beep.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        beep.frequency.value = 440;
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                        beep.start();
+                        beep.stop(audioCtx.currentTime + 0.15);
+                    }
+                } catch(e) {}
+            }
+        } catch(e) { 
+            console.error('sendMsg:', e);
+            alert('Erreur lors de l\'envoi du message');
+        }
     }
 
     /* ============================================================
@@ -1027,7 +1132,7 @@
                 const isArchived  = archivedSet.has(currentEmail);
                 const hasResponse = newEl.dataset.hasResponse === 'true';
                 const statusClass = isArchived ? 'archived' : (hasResponse ? 'replied' : 'unanswered');
-                const statusText  = isArchived ? 'Archivé'  : (hasResponse ? 'Répondu'  : 'Sans réponse');
+                const statusText  = isArchived ? '📦 Archivé'  : (hasResponse ? '✅ Répondu'  : '⏳ Sans réponse');
                 const statusEl    = document.getElementById('waInfoStatus');
                 statusEl.className   = `wa-badge ${statusClass}`;
                 statusEl.textContent = statusText;
@@ -1078,11 +1183,13 @@
     });
 
     /* ============================================================
-       REALTIME
+       REALTIME - AVEC SON POUR NOUVEAUX MESSAGES
        ============================================================ */
     function handleNewMessage(emailClient, senderName, messageText) {
+        // Jouer le son de notification IMMÉDIATEMENT
+        playNotificationSound();
+        
         if (emailClient !== currentEmail) {
-            playBeep();
             markAsUnread(emailClient);
             const item     = document.querySelector(`.wa-conv-item[data-email="${CSS.escape(emailClient)}"]`);
             const initials = item?.dataset.initials || '??';
@@ -1090,7 +1197,24 @@
             const name     = senderName || item?.dataset.name || emailClient;
             showToast(name, messageText || 'Nouveau message', initials, color);
             sendBrowserNotif(name, messageText || 'Nouveau message');
+        } else {
+            // Même si la conversation est ouverte, un petit bip discret
+            try {
+                initAudio();
+                if (audioCtx && audioCtx.state === 'running') {
+                    const beep = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    beep.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    beep.frequency.value = 660;
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+                    beep.start();
+                    beep.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch(e) {}
         }
+        
         refreshList();
         if (emailClient === currentEmail && !archivedSet.has(emailClient)) loadConv(emailClient);
     }
@@ -1098,6 +1222,7 @@
     function initWs() {
         if (window.Echo) {
             window.Echo.channel('new-messages').listen('NewMessageReceived', e => {
+                console.log('📨 Nouveau message reçu:', e);
                 handleNewMessage(e.email_client, e.nom_complet || e.name, e.message);
             });
         } else {
@@ -1111,5 +1236,8 @@
     attachEvents();
     initWs();
     setInterval(refreshList, 15000);
+    
+    // Afficher un petit message de bienvenue silencieux
+    console.log('✅ Interface admin chargée - Notifications sonores activées');
 </script>
 @endsection
