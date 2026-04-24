@@ -680,13 +680,6 @@
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 
     <script>
-<<<<<<< Updated upstream
-=======
-    /* ============================================================
-       CLIENT CHAT - VERSION FINALE STABLE
-       ============================================================ */
-    
->>>>>>> Stashed changes
     (function() {
         "use strict";
         
@@ -701,29 +694,16 @@
         let lastMessageId = null;
         let lastRefreshTime = 0;
         let lastMessagesHash = '';
-<<<<<<< Updated upstream
         let soundEnabled = true;
         let audioEnabled = false;
         let pendingSounds = [];
         const rateLimits = new Map();
-=======
-        let soundEnabled    = true;
-        let audioEnabled    = false;
-        let pendingSounds   = [];
-        const rateLimits    = new Map();
->>>>>>> Stashed changes
         
         const MAX_MESSAGE_LENGTH = 1000;
         const MAX_NAME_LENGTH = 150;
         const MAX_EMAIL_LENGTH = 150;
         const MAX_PHONE_LENGTH = 30;
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           SÉCURITÉ — Échappement HTML
-        ============================================================ */
->>>>>>> Stashed changes
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             const div = document.createElement('div');
@@ -774,32 +754,14 @@
             return cleaned.trim();
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           RATE LIMITING
-        ============================================================ */
->>>>>>> Stashed changes
         const RATE_LIMIT_DELAY = 5000;
         const MAX_REQUESTS_PER_MINUTE = 12;
         const requestTimestamps = [];
         
         function isRateLimited(email) {
             const now = Date.now();
-<<<<<<< Updated upstream
             while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) requestTimestamps.shift();
             if (requestTimestamps.length >= MAX_REQUESTS_PER_MINUTE) { flashError('Trop de tentatives. Veuillez patienter une minute.'); return true; }
-=======
-            while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) {
-                requestTimestamps.shift();
-            }
-            
-            if (requestTimestamps.length >= MAX_REQUESTS_PER_MINUTE) {
-                flashError('Trop de tentatives. Veuillez patienter une minute.');
-                return true;
-            }
-            
->>>>>>> Stashed changes
             const last = rateLimits.get(email) || 0;
             if (now - last < RATE_LIMIT_DELAY) { flashError('Merci de patienter quelques secondes avant de renvoyer.'); return true; }
             rateLimits.set(email, now);
@@ -813,7 +775,6 @@
             if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
         }
         
-<<<<<<< Updated upstream
         function enableAudio() {
             if (audioEnabled) return;
             initAudio();
@@ -823,6 +784,7 @@
         }
         
         function playNotificationSound() {
+            if (!soundEnabled) return;
             if (!audioEnabled) { pendingSounds.push(true); return; }
             try {
                 initAudio();
@@ -855,95 +817,6 @@
             if (!b) return;
             if (unreadCount > 0) { b.textContent = unreadCount > 99 ? '99+' : unreadCount; b.style.display = 'flex'; b.style.animation = 'none'; b.offsetHeight; b.style.animation = 'badgePulse 0.6s ease-in-out'; }
             else { b.style.display = 'none'; }
-=======
-        /* ============================================================
-           AUDIO - SON UNIQUEMENT À LA RÉCEPTION
-        ============================================================ */
-        function initAudio() {
-            if (!audioCtx) {
-                try { 
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
-                } catch(e) {}
-            }
-        }
-
-        function enableAudio() {
-            if (audioEnabled) return;
-            
-            initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume().then(() => {
-                    audioEnabled = true;
-                    pendingSounds.forEach(() => playNotificationSound());
-                    pendingSounds = [];
-                }).catch(e => {});
-            } else if (audioCtx && audioCtx.state === 'running') {
-                audioEnabled = true;
-            }
-        }
-
-        function playNotificationSound() {
-            if (!soundEnabled) return;
-            
-            if (!audioEnabled) {
-                pendingSounds.push(true);
-                return;
-            }
-            
-            try {
-                initAudio();
-                if (!audioCtx || audioCtx.state !== 'running') return;
-                
-                const now = audioCtx.currentTime;
-                const o1 = audioCtx.createOscillator();
-                const g1 = audioCtx.createGain();
-                o1.connect(g1);
-                g1.connect(audioCtx.destination);
-                o1.type = 'sine';
-                o1.frequency.value = 880;
-                g1.gain.setValueAtTime(0.2, now);
-                g1.gain.exponentialRampToValueAtTime(0.00001, now + 0.25);
-                o1.start(now);
-                o1.stop(now + 0.25);
-                
-                setTimeout(() => {
-                    if (audioCtx && audioCtx.state === 'running') {
-                        const o2 = audioCtx.createOscillator();
-                        const g2 = audioCtx.createGain();
-                        o2.connect(g2);
-                        g2.connect(audioCtx.destination);
-                        o2.type = 'sine';
-                        o2.frequency.value = 660;
-                        g2.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                        g2.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-                        o2.start();
-                        o2.stop(audioCtx.currentTime + 0.2);
-                    }
-                }, 120);
-                
-            } catch(e) {}
-        }
-
-        // Activer l'audio au premier clic utilisateur
-        document.addEventListener('click', enableAudio);
-        
-        /* ============================================================
-           BADGE ROBOT
-        ============================================================ */
-        function updateBadge() {
-            const b = document.getElementById('robotBadge');
-            if (!b) return;
-            
-            if (unreadCount > 0) {
-                b.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                b.style.display = 'flex';
-                b.style.animation = 'none';
-                b.offsetHeight;
-                b.style.animation = 'badgePulse 0.6s ease-in-out';
-            } else {
-                b.style.display = 'none';
-            }
->>>>>>> Stashed changes
         }
         
         function showRobotNotification() {
@@ -959,14 +832,7 @@
             modal.classList.add('active');
             unreadCount = 0;
             updateBadge();
-<<<<<<< Updated upstream
             if (currentEmail) { loadMessages(true); startPolling(); }
-=======
-            if (currentEmail) {
-                loadMessages(true);
-                startPolling();
-            }
->>>>>>> Stashed changes
             scrollChatToBottom();
         }
         
@@ -977,54 +843,17 @@
         }
         
         const robotIcon = document.getElementById('robotIcon');
-        if (robotIcon) {
-            robotIcon.addEventListener('click', openChatModal);
-        }
+        if (robotIcon) robotIcon.addEventListener('click', openChatModal);
         
-<<<<<<< Updated upstream
-=======
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('chatModal');
-            const robot = document.getElementById('robotIcon');
-            if (!modal || !modal.classList.contains('active')) return;
-            if (modal.contains(e.target) || (robot && robot.contains(e.target))) return;
-            const expertiseOpen = ['modalInter','modalIntra','modalAccompagnement'].some(id => {
-                const m = document.getElementById(id); return m && m.classList.contains('flex');
-            });
-            if (!expertiseOpen) closeChatModal();
-        });
-        
-        document.addEventListener('keydown', e => {
-            if (e.key !== 'Escape') return;
-            closeChatModal();
-            if (typeof closeExpertiseModal === 'function') {
-                ['inter','intra','accompagnement'].forEach(t => closeExpertiseModal(t));
-            }
-            if (typeof closeModal === 'function') closeModal();
-        });
-        
->>>>>>> Stashed changes
         function scrollChatToBottom() {
             setTimeout(() => { const b = document.getElementById('chatBody'); if (b) b.scrollTop = b.scrollHeight; }, 100);
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           POLLING
-        ============================================================ */
->>>>>>> Stashed changes
         function startPolling() {
             stopPolling();
             if (!currentEmail) return;
             pollInterval = setInterval(() => {
-<<<<<<< Updated upstream
-                if (currentEmail && document.getElementById('chatModal').classList.contains('active')) loadMessages(false);
-=======
-                if (currentEmail && document.getElementById('chatModal') && document.getElementById('chatModal').classList.contains('active')) {
-                    loadMessages(false);
-                }
->>>>>>> Stashed changes
+                if (currentEmail && document.getElementById('chatModal') && document.getElementById('chatModal').classList.contains('active')) loadMessages(false);
             }, 6000);
         }
         
@@ -1032,19 +861,12 @@
             if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           GENERATION HASH
-        ============================================================ */
->>>>>>> Stashed changes
         function generateMessagesHash(messages) {
             if (!messages || messages.length === 0) return '';
             const lastMsg = messages[messages.length - 1];
             return `${lastMsg?.id || ''}-${lastMsg?.updated_at || ''}-${messages.length}`;
         }
         
-<<<<<<< Updated upstream
         function renderMessages(messages) {
             const area = document.getElementById('chatMessagesArea');
             if (!area) return;
@@ -1059,47 +881,6 @@
                     html += `<div class="bubble-received"><div class="bubble-received-avatar">TH</div><div class="bubble-received-inner"><div class="bubble-text">${escapeHtml(m.reponse_admin)}</div><div class="bubble-time-left">${formatTime(m.updated_at)}</div></div></div>`;
                 }
             }
-=======
-        /* ============================================================
-           AFFICHAGE DES MESSAGES
-        ============================================================ */
-        function renderMessages(messages) {
-            const area = document.getElementById('chatMessagesArea');
-            if (!area) return;
-            
-            if (!messages || messages.length === 0) {
-                area.innerHTML = '<div class="pending-tag">⏳ En attente de réponse...</div>';
-                return;
-            }
-        
-            let html = '';
-        
-            for (let i = 0; i < messages.length; i++) {
-                const m = messages[i];
-                
-                // Message ENVOYÉ par le client (à droite)
-                if (m.message && m.message.trim() !== '') {
-                    html += `<div class="bubble-sent">
-                        <div class="bubble-sent-inner">
-                            <div class="bubble-text">${escapeHtml(m.message)}</div>
-                            <div class="bubble-time">${formatTime(m.created_at)}</div>
-                        </div>
-                    </div>`;
-                }
-                
-                // Message REÇU du support (admin) - à gauche
-                if (m.reponse_admin && m.reponse_admin.trim() !== '') {
-                    html += `<div class="bubble-received">
-                        <div class="bubble-received-avatar">TH</div>
-                        <div class="bubble-received-inner">
-                            <div class="bubble-text">${escapeHtml(m.reponse_admin)}</div>
-                            <div class="bubble-time-left">${formatTime(m.updated_at)}</div>
-                        </div>
-                    </div>`;
-                }
-            }
-            
->>>>>>> Stashed changes
             area.innerHTML = html;
             scrollChatToBottom();
         }
@@ -1109,12 +890,6 @@
             try { return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch(e) { return ''; }
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           CHARGEMENT DES MESSAGES
-        ============================================================ */
->>>>>>> Stashed changes
         async function loadMessages(force = false) {
             if (!currentEmail) return;
             if (isLoading) return;
@@ -1133,46 +908,16 @@
                 const isNewContent = currentHash !== lastMessagesHash;
                 if (isNewContent || force) {
                     lastMessagesHash = currentHash;
-<<<<<<< Updated upstream
                     if (messages.length > 0) lastMessageId = messages[messages.length - 1]?.id;
-                    const isChatOpen = document.getElementById('chatModal').classList.contains('active');
+                    const isChatOpen = document.getElementById('chatModal') && document.getElementById('chatModal').classList.contains('active');
                     if (!isChatOpen && isNewContent && !force) { unreadCount++; updateBadge(); showRobotNotification(); playNotificationSound(); }
                     renderMessages(messages);
                     if (isChatOpen) scrollChatToBottom();
-=======
-                    
-                    if (messages.length > 0) {
-                        lastMessageId = messages[messages.length - 1]?.id;
-                    }
-                    
-                    const chatModal = document.getElementById('chatModal');
-                    const isChatOpen = chatModal ? chatModal.classList.contains('active') : false;
-                    
-                    // SON UNIQUEMENT pour les NOUVEAUX messages reçus (pas à l'envoi)
-                    if (!isChatOpen && isNewContent && !force) {
-                        unreadCount++;
-                        updateBadge();
-                        showRobotNotification();
-                        playNotificationSound();
-                    }
-                    
-                    renderMessages(messages);
-                    
-                    if (isChatOpen) {
-                        scrollChatToBottom();
-                    }
->>>>>>> Stashed changes
                 }
             } catch(e) { console.warn('[Chat] loadMessages error:', e.message); }
             finally { isLoading = false; }
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           ENVOI DE MESSAGE
-        ============================================================ */
->>>>>>> Stashed changes
         async function sendMessageAPI(nom, email, telephone, message) {
             if (!isValidName(nom)) return { success: false, message: 'Nom invalide.' };
             if (!isValidEmail(email)) return { success: false, message: 'Email invalide.' };
@@ -1181,10 +926,6 @@
             if (!checkRateLimit(email)) return { success: false, message: '' };
             const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
             if (!csrf) return { success: false, message: 'Erreur de sécurité.' };
-<<<<<<< Updated upstream
-=======
-        
->>>>>>> Stashed changes
             const cleanNom = sanitize(nom, MAX_NAME_LENGTH);
             const cleanEmail = email.trim().substring(0, MAX_EMAIL_LENGTH);
             const cleanTel = sanitize(telephone, MAX_PHONE_LENGTH);
@@ -1197,37 +938,16 @@
                 });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return await res.json();
-<<<<<<< Updated upstream
             } catch(e) { return { success: false, message: 'Erreur réseau.' }; }
-=======
-            } catch(e) {
-                console.warn('[Chat] sendMessageAPI error:', e.message);
-                return { success: false, message: 'Erreur réseau.' };
-            }
->>>>>>> Stashed changes
         }
         
         async function submitInitForm() {
             if (isSending) return;
-<<<<<<< Updated upstream
             const nom = document.getElementById('initNom').value.trim();
             const email = document.getElementById('initEmail').value.trim();
             const tel = document.getElementById('initTel').value.trim();
             const msg = document.getElementById('initMessage').value.trim();
             if (!nom || !email || !msg) { flashError('Merci de remplir tous les champs obligatoires.'); return; }
-=======
-            
-            const nom = document.getElementById('initNom')?.value.trim() || '';
-            const email = document.getElementById('initEmail')?.value.trim() || '';
-            const tel = document.getElementById('initTel')?.value.trim() || '';
-            const msg = document.getElementById('initMessage')?.value.trim() || '';
-            
-            if (!nom || !email || !msg) {
-                flashError('Merci de remplir tous les champs obligatoires.');
-                return;
-            }
-        
->>>>>>> Stashed changes
             const btn = document.getElementById('initSendBtn');
             if (!btn) return;
             isSending = true;
@@ -1251,12 +971,6 @@
             isSending = false;
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           MESSAGE RAPIDE - SANS SON À L'ENVOI
-        ============================================================ */
->>>>>>> Stashed changes
         async function sendQuickMessage() {
             if (isSending) return;
             const ta = document.getElementById('chatTextarea');
@@ -1270,61 +984,19 @@
             ta.value = '';
             ta.style.height = 'auto';
             const result = await sendMessageAPI(currentNom, currentEmail, '', msg);
-<<<<<<< Updated upstream
             if (result.success) { lastMessagesHash = ''; await loadMessages(true); }
             else if (result.message) { flashError(result.message); }
-=======
-            
-            if (result.success) {
-                lastMessagesHash = '';
-                await loadMessages(true);
-                // PAS DE SON ICI - le son est uniquement à la réception
-            } else if (result.message) {
-                flashError(result.message);
-            }
-            
->>>>>>> Stashed changes
             btn.disabled = false;
             isSending = false;
         }
         
-<<<<<<< Updated upstream
         function resetChat() {
             currentEmail = ''; currentNom = ''; lastMessageId = null; lastMessagesHash = ''; unreadCount = 0;
             updateBadge(); stopPolling(); echoListenerSet = false;
             document.getElementById('chatInitForm').style.display = 'block';
             document.getElementById('chatInputArea').style.display = 'none';
             document.getElementById('changeIdentityBar').style.display = 'none';
-=======
-        /* ============================================================
-           MODE CONVERSATION
-        ============================================================ */
-        function switchToConversationMode() {
-            const initForm = document.getElementById('chatInitForm');
-            const inputArea = document.getElementById('chatInputArea');
-            const identityBar = document.getElementById('changeIdentityBar');
-            if (initForm) initForm.style.display = 'none';
-            if (inputArea) inputArea.style.display = 'flex';
-            if (identityBar) identityBar.style.display = 'block';
-        }
-        
-        function resetChat() {
-            currentEmail = '';
-            currentNom = '';
-            lastMessageId = null;
-            lastMessagesHash = '';
-            unreadCount = 0;
-            updateBadge();
-            stopPolling();
-            echoListenerSet = false;
-            const initForm = document.getElementById('chatInitForm');
-            const inputArea = document.getElementById('chatInputArea');
-            const identityBar = document.getElementById('changeIdentityBar');
->>>>>>> Stashed changes
             const area = document.getElementById('chatMessagesArea');
-            if (initForm) initForm.style.display = 'block';
-            if (inputArea) inputArea.style.display = 'none';
-            if (identityBar) identityBar.style.display = 'none';
             if (area) area.innerHTML = '';
             ['initNom','initEmail','initTel','initMessage'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             const btn = document.getElementById('initSendBtn');
@@ -1332,66 +1004,28 @@
             isSending = false;
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           WEBSOCKET ECHO - SON UNIQUEMENT À LA RÉCEPTION
-        ============================================================ */
->>>>>>> Stashed changes
         let wsRetryCount = 0;
         function setupEchoListener() {
             if (echoListenerSet) return;
             function trySetup() {
                 if (window.Echo) {
-<<<<<<< Updated upstream
                     if (window.echoChannel) window.Echo.leaveChannel('new-messages');
-=======
-                    if (window.echoChannel) {
-                        window.Echo.leaveChannel('new-messages');
-                    }
->>>>>>> Stashed changes
                     window.echoChannel = window.Echo.channel('new-messages');
                     window.echoChannel.listen('NewMessageReceived', (event) => {
                         if (currentEmail && currentEmail === event.email_client) {
                             lastMessagesHash = '';
                             loadMessages(true);
-<<<<<<< Updated upstream
                             if (document.getElementById('chatModal').classList.contains('active')) { playNotificationSound(); }
                             else { unreadCount++; updateBadge(); showRobotNotification(); playNotificationSound(); }
                         }
                     });
                     echoListenerSet = true;
                 } else { wsRetryCount++; if (wsRetryCount < 30) setTimeout(trySetup, 500); }
-=======
-                            
-                            const chatModal = document.getElementById('chatModal');
-                            const isChatOpen = chatModal ? chatModal.classList.contains('active') : false;
-                            
-                            // SON UNIQUEMENT à la réception d'un nouveau message
-                            if (isChatOpen) {
-                                playNotificationSound();
-                            } else {
-                                unreadCount++;
-                                updateBadge();
-                                showRobotNotification();
-                                playNotificationSound();
-                            }
-                        }
-                    });
-                    echoListenerSet = true;
-                } else {
-                    wsRetryCount++;
-                    if (wsRetryCount < 30) {
-                        setTimeout(trySetup, 500);
-                    }
-                }
->>>>>>> Stashed changes
             }
             trySetup();
         }
         setupEchoListener();
         
-<<<<<<< Updated upstream
         document.getElementById('footerContactForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isSending) return;
@@ -1433,104 +1067,6 @@
         });
         
         function openModal(catalogueId) {
-=======
-        /* ============================================================
-           FORMULAIRE CONTACT FOOTER
-        ============================================================ */
-        const footerForm = document.getElementById('footerContactForm');
-        if (footerForm) {
-            footerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (isSending) return;
-                
-                const nom = document.getElementById('footer_nom')?.value.trim() || '';
-                const email = document.getElementById('footer_email')?.value.trim() || '';
-                const tel = document.getElementById('footer_telephone')?.value.trim() || '';
-                const msg = document.getElementById('footer_message')?.value.trim() || '';
-                
-                if (!nom || !email || !msg) return;
-            
-                const btn = document.getElementById('footerSubmitBtn');
-                if (!btn) return;
-                const originalText = btn.innerHTML;
-                isSending = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';
-                btn.disabled = true;
-            
-                const successDiv = document.getElementById('footerContactSuccess');
-                const errorDiv = document.getElementById('footerContactError');
-                const result = await sendMessageAPI(nom, email, tel, msg);
-            
-                if (result.success) {
-                    currentEmail = email.trim().substring(0, MAX_EMAIL_LENGTH);
-                    currentNom = nom.trim().substring(0, MAX_NAME_LENGTH);
-                    if (footerForm) footerForm.reset();
-                    switchToConversationMode();
-                    openChatModal();
-                    lastMessagesHash = '';
-                    await loadMessages(true);
-                    startPolling();
-                    if (successDiv) {
-                        successDiv.textContent = 'Message envoyé avec succès !';
-                        successDiv.classList.remove('hidden');
-                        setTimeout(() => successDiv.classList.add('hidden'), 5000);
-                    }
-                } else {
-                    if (errorDiv) {
-                        errorDiv.textContent = result.message || 'Erreur lors de l\'envoi.';
-                        errorDiv.classList.remove('hidden');
-                        setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-                    }
-                }
-                
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                isSending = false;
-            });
-        }
-        
-        /* ============================================================
-           MODALES EXPERTISE
-        ============================================================ */
-        window.openExpertiseModal = function(type) {
-            const ids = { inter: 'modalInter', intra: 'modalIntra', accompagnement: 'modalAccompagnement' };
-            const m = document.getElementById(ids[type]);
-            if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-        };
-        
-        window.closeExpertiseModal = function(type) {
-            const ids = { inter: 'modalInter', intra: 'modalIntra', accompagnement: 'modalAccompagnement' };
-            const m = document.getElementById(ids[type]);
-            if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-        };
-        
-        window.openChatFromModal = function(type) {
-            const messages = {
-                intra: 'Bonjour, je souhaite discuter d\'une formation intra-entreprise sur mesure. Pouvez-vous me contacter ?',
-                accompagnement: 'Bonjour, je souhaite obtenir un devis pour un accompagnement ou un audit. Pouvez-vous me contacter ?'
-            };
-            if (typeof closeExpertiseModal === 'function') {
-                closeExpertiseModal(type);
-            }
-            setTimeout(() => {
-                if (currentEmail) {
-                    switchToConversationMode();
-                    const ta = document.getElementById('chatTextarea');
-                    if (ta) { ta.value = messages[type] || ''; setTimeout(() => ta.focus(), 100); }
-                } else {
-                    const im = document.getElementById('initMessage');
-                    if (im) im.value = messages[type] || '';
-                    setTimeout(() => { const n = document.getElementById('initNom'); if (n) n.focus(); }, 100);
-                }
-                openChatModal();
-            }, 250);
-        };
-        
-        /* ============================================================
-           MODALE CATALOGUE
-        ============================================================ */
-        window.openModal = function(catalogueId) {
->>>>>>> Stashed changes
             const safeId = parseInt(catalogueId, 10);
             if (!safeId || safeId <= 0) return;
             const modal = document.getElementById('syllabusModal');
@@ -1552,7 +1088,6 @@
                     });
                     const actions = document.createElement('div');
                     actions.className = 'mt-6 flex flex-wrap gap-4';
-<<<<<<< Updated upstream
                     if (data.fichier_pdf) { const dl = document.createElement('a'); dl.href = data.fichier_url; dl.target = '_blank'; dl.rel = 'noopener noreferrer'; dl.className = 'bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2'; dl.innerHTML = '<i class="fas fa-download"></i>'; const sp = document.createElement('span'); sp.textContent = 'Télécharger le syllabus'; dl.appendChild(sp); actions.appendChild(dl); }
                     const devis = document.createElement('a'); devis.href = '#contact'; devis.className = 'bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2'; devis.onclick = () => closeModal(); devis.innerHTML = '<i class="fas fa-file-invoice-dollar"></i>'; const sp2 = document.createElement('span'); sp2.textContent = 'Demander un devis'; devis.appendChild(sp2); actions.appendChild(devis);
                     contentDiv.appendChild(actions);
@@ -1565,58 +1100,6 @@
         function scrollPartenaire(dir) { const c = document.getElementById('partenairesScroll'); if (c) c.scrollBy({ left: dir === 'left' ? -300 : 300, behavior: 'smooth' }); }
         function scrollAvis(dir) { const c = document.getElementById('avisScroll'); if (c) c.scrollBy({ left: dir === 'left' ? -350 : 350, behavior: 'smooth' }); }
         
-=======
-                    if (data.fichier_pdf) {
-                        const dl = document.createElement('a');
-                        dl.href = data.fichier_url;
-                        dl.target = '_blank';
-                        dl.rel = 'noopener noreferrer';
-                        dl.className = 'bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2';
-                        dl.innerHTML = '<i class="fas fa-download"></i>';
-                        const sp = document.createElement('span');
-                        sp.textContent = 'Télécharger le syllabus';
-                        dl.appendChild(sp);
-                        actions.appendChild(dl);
-                    }
-                    const devis = document.createElement('a');
-                    devis.href = '#contact';
-                    devis.className = 'bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2';
-                    devis.onclick = () => window.closeModal();
-                    devis.innerHTML = '<i class="fas fa-file-invoice-dollar"></i>';
-                    const sp2 = document.createElement('span');
-                    sp2.textContent = 'Demander un devis';
-                    devis.appendChild(sp2);
-                    actions.appendChild(devis);
-                    contentDiv.appendChild(actions);
-                    titleSpan.textContent = escapeHtml(data.titre || 'Syllabus');
-                })
-                .catch(() => {
-                    contentDiv.innerHTML = '<div class="text-red-600 text-center py-8">Erreur de chargement. Réessayez.</div>';
-                });
-        };
-        
-        window.closeModal = function() {
-            const m = document.getElementById('syllabusModal');
-            if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-        };
-        
-        /* ============================================================
-           CARROUSELS
-        ============================================================ */
-        window.scrollPartenaire = function(dir) {
-            const c = document.getElementById('partenairesScroll');
-            if (c) c.scrollBy({ left: dir === 'left' ? -300 : 300, behavior: 'smooth' });
-        };
-        
-        window.scrollAvis = function(dir) {
-            const c = document.getElementById('avisScroll');
-            if (c) c.scrollBy({ left: dir === 'left' ? -350 : 350, behavior: 'smooth' });
-        };
-        
-        /* ============================================================
-           NOTIFICATIONS
-        ============================================================ */
->>>>>>> Stashed changes
         function flashError(msg) {
             if (!msg) return;
             let el = document.getElementById('chatFlashError');
@@ -1626,12 +1109,6 @@
             setTimeout(() => { if (el) el.style.display = 'none'; }, 5000);
         }
         
-<<<<<<< Updated upstream
-=======
-        /* ============================================================
-           EXPOSER LES FONCTIONS
-        ============================================================ */
->>>>>>> Stashed changes
         window.submitInitForm = submitInitForm;
         window.sendQuickMessage = sendQuickMessage;
         window.closeChatModal = closeChatModal;
@@ -1642,28 +1119,9 @@
         window.scrollAvis = scrollAvis;
         
         document.addEventListener('DOMContentLoaded', () => {
-<<<<<<< Updated upstream
             document.getElementById('chatSendBtn')?.addEventListener('click', sendQuickMessage);
             document.getElementById('chatTextarea')?.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuickMessage(); } });
             document.getElementById('chatTextarea')?.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
-=======
-            const sendBtn = document.getElementById('chatSendBtn');
-            if (sendBtn) sendBtn.addEventListener('click', sendQuickMessage);
-            
-            const textarea = document.getElementById('chatTextarea');
-            if (textarea) {
-                textarea.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendQuickMessage();
-                    }
-                });
-                textarea.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                });
-            }
->>>>>>> Stashed changes
         });
     })();
 </script>
