@@ -6,17 +6,19 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Events\NewMessageReceived;
-use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
+    /**
+     * Envoi d'un nouveau message depuis le formulaire de contact
+     */
     public function send(Request $request)
     {
         $request->validate([
             'nom' => 'required|string|max:150',
             'email' => 'required|email|max:150',
             'telephone' => 'nullable|string|max:30',
-            'message' => 'required|string|min:5',
+            'message' => 'required|string|min:2|max:2000',
         ]);
 
         $message = Message::create([
@@ -31,19 +33,22 @@ class ContactController extends Controller
             'closed' => false,
         ]);
 
-        Log::info('Message créé - broadcast pour: ' . $request->email);
         broadcast(new NewMessageReceived($message));
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Votre message a été envoyé avec succès !'
+                'message' => 'Votre message a été envoyé avec succès !',
+                'data' => $message
             ]);
         }
 
-        return redirect()->back()->with('message_success', 'Votre message a été envoyé avec succès. Nous vous répondrons rapidement.');
+        return redirect()->back()->with('message_success', 'Votre message a été envoyé avec succès.');
     }
 
+    /**
+     * Récupération des messages pour un client
+     */
     public function getMessages(Request $request)
     {
         $email = $request->query('email');
@@ -59,6 +64,9 @@ class ContactController extends Controller
         return response()->json($messages);
     }
 
+    /**
+     * Page admin - liste des conversations
+     */
     public function adminIndex()
     {
         $conversations = Message::select('email_client', 'nom_complet')
@@ -75,27 +83,12 @@ class ContactController extends Controller
                 ->count();
         }
         
-        // Changement ici : utilise 'admin.discu' au lieu de 'admin.messages'
         return view('admin.discu', compact('conversations'));
     }
 
-    public function repondre(Request $request, $id)
-    {
-        $request->validate([
-            'reponse_admin' => 'required|string|min:2'
-        ]);
-
-        $message = Message::findOrFail($id);
-        $message->reponse_admin = $request->reponse_admin;
-        $message->repondu = true;
-        $message->save();
-
-        Log::info('Réponse envoyée - broadcast pour: ' . $message->email_client);
-        broadcast(new NewMessageReceived($message));
-
-        return redirect()->back()->with('success', '✅ Réponse envoyée !');
-    }
-
+    /**
+     * Récupération de la conversation complète
+     */
     public function getConversation($email)
     {
         $messages = Message::where('email_client', $email)
@@ -105,31 +98,67 @@ class ContactController extends Controller
         return response()->json($messages);
     }
 
+    /**
+     * Réponse admin - Version finale corrigée
+     */
     public function replyFromModal(Request $request)
     {
         $request->validate([
             'email_client' => 'required|email',
-            'reponse_admin' => 'required|string'
+            'reponse_admin' => 'required|string|min:1|max:2000'
         ]);
 
+        // Chercher le dernier message SANS réponse de ce client
         $message = Message::where('email_client', $request->email_client)
+            ->whereNull('reponse_admin')
             ->latest()
             ->first();
-
+        
         if ($message) {
+            // Cas 1: Un message existe sans réponse → on ajoute la réponse
             $message->reponse_admin = $request->reponse_admin;
             $message->repondu = true;
             $message->save();
             
-            Log::info('Réponse modal - broadcast pour: ' . $request->email_client);
             broadcast(new NewMessageReceived($message));
             
             return response()->json(['success' => true]);
         }
         
-        return response()->json(['success' => false, 'message' => 'Aucun message trouvé pour cet email'], 404);
+        // Cas 2: Tous les messages ont déjà une réponse
+        // On récupère les infos du client
+        $lastMessage = Message::where('email_client', $request->email_client)->latest()->first();
+        
+        if (!$lastMessage) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Aucun message trouvé'
+            ], 404);
+        }
+        
+        // Créer un NOUVEAU message de type "réponse admin"
+        // IMPORTANT: le champ 'message' reste vide, la réponse va dans 'reponse_admin'
+        $newMessage = Message::create([
+            'nom_complet' => $lastMessage->nom_complet,
+            'email_client' => $request->email_client,
+            'telephone' => $lastMessage->telephone,
+            'message' => '', // Vide car c'est une réponse admin
+            'reponse_admin' => $request->reponse_admin,
+            'sujet' => 'Réponse de notre service client',
+            'date_envoi' => now(),
+            'lu' => false,
+            'repondu' => true,
+            'closed' => false,
+        ]);
+        
+        broadcast(new NewMessageReceived($newMessage));
+        
+        return response()->json(['success' => true]);
     }
 
+    /**
+     * Marquer un message comme lu
+     */
     public function markAsRead($id)
     {
         $message = Message::findOrFail($id);
@@ -139,6 +168,9 @@ class ContactController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Archiver / Désarchiver une conversation
+     */
     public function toggleCloseConversation(Request $request)
     {
         $request->validate([
@@ -146,18 +178,8 @@ class ContactController extends Controller
             'closed' => 'required|boolean'
         ]);
         
-        // Mettre à jour tous les messages de cette conversation
         Message::where('email_client', $request->email_client)
             ->update(['closed' => $request->closed]);
-        
-        // Mettre à jour l'utilisateur si existe
-        $user = User::where('email', $request->email_client)->first();
-        if ($user) {
-            $user->conversation_closed = $request->closed;
-            $user->save();
-        }
-        
-        // PAS DE BROADCAST - Pas besoin de notifier pour la clôture
         
         return response()->json(['success' => true, 'closed' => $request->closed]);
     }
