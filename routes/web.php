@@ -106,10 +106,26 @@ Route::get('/api/catalogue/{id}', function ($id) {
         'fichier_url' => $catalogue->fichier_pdf ? asset('storage/' . $catalogue->fichier_pdf) : null,
     ]);
 });
+
+// ==================== PAGE ADMIN DISCU ====================
 Route::get('/admin/discu', [App\Http\Controllers\ContactController::class, 'adminIndex'])->name('admin.discu');
 
+// ==================== PAGE À PROPOS ====================
 Route::get('/apropos', function () {
     return view('apropos');
 })->name('apropos');
+
+// ==================== PAGES EXPERTISES DÉDIÉES ====================
+Route::get('/expertise/inter-entreprises', function () {
+    return view('expertises.inter');
+})->name('expertise.inter');
+
+Route::get('/expertise/intra-entreprise', function () {
+    return view('expertises.intra');
+})->name('expertise.intra');
+
+Route::get('/expertise/accompagnement-audit', function () {
+    return view('expertises.accompagnement');
+})->name('expertise.accompagnement');
 
 require __DIR__.'/auth.php';
