@@ -15,6 +15,7 @@
         <table class="min-w-full">
             <thead class="bg-gray-50">
                 <tr>
+                    <th class="px-6 py-3">Image</th>               <!-- NOUVEAU -->
                     <th class="px-6 py-3">Titre</th>
                     <th class="px-6 py-3">Fichier</th>
                     <th class="px-6 py-3">Actif</th>
@@ -25,6 +26,14 @@
             <tbody>
                 @foreach($catalogues as $catalogue)
                 <tr class="border-t">
+                    <!-- NOUVEAU : Image miniature -->
+                    <td class="px-6 py-4">
+                        @if($catalogue->image)
+                            <img src="{{ asset('storage/'.$catalogue->image) }}" alt="Image" class="w-12 h-12 object-cover rounded">
+                        @else
+                            <span class="text-gray-400 text-sm">Aucune</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4">{{ $catalogue->titre }}</td>
                     <td class="px-6 py-4">
                         @if($catalogue->fichier_pdf)

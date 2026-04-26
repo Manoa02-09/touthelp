@@ -6,10 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Catalogue extends Model
 {
-   protected $fillable = [
-    'titre', 'description', 'objectifs', 'public_vise',
-    'programme', 'fichier_pdf', 'actif', 'ordre'
-];
+    protected $fillable = [
+        'titre',
+        'description',
+        'objectifs',
+        'public_vise',
+        'programme',
+        'fichier_pdf',
+        'image',      // ← AJOUT : pour l’image du catalogue
+        'actif',
+        'ordre',
+    ];
+
     protected $casts = [
         'actif' => 'boolean',
     ];
