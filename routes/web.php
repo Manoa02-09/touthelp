@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 // ==================== PAGE D'ACCUEIL ====================
 Route::get('/', function () {
     $catalogues = Catalogue::where('actif', true)->orderBy('ordre', 'asc')->get();
-    $articles = Article::where('publie', true)->orderBy('date_publication', 'desc')->limit(3)->get();
+    $articles = Article::where('publie', true)->orderBy('date_publication', 'desc')->get();
     $partenaires = Partenaire::where('actif', true)->orderBy('ordre_affichage', 'asc')->get();
     $avis = Avis::where('statut', 'publie')->orderBy('created_at', 'desc')->limit(10)->get();
 
@@ -35,8 +35,14 @@ Route::post('/avis', [AvisClientController::class, 'store'])->name('avis.store')
 // ==================== DÉTAIL D'UN ARTICLE (BLOG) ====================
 Route::get('/article/{slug}', function ($slug) {
     $article = Article::where('slug', $slug)->where('publie', true)->firstOrFail();
-    return view('site.article.show', compact('article'));
+    return view('article.show', compact('article'));
 })->name('blog.show');
+
+// ==================== DÉTAIL D'UN CATALOGUE (PAGE DÉDIÉE) ====================
+Route::get('/catalogue/{id}', function ($id) {
+    $catalogue = Catalogue::findOrFail($id);
+    return view('catalogue.show', compact('catalogue'));
+})->name('catalogue.show');
 
 // ==================== CALENDRIER ====================
 Route::get('/calendrier', function () {
@@ -69,15 +75,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('partenaires', PartenaireController::class);
     Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.update.profile');
 
-    // ========== PARAMÈTRES ==========
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.update.general');
-    Route::post('/settings/email', [SettingsController::class, 'updateEmail'])->name('settings.update.email');
-    Route::post('/settings/security', [SettingsController::class, 'updateSecurity'])->name('settings.update.security');
-    Route::post('/settings/social', [SettingsController::class, 'updateSocial'])->name('settings.update.social');
-    Route::post('/settings/legal', [SettingsController::class, 'updateLegal'])->name('settings.update.legal');
-    Route::delete('/settings/account', [SettingsController::class, 'destroyAccount'])->name('settings.account.destroy');
-    Route::post('/settings/test-email', [SettingsController::class, 'testEmail'])->name('settings.test.email');
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 // ==================== API ADMIN (MESSAGERIE) ====================
@@ -98,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('profile.destroy');
 });
 
-// ==================== API POUR LES CATALOGUES (MODALE) ====================
+// ==================== API POUR LES CATALOGUES (MODALE – gardée pour compatibilité) ====================
 Route::get('/api/catalogue/{id}', function ($id) {
     $catalogue = App\Models\Catalogue::findOrFail($id);
     return response()->json([

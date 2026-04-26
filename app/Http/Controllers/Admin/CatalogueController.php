@@ -23,29 +23,38 @@ class CatalogueController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'titre' => 'required|string|max:200',
-            'description' => 'nullable|string',
-            'objectifs' => 'nullable|string',
-            'public_vise' => 'nullable|string',
-            'programme' => 'nullable|string',
-            'fichier_pdf' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
-            'actif' => 'nullable|boolean',
-            'ordre' => 'nullable|integer',
+            'titre'        => 'required|string|max:200',
+            'description'  => 'nullable|string',
+            'objectifs'    => 'nullable|string',
+            'public_vise'  => 'nullable|string',
+            'programme'    => 'nullable|string',
+            'fichier_pdf'  => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Nouveau champ image
+            'actif'        => 'nullable|boolean',
+            'ordre'        => 'nullable|integer',
         ]);
 
         $catalogue = Catalogue::create([
-            'titre' => $request->titre,
+            'titre'       => $request->titre,
             'description' => $request->description,
-            'objectifs' => $request->objectifs,
+            'objectifs'   => $request->objectifs,
             'public_vise' => $request->public_vise,
-            'programme' => $request->programme,
-            'actif' => $request->has('actif'),
-            'ordre' => $request->ordre ?? 0,
+            'programme'   => $request->programme,
+            'actif'       => $request->has('actif'),
+            'ordre'       => $request->ordre ?? 0,
         ]);
 
+        // Gestion du fichier PDF
         if ($request->hasFile('fichier_pdf')) {
             $path = $request->file('fichier_pdf')->store('catalogues', 'public');
             $catalogue->fichier_pdf = $path;
+            $catalogue->save();
+        }
+
+        // Gestion de l'image
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('catalogues', 'public');
+            $catalogue->image = $imagePath;
             $catalogue->save();
         }
 
@@ -60,30 +69,44 @@ class CatalogueController extends Controller
     public function update(Request $request, Catalogue $catalogue)
     {
         $request->validate([
-            'titre' => 'required|string|max:200',
-            'description' => 'nullable|string',
-            'objectifs' => 'nullable|string',
-            'public_vise' => 'nullable|string',
-            'programme' => 'nullable|string',
-            'fichier_pdf' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
-            'actif' => 'nullable|boolean',
-            'ordre' => 'nullable|integer',
+            'titre'        => 'required|string|max:200',
+            'description'  => 'nullable|string',
+            'objectifs'    => 'nullable|string',
+            'public_vise'  => 'nullable|string',
+            'programme'    => 'nullable|string',
+            'fichier_pdf'  => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'actif'        => 'nullable|boolean',
+            'ordre'        => 'nullable|integer',
         ]);
 
         $catalogue->update([
-            'titre' => $request->titre,
+            'titre'       => $request->titre,
             'description' => $request->description,
-            'objectifs' => $request->objectifs,
+            'objectifs'   => $request->objectifs,
             'public_vise' => $request->public_vise,
-            'programme' => $request->programme,
-            'actif' => $request->has('actif'),
-            'ordre' => $request->ordre ?? 0,
+            'programme'   => $request->programme,
+            'actif'       => $request->has('actif'),
+            'ordre'       => $request->ordre ?? 0,
         ]);
 
+        // Mise à jour du fichier PDF
         if ($request->hasFile('fichier_pdf')) {
-            if ($catalogue->fichier_pdf) Storage::disk('public')->delete($catalogue->fichier_pdf);
+            if ($catalogue->fichier_pdf) {
+                Storage::disk('public')->delete($catalogue->fichier_pdf);
+            }
             $path = $request->file('fichier_pdf')->store('catalogues', 'public');
             $catalogue->fichier_pdf = $path;
+            $catalogue->save();
+        }
+
+        // Mise à jour de l'image (suppression ancienne + nouvelle)
+        if ($request->hasFile('image')) {
+            if ($catalogue->image) {
+                Storage::disk('public')->delete($catalogue->image);
+            }
+            $imagePath = $request->file('image')->store('catalogues', 'public');
+            $catalogue->image = $imagePath;
             $catalogue->save();
         }
 
@@ -102,8 +125,16 @@ class CatalogueController extends Controller
 
     public function destroy(Catalogue $catalogue)
     {
-        if ($catalogue->fichier_pdf) Storage::disk('public')->delete($catalogue->fichier_pdf);
+        // Supprime le fichier PDF associé s'il existe
+        if ($catalogue->fichier_pdf) {
+            Storage::disk('public')->delete($catalogue->fichier_pdf);
+        }
+        // Supprime l'image associée si elle existe
+        if ($catalogue->image) {
+            Storage::disk('public')->delete($catalogue->image);
+        }
         $catalogue->delete();
+
         return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue supprimé.');
     }
 }
