@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\AvisController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\PartenaireController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AvisClientController;
 use App\Models\Catalogue;
@@ -62,14 +64,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('catalogues', CatalogueController::class);
     Route::resource('formations', FormationController::class);
     Route::resource('avis', AvisController::class);
-    // Route pour accepter un avis (publication rapide)
     Route::patch('/avis/{avi}/accept', [AvisController::class, 'accept'])->name('avis.accept');
     Route::resource('articles', ArticleController::class);
     Route::resource('partenaires', PartenaireController::class);
+    Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.update.profile');
 
-    // Paramètres (email de contact)
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    // ========== PARAMÈTRES ==========
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.update.general');
+    Route::post('/settings/email', [SettingsController::class, 'updateEmail'])->name('settings.update.email');
+    Route::post('/settings/security', [SettingsController::class, 'updateSecurity'])->name('settings.update.security');
+    Route::post('/settings/social', [SettingsController::class, 'updateSocial'])->name('settings.update.social');
+    Route::post('/settings/legal', [SettingsController::class, 'updateLegal'])->name('settings.update.legal');
+    Route::delete('/settings/account', [SettingsController::class, 'destroyAccount'])->name('settings.account.destroy');
+    Route::post('/settings/test-email', [SettingsController::class, 'testEmail'])->name('settings.test.email');
 });
 
 // ==================== API ADMIN (MESSAGERIE) ====================
@@ -127,5 +135,8 @@ Route::get('/expertise/intra-entreprise', function () {
 Route::get('/expertise/accompagnement-audit', function () {
     return view('expertises.accompagnement');
 })->name('expertise.accompagnement');
+
+// ==================== API RECHERCHE GLOBALE ====================
+Route::get('/api/admin/search', [SearchController::class, 'api'])->name('api.admin.search');
 
 require __DIR__.'/auth.php';

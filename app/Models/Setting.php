@@ -6,16 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'type', 'group'];
 
-    public static function get($key, $default = null)
+    public static function get(string $key, $default = null)
     {
         $setting = self::where('key', $key)->first();
         return $setting ? $setting->value : $default;
     }
 
-    public static function set($key, $value)
+    public static function set(string $key, $value, string $type = 'text', string $group = 'general')
     {
-        self::updateOrCreate(['key' => $key], ['value' => $value]);
+        return self::updateOrCreate(
+            ['key' => $key],
+            ['value' => $value, 'type' => $type, 'group' => $group]
+        );
+    }
+
+    public static function getGroup(string $group)
+    {
+        return self::where('group', $group)->get()->pluck('value', 'key');
     }
 }

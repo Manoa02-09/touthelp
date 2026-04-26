@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
+use App\Models\Catalogue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,12 +18,14 @@ class FormationController extends Controller
 
     public function create()
     {
-        return view('admin.formations.create');
+        $catalogues = Catalogue::orderBy('titre')->get();
+        return view('admin.formations.create', compact('catalogues'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'catalogue_id' => 'required|exists:catalogues,id',
             'titre' => 'required|string|max:200',
             'image' => 'nullable|image|max:2048',
             'description' => 'nullable|string',
@@ -38,6 +41,7 @@ class FormationController extends Controller
         ]);
 
         $formation = Formation::create([
+            'catalogue_id' => $request->catalogue_id,
             'titre' => $request->titre,
             'description' => $request->description,
             'description_courte' => $request->description_courte,
@@ -62,12 +66,14 @@ class FormationController extends Controller
 
     public function edit(Formation $formation)
     {
-        return view('admin.formations.edit', compact('formation'));
+        $catalogues = Catalogue::orderBy('titre')->get();
+        return view('admin.formations.edit', compact('formation', 'catalogues'));
     }
 
     public function update(Request $request, Formation $formation)
     {
         $request->validate([
+            'catalogue_id' => 'required|exists:catalogues,id',
             'titre' => 'required|string|max:200',
             'image' => 'nullable|image|max:2048',
             'description' => 'nullable|string',
@@ -83,6 +89,7 @@ class FormationController extends Controller
         ]);
 
         $formation->update([
+            'catalogue_id' => $request->catalogue_id,
             'titre' => $request->titre,
             'description' => $request->description,
             'description_courte' => $request->description_courte,
@@ -103,7 +110,19 @@ class FormationController extends Controller
             $formation->save();
         }
 
+        if ($request->has('delete_image')) {
+            if ($formation->image) Storage::disk('public')->delete($formation->image);
+            $formation->image = null;
+            $formation->save();
+        }
+
         return redirect()->route('admin.formations.index')->with('success', 'Formation mise à jour.');
+    }
+
+    // ✅ MÉTHODE SHOW AJOUTÉE
+    public function show(Formation $formation)
+    {
+        return redirect()->route('admin.formations.edit', $formation);
     }
 
     public function destroy(Formation $formation)

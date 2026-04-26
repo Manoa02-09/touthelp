@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Events\NewMessageReceived;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -33,7 +33,11 @@ class ContactController extends Controller
             'closed' => false,
         ]);
 
-        broadcast(new NewMessageReceived($message));
+        try {
+            broadcast(new NewMessageReceived($message));
+        } catch (\Exception $e) {
+            Log::warning('Pusher broadcast error: ' . $e->getMessage());
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -103,57 +107,78 @@ class ContactController extends Controller
      */
     public function replyFromModal(Request $request)
     {
-        $request->validate([
-            'email_client' => 'required|email',
-            'reponse_admin' => 'required|string|min:1|max:2000'
-        ]);
-
-        // Chercher le dernier message SANS réponse de ce client
-        $message = Message::where('email_client', $request->email_client)
-            ->whereNull('reponse_admin')
-            ->latest()
-            ->first();
-        
-        if ($message) {
-            // Cas 1: Un message existe sans réponse → on ajoute la réponse
-            $message->reponse_admin = $request->reponse_admin;
-            $message->repondu = true;
-            $message->save();
+        try {
+            Log::info('=== REPLY FUNCTION CALLED ===');
+            Log::info('Email: ' . $request->email_client);
+            Log::info('Message: ' . $request->reponse_admin);
             
-            broadcast(new NewMessageReceived($message));
+            $request->validate([
+                'email_client' => 'required|email',
+                'reponse_admin' => 'required|string|min:1|max:2000'
+            ]);
             
-            return response()->json(['success' => true]);
+            // 1. Chercher un message SANS réponse de ce client
+            $message = Message::where('email_client', $request->email_client)
+                ->where(function($q) {
+                    $q->whereNull('reponse_admin')->orWhere('reponse_admin', '');
+                })
+                ->latest()
+                ->first();
+            
+            if ($message) {
+                Log::info('Cas 1: Message trouvé sans réponse, ID: ' . $message->id);
+                $message->reponse_admin = $request->reponse_admin;
+                $message->repondu = true;
+                $message->save();
+                
+                try {
+                    event(new NewMessageReceived($message));
+                } catch (\Exception $e) {
+                    Log::warning('Pusher event error (ignorée): ' . $e->getMessage());
+                }
+                
+                return response()->json(['success' => true, 'message' => 'Réponse ajoutée']);
+            }
+            
+            // 2. Créer une nouvelle entrée de réponse
+            $lastMessage = Message::where('email_client', $request->email_client)->latest()->first();
+            
+            if (!$lastMessage) {
+                Log::error('Cas 2: Aucun message trouvé pour ce client');
+                return response()->json(['success' => false, 'message' => 'Aucun message trouvé'], 404);
+            }
+            
+            Log::info('Cas 2: Création d\'une nouvelle réponse pour: ' . $lastMessage->nom_complet);
+            
+            $newMessage = Message::create([
+                'nom_complet' => $lastMessage->nom_complet,
+                'email_client' => $request->email_client,
+                'telephone' => $lastMessage->telephone ?? null,
+                'message' => '',
+                'reponse_admin' => $request->reponse_admin,
+                'sujet' => 'Réponse de notre service client',
+                'date_envoi' => now(),
+                'lu' => false,
+                'repondu' => true,
+                'closed' => false,
+            ]);
+            
+            try {
+                event(new NewMessageReceived($newMessage));
+            } catch (\Exception $e) {
+                Log::warning('Pusher event error (ignorée): ' . $e->getMessage());
+            }
+            
+            return response()->json(['success' => true, 'message' => 'Nouvelle réponse créée']);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error: ' . json_encode($e->errors()));
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('CRITICAL ERROR: ' . $e->getMessage());
+            Log::error('File: ' . $e->getFile() . ' line ' . $e->getLine());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-        
-        // Cas 2: Tous les messages ont déjà une réponse
-        // On récupère les infos du client
-        $lastMessage = Message::where('email_client', $request->email_client)->latest()->first();
-        
-        if (!$lastMessage) {
-            return response()->json([
-                'success' => false, 
-                'message' => 'Aucun message trouvé'
-            ], 404);
-        }
-        
-        // Créer un NOUVEAU message de type "réponse admin"
-        // IMPORTANT: le champ 'message' reste vide, la réponse va dans 'reponse_admin'
-        $newMessage = Message::create([
-            'nom_complet' => $lastMessage->nom_complet,
-            'email_client' => $request->email_client,
-            'telephone' => $lastMessage->telephone,
-            'message' => '', // Vide car c'est une réponse admin
-            'reponse_admin' => $request->reponse_admin,
-            'sujet' => 'Réponse de notre service client',
-            'date_envoi' => now(),
-            'lu' => false,
-            'repondu' => true,
-            'closed' => false,
-        ]);
-        
-        broadcast(new NewMessageReceived($newMessage));
-        
-        return response()->json(['success' => true]);
     }
 
     /**

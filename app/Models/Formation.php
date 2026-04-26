@@ -7,9 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Formation extends Model
 {
     protected $fillable = [
-        'titre', 'image', 'description', 'description_courte',
-        'date_debut', 'date_fin', 'heure', 'lieu', 'prix',
-        'places_max', 'lien_inscription', 'actif'
+        'catalogue_id',  // ← AJOUTE CETTE LIGNE
+        'titre', 
+        'image', 
+        'description', 
+        'description_courte',
+        'date_debut', 
+        'date_fin', 
+        'heure', 
+        'lieu', 
+        'prix',
+        'places_max', 
+        'lien_inscription', 
+        'actif'
     ];
 
     protected $casts = [
@@ -17,4 +27,10 @@ class Formation extends Model
         'date_fin' => 'date',
         'actif' => 'boolean',
     ];
+
+    // Ajoute aussi la relation (bonne pratique)
+    public function catalogue()
+    {
+        return $this->belongsTo(Catalogue::class);
+    }
 }

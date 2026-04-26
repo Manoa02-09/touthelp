@@ -13,6 +13,7 @@
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -618,7 +619,7 @@
         </div>
     </section>
 
-    <!-- FOOTER FUSIONNÉ (NOTRE VERSION) -->
+    <!-- FOOTER FUSIONNÉ -->
     <footer id="contact" class="scroll-mt-header">
         <div class="bg-rose-500 text-white pt-12">
             <div class="container mx-auto px-4">
@@ -677,7 +678,6 @@
     <div id="syllabusModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"><div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"><div class="sticky top-0 bg-white p-4 border-b flex justify-between items-center"><h3 id="modalTitle" class="text-2xl font-bold text-gray-800">Détail du syllabus</h3><button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button></div><div id="modalContent" class="p-6"></div></div></div>
 
     @vite(['resources/js/app.js'])
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 
     <script>
     (function() {
@@ -687,7 +687,7 @@
         let currentNom = '';
         let unreadCount = 0;
         let audioCtx = null;
-        let echoListenerSet = false;
+        let pusherListenerSet = false;
         let pollInterval = null;
         let isLoading = false;
         let isSending = false;
@@ -697,7 +697,8 @@
         let soundEnabled = true;
         let audioEnabled = false;
         let pendingSounds = [];
-        const rateLimits = new Map();
+        let wsRetryCount = 0;
+        let pusherChannel = null;
         
         const MAX_MESSAGE_LENGTH = 1000;
         const MAX_NAME_LENGTH = 150;
@@ -768,6 +769,8 @@
             requestTimestamps.push(now);
             return false;
         }
+        
+        let rateLimits = new Map();
         
         function checkRateLimit(email) { return !isRateLimited(email); }
         
@@ -964,7 +967,7 @@
                 lastMessagesHash = '';
                 await loadMessages(true);
                 startPolling();
-                setupEchoListener();
+                setupPusherListener();
             } else if (result.message) { flashError(result.message); }
             btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation';
             btn.disabled = false;
@@ -981,18 +984,24 @@
             if (!btn) return;
             isSending = true;
             btn.disabled = true;
+            const originalMsg = msg;
             ta.value = '';
             ta.style.height = 'auto';
-            const result = await sendMessageAPI(currentNom, currentEmail, '', msg);
-            if (result.success) { lastMessagesHash = ''; await loadMessages(true); }
-            else if (result.message) { flashError(result.message); }
+            const result = await sendMessageAPI(currentNom, currentEmail, '', originalMsg);
+            if (result.success) { 
+                lastMessagesHash = ''; 
+                await loadMessages(true); 
+            } else if (result.message) { 
+                flashError(result.message); 
+                ta.value = originalMsg;
+            }
             btn.disabled = false;
             isSending = false;
         }
         
         function resetChat() {
             currentEmail = ''; currentNom = ''; lastMessageId = null; lastMessagesHash = ''; unreadCount = 0;
-            updateBadge(); stopPolling(); echoListenerSet = false;
+            updateBadge(); stopPolling();
             document.getElementById('chatInitForm').style.display = 'block';
             document.getElementById('chatInputArea').style.display = 'none';
             document.getElementById('changeIdentityBar').style.display = 'none';
@@ -1004,27 +1013,64 @@
             isSending = false;
         }
         
-        let wsRetryCount = 0;
-        function setupEchoListener() {
-            if (echoListenerSet) return;
-            function trySetup() {
-                if (window.Echo) {
-                    if (window.echoChannel) window.Echo.leaveChannel('new-messages');
-                    window.echoChannel = window.Echo.channel('new-messages');
-                    window.echoChannel.listen('NewMessageReceived', (event) => {
+        // Configuration Pusher (remplace Echo/Reverb)
+        function setupPusherListener() {
+            if (pusherListenerSet) return;
+            
+            function initPusher() {
+                if (typeof Pusher === 'undefined') {
+                    wsRetryCount++;
+                    if (wsRetryCount < 30) setTimeout(initPusher, 500);
+                    return;
+                }
+                
+                const pusherKey = '{{ env("PUSHER_APP_KEY") }}';
+                const pusherCluster = '{{ env("PUSHER_APP_CLUSTER") }}';
+                
+                if (!pusherKey || pusherKey === '') {
+                    console.warn('Pusher non configuré');
+                    return;
+                }
+                
+                try {
+                    const pusher = new Pusher(pusherKey, {
+                        cluster: pusherCluster,
+                        encrypted: true
+                    });
+                    
+                    if (pusherChannel) {
+                        try { pusherChannel.unbind_all(); } catch(e) {}
+                    }
+                    
+                    pusherChannel = pusher.subscribe('new-messages');
+                    
+                    pusherChannel.bind('App\\Events\\NewMessageReceived', (event) => {
+                        console.log('📨 Message reçu (Pusher):', event);
+                        
                         if (currentEmail && currentEmail === event.email_client) {
                             lastMessagesHash = '';
                             loadMessages(true);
-                            if (document.getElementById('chatModal').classList.contains('active')) { playNotificationSound(); }
-                            else { unreadCount++; updateBadge(); showRobotNotification(); playNotificationSound(); }
+                            const modal = document.getElementById('chatModal');
+                            if (modal && modal.classList.contains('active')) {
+                                playNotificationSound();
+                            } else {
+                                unreadCount++;
+                                updateBadge();
+                                showRobotNotification();
+                                playNotificationSound();
+                            }
                         }
                     });
-                    echoListenerSet = true;
-                } else { wsRetryCount++; if (wsRetryCount < 30) setTimeout(trySetup, 500); }
+                    
+                    pusherListenerSet = true;
+                    console.log('✅ Pusher connecté (client)');
+                } catch(e) {
+                    console.error('Erreur Pusher:', e);
+                }
             }
-            trySetup();
+            
+            initPusher();
         }
-        setupEchoListener();
         
         document.getElementById('footerContactForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1053,6 +1099,7 @@
                 lastMessagesHash = '';
                 await loadMessages(true);
                 startPolling();
+                setupPusherListener();
                 successDiv.textContent = 'Message envoyé avec succès !';
                 successDiv.classList.remove('hidden');
                 setTimeout(() => successDiv.classList.add('hidden'), 5000);
@@ -1124,6 +1171,6 @@
             document.getElementById('chatTextarea')?.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
         });
     })();
-</script>
+    </script>
 </body>
 </html>

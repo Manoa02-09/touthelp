@@ -90,6 +90,16 @@ class CatalogueController extends Controller
         return redirect()->route('admin.catalogues.index')->with('success', 'Catalogue mis à jour.');
     }
 
+    // ✅ AJOUTE CETTE MÉTHODE
+    public function show(Catalogue $catalogue)
+    {
+        // Soit tu rediriges vers l'édition (solution simple)
+        return redirect()->route('admin.catalogues.edit', $catalogue);
+        
+        // Ou si tu veux une vraie page show, crée la vue :
+        // return view('admin.catalogues.show', compact('catalogue'));
+    }
+
     public function destroy(Catalogue $catalogue)
     {
         if ($catalogue->fichier_pdf) Storage::disk('public')->delete($catalogue->fichier_pdf);
