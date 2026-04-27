@@ -23,8 +23,10 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
+        //dd($request->all());
         $request->validate([
             'titre' => 'required|string|max:200',
+            'auteur' => 'required|string|max:100',
             'contenu' => 'required|string',
             'extrait' => 'nullable|string',
             'image_une' => 'nullable|image|max:2048',
@@ -32,8 +34,8 @@ class ArticleController extends Controller
             'publie' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication']);
-        $data['type'] = 'blog'; // forcé
+        $data = $request->only(['titre', 'auteur', 'contenu', 'extrait', 'date_publication']);
+        $data['type'] = 'blog';
         $data['slug'] = Str::slug($request->titre) . '-' . uniqid();
         $data['publie'] = $request->has('publie');
 
@@ -55,6 +57,7 @@ class ArticleController extends Controller
     {
         $request->validate([
             'titre' => 'required|string|max:200',
+            'auteur' => 'required|string|max:100',
             'contenu' => 'required|string',
             'extrait' => 'nullable|string',
             'image_une' => 'nullable|image|max:2048',
@@ -62,17 +65,24 @@ class ArticleController extends Controller
             'publie' => 'nullable|boolean',
         ]);
 
-        $data = $request->only(['titre', 'contenu', 'extrait', 'date_publication']);
+        $data = $request->only(['titre', 'auteur', 'contenu', 'extrait', 'date_publication']);
         $data['publie'] = $request->has('publie');
-        // Ne pas modifier le type (reste 'blog')
+
         if ($request->titre != $article->titre) {
             $data['slug'] = Str::slug($request->titre) . '-' . uniqid();
         }
 
+        // Gestion de l'image
         if ($request->hasFile('image_une')) {
             if ($article->image_une) Storage::disk('public')->delete($article->image_une);
             $path = $request->file('image_une')->store('articles', 'public');
             $data['image_une'] = $path;
+        }
+
+        // Suppression d'image si demandée
+        if ($request->has('delete_image') && $request->delete_image == 1) {
+            if ($article->image_une) Storage::disk('public')->delete($article->image_une);
+            $data['image_une'] = null;
         }
 
         $article->update($data);

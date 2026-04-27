@@ -5,54 +5,15 @@
 
 @section('content')
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
-    @endif
-
-    <div class="bg-white rounded shadow overflow-hidden">
-        <table class="min-w-full">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3">Image</th>               <!-- NOUVEAU -->
-                    <th class="px-6 py-3">Titre</th>
-                    <th class="px-6 py-3">Fichier</th>
-                    <th class="px-6 py-3">Actif</th>
-                    <th class="px-6 py-3">Ordre</th>
-                    <th class="px-6 py-3">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($catalogues as $catalogue)
-                <tr class="border-t">
-                    <!-- NOUVEAU : Image miniature -->
-                    <td class="px-6 py-4">
-                        @if($catalogue->image)
-                            <img src="{{ asset('storage/'.$catalogue->image) }}" alt="Image" class="w-12 h-12 object-cover rounded">
-                        @else
-                            <span class="text-gray-400 text-sm">Aucune</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4">{{ $catalogue->titre }}</td>
-                    <td class="px-6 py-4">
-                        @if($catalogue->fichier_pdf)
-                            <a href="{{ asset('storage/'.$catalogue->fichier_pdf) }}" target="_blank">Télécharger</a>
-                        @else
-                            <span class="text-gray-400">Aucun</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4">{{ $catalogue->actif ? 'Oui' : 'Non' }}</td>
-                    <td class="px-6 py-4">{{ $catalogue->ordre }}</td>
-                    <td class="px-6 py-4">
-                        <a href="{{ route('admin.catalogues.edit', $catalogue) }}" class="text-blue-600 mr-3">Modifier</a>
-                        <form action="{{ route('admin.catalogues.destroy', $catalogue) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-600">Supprimer</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+<!-- PAGE HEADER -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+            📚 Catalogues
+        </h1>
+        <p style="color: var(--text-muted); font-size: 13px;">
+            Total: <strong>{{ $catalogues->count() }} catalogues</strong> • Gestion complète de vos syllabus
+        </p>
     </div>
     <a href="{{ route('admin.catalogues.create') }}" class="btn-primary">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">

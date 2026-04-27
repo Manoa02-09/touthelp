@@ -90,6 +90,7 @@
                     <tr>
                         <th>Image</th>
                         <th>Titre</th>
+                        <th>Auteur</th>
                         <th>Date publication</th>
                         <th>Extrait</th>
                         <th>Statut</th>
@@ -126,6 +127,14 @@
                                     @endif
                                 </span>
                             </div>
+                        </td>
+                        <td>
+                            <span style="color: var(--text-secondary); font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                {{ $article->auteur ?? 'Auteur inconnu' }}
+                            </span>
                         </td>
                         <td>
                             <span style="color: var(--text-secondary); font-size: 13px; display: flex; align-items: center; gap: 4px;">

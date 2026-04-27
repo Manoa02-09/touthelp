@@ -73,10 +73,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/avis/{avi}/accept', [AvisController::class, 'accept'])->name('avis.accept');
     Route::resource('articles', ArticleController::class);
     Route::resource('partenaires', PartenaireController::class);
-    Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.update.profile');
 
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    // ========== PARAMÈTRES (Settings) ==========
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.update.general');
+    Route::post('/settings/security', [SettingsController::class, 'updateSecurity'])->name('settings.update.security');
+    Route::post('/settings/social', [SettingsController::class, 'updateSocial'])->name('settings.update.social');
+    Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.update.profile');
+    Route::delete('/settings/account', [SettingsController::class, 'destroyAccount'])->name('settings.account.destroy');
 });
 
 // ==================== API ADMIN (MESSAGERIE) ====================

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Tout Help - Accueil</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://js.pusher.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' ws://localhost:8080 wss://localhost:8080 http://127.0.0.1:8080; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://js.pusher.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://*.pusher.com; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Frame-Options" content="DENY">
@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -980,6 +981,8 @@
     </div>
 </section>
 
+<!-- [FIN DES SECTIONS PRÉCÉDENTES (ACCUEIL, APROPOS, EXPERTISE, CATALOGUE, PARTENAIRES, AVIS, BLOG) — TOUT LE DESIGN EST CONSERVÉ] -->
+
 <footer id="contact" class="scroll-mt-header">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2.5rem 2.5rem 0 0;" class="text-white pt-12 pb-8">
         <div class="container mx-auto px-4">
@@ -992,14 +995,17 @@
                     <form id="footerContactForm" class="space-y-3">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <input type="text" name="nom" placeholder="Nom" class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
-                            <input type="email" name="email" placeholder="Email" class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
+                            <input type="text" name="nom" id="footer_nom" placeholder="Nom" class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
+                            <input type="email" name="email" id="footer_email" placeholder="Email" class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
+                            <input type="tel" name="telephone" id="footer_telephone" placeholder="Téléphone" class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition">
                         </div>
-                        <textarea name="message" rows="3" placeholder="Votre message..." class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required></textarea>
-                        <button type="submit" class="w-full bg-white text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-50 transition shadow-lg transform hover:-translate-y-1">
+                        <textarea name="message" rows="3" id="footer_message" placeholder="Votre message..." class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required></textarea>
+                        <button type="submit" id="footerSubmitBtn" class="w-full bg-white text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-50 transition shadow-lg transform hover:-translate-y-1">
                             Envoyer
                         </button>
                     </form>
+                    <div id="footerContactSuccess" class="hidden mt-3 p-2 bg-green-800/30 text-green-200 text-sm text-center rounded-xl"></div>
+<div id="footerContactError" class="hidden mt-3 p-2 bg-red-800/30 text-red-200 text-sm text-center rounded-xl"></div>
                 </div>
                 <div class="border-t border-gray-700 pt-6 mt-8 text-center"><p class="text-gray-500 text-xs">&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p></div>
             </div>
@@ -1021,6 +1027,7 @@
                     </nav>
                 </div>
 
+                <!-- Message du développeur -->
                 <div class="w-full max-w-2xl bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-center backdrop-blur-sm">
                     <p class="text-indigo-400 text-[10px] uppercase font-bold tracking-[0.2em] mb-2">Partenaire Digital</p>
                     <p class="text-gray-300 text-sm leading-relaxed">
@@ -1071,175 +1078,245 @@
     </div>
 
     @vite(['resources/js/app.js'])
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 
-    <script>
+   <script>
     (function() {
         "use strict";
-        let currentEmail='',currentNom='',unreadCount=0,audioCtx=null,echoListenerSet=false,pollInterval=null,isLoading=false,isSending=false,lastMessageId=null,lastRefreshTime=0,lastMessagesHash='',hasNewMessage=false,notificationTimeout=null;
+        let currentEmail='',currentNom='',unreadCount=0,audioCtx=null,pusherListenerSet=false,pollInterval=null,isLoading=false,isSending=false,lastMessageId=null,lastRefreshTime=0,lastMessagesHash='',hasNewMessage=false,notificationTimeout=null,pusherChannel=null,wsRetryCount=0;
         const rateLimits=new Map(),MAX_MESSAGE_LENGTH=1000,MAX_NAME_LENGTH=150,MAX_EMAIL_LENGTH=150,MAX_PHONE_LENGTH=30;
+        
         function escapeHtml(str){if(str===null||str===undefined)return'';const div=document.createElement('div');div.textContent=String(str);return div.innerHTML;}
         function isValidEmail(email){if(!email||typeof email!=='string')return false;const trimmed=email.trim();if(trimmed.length>MAX_EMAIL_LENGTH)return false;const emailRegex=/^[a-zA-Z0-9][a-zA-Z0-9._%+-]{0,63}@[a-zA-Z0-9][a-zA-Z0-9.-]{0,252}\.[a-zA-Z]{2,}$/;return emailRegex.test(trimmed);}
         function isValidName(name){if(!name||typeof name!=='string')return false;const trimmed=name.trim();if(trimmed.length>MAX_NAME_LENGTH)return false;if(trimmed.length<2)return false;const nameRegex=/^[a-zA-ZÀ-ÿ\s'\-]{2,150}$/;return nameRegex.test(trimmed);}
         function isValidPhone(phone){if(!phone)return true;const trimmed=phone.trim();if(trimmed.length>MAX_PHONE_LENGTH)return false;const phoneRegex=/^[\d\s+\-().]{1,30}$/;return phoneRegex.test(trimmed);}
         function isValidMessage(msg){if(!msg||typeof msg!=='string')return false;const trimmed=msg.trim();if(trimmed.length<2)return false;if(trimmed.length>MAX_MESSAGE_LENGTH)return false;if(/<[^>]*>/.test(trimmed))return false;if(/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(trimmed))return false;return true;}
         function sanitize(str,max=1000){if(!str)return'';let cleaned=String(str);cleaned=cleaned.replace(/<[^>]*>/g,'');cleaned=cleaned.substring(0,max);return cleaned.trim();}
+        
         const RATE_LIMIT_DELAY=5000,MAX_REQUESTS_PER_MINUTE=12,requestTimestamps=[];
         function isRateLimited(email){const now=Date.now();while(requestTimestamps.length>0&&requestTimestamps[0]<now-60000){requestTimestamps.shift();}if(requestTimestamps.length>=MAX_REQUESTS_PER_MINUTE){flashError('Trop de tentatives. Veuillez patienter une minute.');return true;}const last=rateLimits.get(email)||0;if(now-last<RATE_LIMIT_DELAY){flashError('Merci de patienter quelques secondes avant de renvoyer.');return true;}rateLimits.set(email,now);requestTimestamps.push(now);return false;}
         function checkRateLimit(email){return!isRateLimited(email);}
+        
         let audioEnabled=false,pendingSounds=[];
         function initAudio(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}}
         function enableAudio(){if(audioEnabled)return;initAudio();if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume().then(()=>{audioEnabled=true;pendingSounds.forEach(()=>playNotifSound());pendingSounds=[];}).catch(e=>console.warn('Audio resume failed:',e));}else if(audioCtx&&audioCtx.state==='running'){audioEnabled=true;}}
         function playNotifSound(){if(!audioEnabled){pendingSounds.push(true);return;}try{initAudio();if(!audioCtx||audioCtx.state!=='running')return;const now=audioCtx.currentTime;const o1=audioCtx.createOscillator();const g1=audioCtx.createGain();o1.connect(g1);g1.connect(audioCtx.destination);o1.type='sine';o1.frequency.value=880;g1.gain.setValueAtTime(0.2,now);g1.gain.exponentialRampToValueAtTime(0.00001,now+0.25);o1.start(now);o1.stop(now+0.25);setTimeout(()=>{if(audioCtx&&audioCtx.state==='running'){const o2=audioCtx.createOscillator();const g2=audioCtx.createGain();o2.connect(g2);g2.connect(audioCtx.destination);o2.type='sine';o2.frequency.value=660;g2.gain.setValueAtTime(0.15,audioCtx.currentTime);g2.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.2);o2.start();o2.stop(audioCtx.currentTime+0.2);}},120);}catch(e){console.warn('Erreur lecture son:',e);}}
         document.addEventListener('click',enableAudio,{once:true});
         document.getElementById('robotIcon')?.addEventListener('click',enableAudio);
+        
         function updateBadge(){const b=document.getElementById('robotBadge');if(!b)return;if(unreadCount>0){b.textContent=unreadCount>99?'99+':unreadCount;b.style.display='flex';b.style.animation='none';b.offsetHeight;b.style.animation='badgePulse 0.6s ease-in-out';}else{b.style.display='none';}}
         function showRobotNotification(){const robot=document.getElementById('robotIcon');if(!robot)return;robot.classList.add('robot-notification');setTimeout(()=>robot.classList.remove('robot-notification'),1000);}
         function openChatModal(){const modal=document.getElementById('chatModal');modal.classList.add('active');unreadCount=0;updateBadge();if(currentEmail){loadMessages(true);startPolling();}scrollChatToBottom();}
         function closeChatModal(){document.getElementById('chatModal').classList.remove('active');stopPolling();}
         document.getElementById('robotIcon').addEventListener('click',openChatModal);
-        window.addEventListener('click',(e)=>{const modal=document.getElementById('chatModal');const robot=document.getElementById('robotIcon');if(!modal.classList.contains('active'))return;if(modal.contains(e.target)||robot.contains(e.target))return;closeChatModal();});
-        document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;closeChatModal();});
+        
         function scrollChatToBottom(){setTimeout(()=>{const b=document.getElementById('chatBody');if(b)b.scrollTop=b.scrollHeight;},100);}
         function startPolling(){stopPolling();if(!currentEmail)return;pollInterval=setInterval(()=>{if(currentEmail&&document.getElementById('chatModal').classList.contains('active')){loadMessages(false);}},6000);}
         function stopPolling(){if(pollInterval){clearInterval(pollInterval);pollInterval=null;}}
         function generateMessagesHash(messages){if(!messages||messages.length===0)return'';const lastMsg=messages[messages.length-1];return`${lastMsg?.id||''}-${lastMsg?.updated_at||''}-${messages.length}`;}
-        function renderMessages(messages,isNewMessage=false){const area=document.getElementById('chatMessagesArea');if(!messages||messages.length===0){area.innerHTML='<div class="pending-tag">⏳ En attente de réponse...</div>';return;}const frag=document.createDocumentFragment();for(let i=0;i<messages.length;i++){const m=messages[i];const sentDiv=document.createElement('div');sentDiv.className='bubble-sent';const sentInner=document.createElement('div');sentInner.className='bubble-sent-inner';const sentTxt=document.createElement('div');sentTxt.className='bubble-text';sentTxt.textContent=escapeHtml(m.message);const sentTime=document.createElement('div');sentTime.className='bubble-time';sentTime.textContent=formatTime(m.created_at);sentInner.append(sentTxt,sentTime);sentDiv.appendChild(sentInner);frag.appendChild(sentDiv);if(m.reponse_admin&&m.reponse_admin.trim()){const recvDiv=document.createElement('div');recvDiv.className='bubble-received';const av=document.createElement('div');av.className='bubble-received-avatar';av.textContent='TH';const recvInner=document.createElement('div');recvInner.className='bubble-received-inner';const recvTxt=document.createElement('div');recvTxt.className='bubble-text';recvTxt.textContent=escapeHtml(m.reponse_admin);const recvTime=document.createElement('div');recvTime.className='bubble-time-left';recvTime.textContent=formatTime(m.updated_at);recvInner.append(recvTxt,recvTime);recvDiv.append(av,recvInner);frag.appendChild(recvDiv);}}const currentHTML=area.innerHTML;const newHTML=frag.children.length>0?Array.from(frag.children).map(el=>el.outerHTML).join(''):'';if(currentHTML!==newHTML){area.innerHTML='';area.appendChild(frag);scrollChatToBottom();}}
+        
+        function renderMessages(messages){const area=document.getElementById('chatMessagesArea');if(!messages||messages.length===0){area.innerHTML='<div class="pending-tag">⏳ En attente de réponse...</div>';return;}const frag=document.createDocumentFragment();for(let i=0;i<messages.length;i++){const m=messages[i];const sentDiv=document.createElement('div');sentDiv.className='bubble-sent';const sentInner=document.createElement('div');sentInner.className='bubble-sent-inner';const sentTxt=document.createElement('div');sentTxt.className='bubble-text';sentTxt.textContent=escapeHtml(m.message);const sentTime=document.createElement('div');sentTime.className='bubble-time';sentTime.textContent=formatTime(m.created_at);sentInner.append(sentTxt,sentTime);sentDiv.appendChild(sentInner);frag.appendChild(sentDiv);if(m.reponse_admin&&m.reponse_admin.trim()){const recvDiv=document.createElement('div');recvDiv.className='bubble-received';const av=document.createElement('div');av.className='bubble-received-avatar';av.textContent='TH';const recvInner=document.createElement('div');recvInner.className='bubble-received-inner';const recvTxt=document.createElement('div');recvTxt.className='bubble-text';recvTxt.textContent=escapeHtml(m.reponse_admin);const recvTime=document.createElement('div');recvTime.className='bubble-time-left';recvTime.textContent=formatTime(m.updated_at);recvInner.append(recvTxt,recvTime);recvDiv.append(av,recvInner);frag.appendChild(recvDiv);}}area.innerHTML='';area.appendChild(frag);scrollChatToBottom();}
+        
         function formatTime(d){if(!d)return'';try{return new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}catch(e){return'';}}
+        
         async function loadMessages(force=false){if(!currentEmail)return;if(isLoading)return;const now=Date.now();if(now-lastRefreshTime<500&&!force)return;lastRefreshTime=now;isLoading=true;try{const encodedEmail=encodeURIComponent(currentEmail);const url=`/api/messages?email=${encodedEmail}&_=${now}`;const res=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const msgs=await res.json();const messages=Array.isArray(msgs)?msgs:[];const currentHash=generateMessagesHash(messages);const isNewContent=currentHash!==lastMessagesHash;if(isNewContent||force){lastMessagesHash=currentHash;if(messages.length>0)lastMessageId=messages[messages.length-1]?.id;const isChatOpen=document.getElementById('chatModal').classList.contains('active');if(!isChatOpen&&isNewContent&&!force){unreadCount++;updateBadge();showRobotNotification();playNotifSound();}renderMessages(messages);if(isChatOpen)scrollChatToBottom();}}catch(e){console.warn('[Chat] loadMessages error:',e.message);}finally{isLoading=false;}}
+        
         async function sendMessageAPI(nom,email,telephone,message){if(!isValidName(nom))return{success:false,message:'Nom invalide (2-150 caractères, lettres uniquement).'};if(!isValidEmail(email))return{success:false,message:'Email invalide.'};if(!isValidPhone(telephone))return{success:false,message:'Téléphone invalide.'};if(!isValidMessage(message))return{success:false,message:'Message invalide (2-1000 caractères, pas de code HTML).'};if(!checkRateLimit(email))return{success:false,message:''};const csrf=document.querySelector('meta[name="csrf-token"]')?.content;if(!csrf)return{success:false,message:'Erreur de sécurité. Rechargez la page.'};const cleanNom=sanitize(nom,MAX_NAME_LENGTH);const cleanEmail=email.trim().substring(0,MAX_EMAIL_LENGTH);const cleanTel=sanitize(telephone,MAX_PHONE_LENGTH);const cleanMsg=sanitize(message,MAX_MESSAGE_LENGTH);try{const res=await fetch('/contact/send',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},body:JSON.stringify({nom:cleanNom,email:cleanEmail,telephone:cleanTel,message:cleanMsg})});if(!res.ok)throw new Error(`HTTP ${res.status}`);return await res.json();}catch(e){console.warn('[Chat] sendMessageAPI error:',e.message);return{success:false,message:'Erreur réseau. Vérifiez votre connexion.'};}}
-        async function submitInitForm(){if(isSending)return;const nom=document.getElementById('initNom').value.trim();const email=document.getElementById('initEmail').value.trim();const tel=document.getElementById('initTel').value.trim();const msg=document.getElementById('initMessage').value.trim();if(!nom||!email||!msg){flashError('Merci de remplir tous les champs obligatoires.');return;}const btn=document.getElementById('initSendBtn');isSending=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i> Envoi...';btn.disabled=true;const result=await sendMessageAPI(nom,email,tel,msg);if(result.success){currentEmail=email.trim().substring(0,MAX_EMAIL_LENGTH);currentNom=nom.trim().substring(0,MAX_NAME_LENGTH);switchToConversationMode();await new Promise(r=>setTimeout(r,500));lastMessagesHash='';await loadMessages(true);startPolling();setupEchoListener();}else if(result.message){flashError(result.message);}btn.innerHTML='<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation';btn.disabled=false;isSending=false;}
-        async function sendQuickMessage(){if(isSending)return;const ta=document.getElementById('chatTextarea');const msg=ta.value.trim();if(!msg||!currentEmail)return;const btn=document.getElementById('chatSendBtn');isSending=true;btn.disabled=true;ta.value='';ta.style.height='auto';const result=await sendMessageAPI(currentNom,currentEmail,'',msg);if(result.success){lastMessagesHash='';await loadMessages(true);}else if(result.message){flashError(result.message);}btn.disabled=false;isSending=false;}
-        function switchToConversationMode(){document.getElementById('chatInitForm').style.display='none';document.getElementById('chatInputArea').style.display='flex';document.getElementById('changeIdentityBar').style.display='block';}
-        function resetChat(){currentEmail='';currentNom='';lastMessageId=null;lastMessagesHash='';unreadCount=0;updateBadge();stopPolling();echoListenerSet=false;document.getElementById('chatInitForm').style.display='block';document.getElementById('chatInputArea').style.display='none';document.getElementById('changeIdentityBar').style.display='none';const area=document.getElementById('chatMessagesArea');if(area)area.innerHTML='';['initNom','initEmail','initTel','initMessage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const btn=document.getElementById('initSendBtn');if(btn){btn.innerHTML='<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation';btn.disabled=false;}isSending=false;}
-        let wsRetryCount=0;
-        function setupEchoListener(){if(echoListenerSet)return;function trySetup(){if(window.Echo){if(window.echoChannel)window.Echo.leaveChannel('new-messages');window.echoChannel=window.Echo.channel('new-messages');window.echoChannel.listen('NewMessageReceived',(event)=>{if(currentEmail&&currentEmail===event.email_client){lastMessagesHash='';loadMessages(true);if(document.getElementById('chatModal').classList.contains('active')){playNotifSound();}else{unreadCount++;updateBadge();showRobotNotification();playNotifSound();}}});echoListenerSet=true;}else{wsRetryCount++;if(wsRetryCount<30)setTimeout(trySetup,500);}}trySetup();}
-        setupEchoListener();
-        document.getElementById('footerContactForm')?.addEventListener('submit',async(e)=>{e.preventDefault();if(isSending)return;const nom=document.getElementById('footer_nom').value.trim();const email=document.getElementById('footer_email').value.trim();const tel=document.getElementById('footer_telephone').value.trim();const msg=document.getElementById('footer_message').value.trim();if(!nom||!email||!msg)return;const btn=document.getElementById('footerSubmitBtn');const originalText=btn.innerHTML;isSending=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';btn.disabled=true;const successDiv=document.getElementById('footerContactSuccess');const errorDiv=document.getElementById('footerContactError');const result=await sendMessageAPI(nom,email,tel,msg);if(result.success){currentEmail=email.trim().substring(0,MAX_EMAIL_LENGTH);currentNom=nom.trim().substring(0,MAX_NAME_LENGTH);document.getElementById('footerContactForm').reset();switchToConversationMode();openChatModal();lastMessagesHash='';await loadMessages(true);startPolling();successDiv.textContent='Message envoyé avec succès !';successDiv.classList.remove('hidden');setTimeout(()=>successDiv.classList.add('hidden'),5000);}else{errorDiv.textContent=result.message||'Erreur lors de l\'envoi.';errorDiv.classList.remove('hidden');setTimeout(()=>errorDiv.classList.add('hidden'),5000);}btn.innerHTML=originalText;btn.disabled=false;isSending=false;});
-        function scrollPartenaire(dir){const c=document.getElementById('partenairesScroll');if(c)c.scrollBy({left:dir==='left'?-300:300,behavior:'smooth'});}
-        function flashError(msg){if(!msg)return;let el=document.getElementById('chatFlashError');if(!el){el=document.createElement('div');el.id='chatFlashError';el.style.cssText='background:#fee2e2;color:#b91c1c;padding:8px 12px;border-radius:8px;font-size:12px;margin:0 0 8px;text-align:center;';const form=document.getElementById('chatInitForm');if(form)form.prepend(el);}el.textContent=escapeHtml(String(msg).substring(0,200));el.style.display='block';setTimeout(()=>{if(el)el.style.display='none';},5000);}
-        window.scrollPartenaire=scrollPartenaire;
-        window.submitInitForm=submitInitForm;
-        window.sendQuickMessage=sendQuickMessage;
-        window.closeChatModal=closeChatModal;
-        window.resetChat=resetChat;
-        document.addEventListener('DOMContentLoaded',()=>{
-            document.getElementById('chatSendBtn')?.addEventListener('click',sendQuickMessage);
-            document.getElementById('chatTextarea')?.addEventListener('keypress',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendQuickMessage();}});
-            document.getElementById('chatTextarea')?.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
-            const sections = document.querySelectorAll('section, footer');
-            const navLinks = document.querySelectorAll('.nav-link');
-            function setActiveLink(){let current='';const scrollPosition=window.scrollY+150;sections.forEach(section=>{const sectionTop=section.offsetTop;const sectionBottom=sectionTop+section.offsetHeight;if(scrollPosition>=sectionTop&&scrollPosition<sectionBottom){current=section.getAttribute('id');}});if(!current&&window.scrollY<200)current='accueil';navLinks.forEach(link=>{link.classList.remove('active');const href=link.getAttribute('href');if(href===`#${current}`){link.classList.add('active');}});}
-            setActiveLink();window.addEventListener('scroll',setActiveLink);
+        
+        async function submitInitForm(){if(isSending)return;const nom=document.getElementById('initNom').value.trim();const email=document.getElementById('initEmail').value.trim();const tel=document.getElementById('initTel').value.trim();const msg=document.getElementById('initMessage').value.trim();if(!nom||!email||!msg){flashError('Merci de remplir tous les champs obligatoires.');return;}const btn=document.getElementById('initSendBtn');isSending=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i> Envoi...';btn.disabled=true;const result=await sendMessageAPI(nom,email,tel,msg);if(result.success){currentEmail=email.trim().substring(0,MAX_EMAIL_LENGTH);currentNom=nom.trim().substring(0,MAX_NAME_LENGTH);switchToConversationMode();await new Promise(r=>setTimeout(r,500));lastMessagesHash='';await loadMessages(true);startPolling();setupPusherListener();}else if(result.message){flashError(result.message);}btn.innerHTML='<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation';btn.disabled=false;isSending=false;}
+        
+        async function sendQuickMessage(){if(isSending)return;const ta=document.getElementById('chatTextarea');const msg=ta.value.trim();if(!msg||!currentEmail)return;const btn=document.getElementById('chatSendBtn');isSending=true;btn.disabled=true;ta.value='';ta.style.height='auto';const result=await sendMessageAPI(currentNom,currentEmail,'',msg);if(result.success){lastMessagesHash='';await loadMessages(true);}else if(result.message){flashError(result.message);ta.value=msg;}btn.disabled=false;isSending=false;}
+        
+        // FORMULAIRE DE CONTACT EN BAS DE PAGE
+        document.getElementById('footerContactForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isSending) return;
             
-            // SLIDER AVIS AVEC AUTO-DÉFILEMENT
-            const track = document.getElementById('avisTrack');
-            const prevBtn = document.getElementById('avisPrevBtn');
-            const nextBtn = document.getElementById('avisNextBtn');
-            let autoSlideInterval = null;
-            let isAutoSliding = true;
+            const nom = document.getElementById('footer_nom').value.trim();
+            const email = document.getElementById('footer_email').value.trim();
+            const tel = document.getElementById('footer_telephone').value.trim();
+            const msg = document.getElementById('footer_message').value.trim();
             
-            if(track && prevBtn && nextBtn){
-                const cards = track.querySelectorAll('.avis-card-new');
-                const totalCards = cards.length;
-                let currentIndex = 0;
-                const visibleCount = 3;
-                
-                function getCardWidth(){
-                    if(!cards[0]) return 0;
-                    const outer = document.getElementById('avisTrackOuter');
-                    const gap = 20;
-                    return (outer.clientWidth - gap * (visibleCount - 1)) / visibleCount;
-                }
-                
-                function updateSlider(){
-                    const cardW = getCardWidth();
-                    const gap = 20;
-                    const offset = currentIndex * (cardW + gap);
-                    track.style.transform = `translateX(-${offset}px)`;
-                    if(prevBtn) prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
-                    if(nextBtn) nextBtn.style.opacity = currentIndex >= totalCards - visibleCount ? '0.4' : '1';
-                }
-                
-                function nextSlide(){
-                    const maxIndex = Math.max(0, totalCards - visibleCount);
-                    if(currentIndex < maxIndex){
-                        currentIndex++;
-                        updateSlider();
-                    } else {
-                        currentIndex = 0;
-                        updateSlider();
-                    }
-                }
-                
-                function startAutoSlide(){
-                    if(autoSlideInterval) clearInterval(autoSlideInterval);
-                    if(!isAutoSliding) return;
-                    autoSlideInterval = setInterval(() => {
-                        nextSlide();
-                    }, 5000);
-                }
-                
-                function stopAutoSlide(){
-                    if(autoSlideInterval){
-                        clearInterval(autoSlideInterval);
-                        autoSlideInterval = null;
-                    }
-                }
-                
-                function resetAutoSlide(){
-                    if(!isAutoSliding) return;
-                    stopAutoSlide();
-                    startAutoSlide();
-                }
-                
-                prevBtn.addEventListener('click', () => {
-                    if(currentIndex > 0){
-                        currentIndex--;
-                        updateSlider();
-                    }
-                    resetAutoSlide();
-                });
-                
-                nextBtn.addEventListener('click', () => {
-                    nextSlide();
-                    resetAutoSlide();
-                });
-                
-                const sliderContainer = document.querySelector('.avis-slider-wrapper');
-                if(sliderContainer){
-                    sliderContainer.addEventListener('mouseenter', () => {
-                        if(autoSlideInterval) stopAutoSlide();
-                    });
-                    sliderContainer.addEventListener('mouseleave', () => {
-                        if(isAutoSliding) startAutoSlide();
-                    });
-                }
-                
-                window.addEventListener('resize', () => {
-                    updateSlider();
-                    resetAutoSlide();
-                });
-                
-                updateSlider();
-                startAutoSlide();
+            if (!nom || !email || !msg) {
+                flashError('Merci de remplir tous les champs obligatoires.');
+                return;
             }
+            
+            const btn = document.getElementById('footerSubmitBtn');
+            const originalText = btn.innerHTML;
+            isSending = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...';
+            btn.disabled = true;
+            
+            const result = await sendMessageAPI(nom, email, tel, msg);
+            
+            if (result.success) {
+                currentEmail = email.trim().substring(0, MAX_EMAIL_LENGTH);
+                currentNom = nom.trim().substring(0, MAX_NAME_LENGTH);
+                document.getElementById('footerContactForm').reset();
+                switchToConversationMode();
+                openChatModal();
+                lastMessagesHash = '';
+                await loadMessages(true);
+                startPolling();
+                setupPusherListener();
+                
+                const successDiv = document.getElementById('footerContactSuccess');
+                if (successDiv) {
+                    successDiv.textContent = 'Message envoyé avec succès ! La conversation a été ouverte.';
+                    successDiv.classList.remove('hidden');
+                    setTimeout(() => successDiv.classList.add('hidden'), 5000);
+                }
+            } else if (result.message) {
+                flashError(result.message);
+                const errorDiv = document.getElementById('footerContactError');
+                if (errorDiv) {
+                    errorDiv.textContent = result.message;
+                    errorDiv.classList.remove('hidden');
+                    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+                }
+            }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            isSending = false;
         });
-    })();
+        
+        function switchToConversationMode(){document.getElementById('chatInitForm').style.display='none';document.getElementById('chatInputArea').style.display='flex';document.getElementById('changeIdentityBar').style.display='block';}
+        
+        function resetChat(){currentEmail='';currentNom='';lastMessageId=null;lastMessagesHash='';unreadCount=0;updateBadge();stopPolling();pusherListenerSet=false;document.getElementById('chatInitForm').style.display='block';document.getElementById('chatInputArea').style.display='none';document.getElementById('changeIdentityBar').style.display='none';const area=document.getElementById('chatMessagesArea');if(area)area.innerHTML='';['initNom','initEmail','initTel','initMessage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const btn=document.getElementById('initSendBtn');if(btn){btn.innerHTML='<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation';btn.disabled=false;}isSending=false;}
+        
+        // Configuration Pusher (remplace Echo/Reverb)
+        function setupPusherListener() {
+            if (pusherListenerSet) return;
+            
+            function initPusher() {
+                if (typeof Pusher === 'undefined') {
+                    wsRetryCount++;
+                    if (wsRetryCount < 30) setTimeout(initPusher, 500);
+                    return;
+                }
+                
+                const pusherKey = '{{ env("PUSHER_APP_KEY") }}';
+                const pusherCluster = '{{ env("PUSHER_APP_CLUSTER") }}';
+                
+                if (!pusherKey || pusherKey === '') {
+                    console.warn('Pusher non configuré');
+                    return;
+                }
+                
+                try {
+                    const pusher = new Pusher(pusherKey, {
+                        cluster: pusherCluster,
+                        encrypted: true
+                    });
+                    
+                    if (pusherChannel) {
+                        try { pusherChannel.unbind_all(); } catch(e) {}
+                    }
+                    
+                    pusherChannel = pusher.subscribe('new-messages');
+                    
+                    pusherChannel.bind('App\\Events\\NewMessageReceived', (event) => {
+                        console.log('📨 Message reçu (Pusher client):', event);
+                        
+                        if (currentEmail && currentEmail === event.email_client) {
+                            lastMessagesHash = '';
+                            loadMessages(true);
+                            const modal = document.getElementById('chatModal');
+                            if (modal && modal.classList.contains('active')) {
+                                playNotifSound();
+                            } else {
+                                unreadCount++;
+                                updateBadge();
+                                showRobotNotification();
+                                playNotifSound();
+                            }
+                        }
+                    });
+                    
+                    pusherListenerSet = true;
+                    console.log('✅ Pusher connecté (client)');
+                } catch(e) {
+                    console.error('Erreur Pusher:', e);
+                }
+            }
+            
+            initPusher();
+        }
+        
+        function flashError(msg){if(!msg)return;let el=document.getElementById('chatFlashError');if(!el){el=document.createElement('div');el.id='chatFlashError';el.style.cssText='background:#fee2e2;color:#b91c1c;padding:8px 12px;border-radius:8px;font-size:12px;margin:0 0 8px;text-align:center;';const form=document.getElementById('chatInitForm');if(form)form.prepend(el);}el.textContent=escapeHtml(String(msg).substring(0,200));el.style.display='block';setTimeout(()=>{if(el)el.style.display='none';},5000);}
+        
+        window.submitInitForm = submitInitForm;
+        window.sendQuickMessage = sendQuickMessage;
+        window.closeChatModal = closeChatModal;
+        window.resetChat = resetChat;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('chatSendBtn')?.addEventListener('click', sendQuickMessage);
+            document.getElementById('chatTextarea')?.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuickMessage(); } });
+            document.getElementById('chatTextarea')?.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
+        });
 
-    (function(){
-        const track=document.getElementById('marqueeTrack');if(!track)return;
-        let position=0,speed=0.6,animationId=null,isHovering=false,singleSetWidth=0;
-        function updateSingleSetWidth(){if(!track.children.length)return;const totalChildren=track.children.length;const setCount=4;const childrenPerSet=totalChildren/setCount;singleSetWidth=0;for(let i=0;i<childrenPerSet;i++){singleSetWidth+=track.children[i].offsetWidth+parseFloat(getComputedStyle(track.children[i]).marginRight);}}
-        updateSingleSetWidth();window.addEventListener('resize',()=>updateSingleSetWidth());
-        function centerInitially(){if(!track.children.length)return;const containerWidth=track.parentElement.clientWidth;const firstLogo=track.children[0];const firstLogoWidth=firstLogo.offsetWidth+parseFloat(getComputedStyle(firstLogo).marginRight);const offset=(containerWidth/2)-(firstLogoWidth/2);position=-offset;track.style.transform=`translateX(${position}px)`;}
-        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>centerInitially(),100));}else{setTimeout(()=>centerInitially(),100);}
-        const container=document.getElementById('partenairesContainer');if(container){container.addEventListener('mouseenter',()=>{isHovering=true;});container.addEventListener('mouseleave',()=>{isHovering=false;});}
-        function step(){if(!isHovering){position-=speed;if(Math.abs(position)>=singleSetWidth){position+=singleSetWidth;}track.style.transform=`translateX(${position}px)`;}animationId=requestAnimationFrame(step);}
-        step();window.addEventListener('beforeunload',()=>{if(animationId)cancelAnimationFrame(animationId);});
+         // ========== FORMULAIRE DE CONTACT FOOTER ==========
+        const footerForm = document.getElementById('footerContactForm');
+        if (footerForm) {
+            footerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const nom = document.getElementById('footer_nom').value.trim();
+                const email = document.getElementById('footer_email').value.trim();
+                const tel = document.getElementById('footer_telephone').value.trim();
+                const msg = document.getElementById('footer_message').value.trim();
+                
+                if (!nom || !email || !msg) {
+                    alert('Merci de remplir tous les champs obligatoires.');
+                    return;
+                }
+                
+                const btn = document.getElementById('footerSubmitBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi...';
+                btn.disabled = true;
+                
+                try {
+                    const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+                    const res = await fetch('/contact/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+                        body: JSON.stringify({ nom, email, telephone: tel, message: msg })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        currentEmail = email;
+                        currentNom = nom;
+                        footerForm.reset();
+                        openChatModal();
+                        
+                        lastMessagesHash = '';
+                        if (typeof loadMessages === 'function') await loadMessages(true);
+                        if (typeof startPolling === 'function') startPolling();
+                        if (typeof setupPusherListener === 'function') setupPusherListener();
+                        
+                        const successDiv = document.getElementById('footerContactSuccess');
+                        if (successDiv) {
+                            successDiv.textContent = '✅ Message envoyé ! La conversation est ouverte.';
+                            successDiv.classList.remove('hidden');
+                            setTimeout(() => successDiv.classList.add('hidden'), 5000);
+                        }
+                    } else {
+                        alert(data.message || 'Erreur lors de l\'envoi');
+                    }
+                } catch(error) {
+                    console.error(error);
+                    alert('Erreur réseau');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+        }
     })();
-
-    function scrollMarqueeManual(direction){const track=document.getElementById('marqueeTrack');if(!track)return;const step=direction==='left'?-300:300;const current=parseFloat(track.style.transform.replace('translateX(','').replace('px)',''))||0;track.style.transform=`translateX(${current+step}px)`;}
-    </script>
+</script>
 </body>
 </html>

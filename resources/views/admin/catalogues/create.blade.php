@@ -690,24 +690,7 @@ input[type="number"].field-input::-webkit-outer-spin-button { -webkit-appearance
     <form action="{{ route('admin.catalogues.store') }}" method="POST" enctype="multipart/form-data" id="catalogueForm" novalidate>
         @csrf
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block font-bold mb-2">Titre</label><input type="text" name="titre" class="w-full border rounded px-3 py-2" required></div>
-            <div><label class="block font-bold mb-2">Ordre</label><input type="number" name="ordre" value="0" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block font-bold mb-2">Actif</label><input type="checkbox" name="actif" value="1" checked> Oui</div>
-            
-            <!-- NOUVEAU : Champ Image -->
-            <div>
-                <label class="block font-bold mb-2">Image (PNG, JPG, JPEG)</label>
-                <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2">
-                <p class="text-sm text-gray-500 mt-1">Image illustrant la formation (affichée sur le site).</p>
-            </div>
-
-            <div><label class="block font-bold mb-2">Fichier (PDF/DOC/DOCX)</label><input type="file" name="fichier_pdf" accept=".pdf,.doc,.docx" class="w-full border rounded px-3 py-2"></div>
-            <div class="col-span-2"><label class="block font-bold mb-2">Description</label><textarea name="description" rows="3" class="w-full border rounded px-3 py-2"></textarea></div>
-            <div class="col-span-2"><label class="block font-bold mb-2">Objectifs</label><textarea name="objectifs" rows="3" class="w-full border rounded px-3 py-2"></textarea></div>
-            <div class="col-span-2"><label class="block font-bold mb-2">Public visé</label><textarea name="public_vise" rows="3" class="w-full border rounded px-3 py-2"></textarea></div>
-            <div class="col-span-2"><label class="block font-bold mb-2">Programme (HTML autorisé)</label><textarea name="programme" rows="8" class="w-full border rounded px-3 py-2"></textarea></div>
-        </div>
+        <div class="form-shell">
 
             {{-- ===== LEFT COLUMN ===== --}}
             <div>
