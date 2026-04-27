@@ -587,7 +587,172 @@
         #blog .blog-card img { width: 100%; height: 220px; object-fit: cover; border-bottom: 2px solid #DDD6FE; }
         .give-review-btn { display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-weight: 700; padding: 0.85rem 2.5rem; border-radius: 14px; font-size: 1.05rem; transition: opacity 0.2s, transform 0.15s; text-decoration: none; box-shadow: 0 4px 14px rgba(245,158,11,0.25); }
         .give-review-btn:hover { opacity: 0.9; transform: scale(1.03); }
-    </style>
+
+    /* AVIS - Carrousel centré (style Coverflow) */
+/* Slider horizontal – 3 cartes visibles, taille identique */
+.avis-slider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+.avis-slider-viewport {
+    overflow: hidden;
+    flex: 1;
+}
+.avis-slider-track {
+    display: flex;
+    transition: transform 0.4s ease;
+    gap: 1.5rem;  /* espacement entre cartes */
+}
+.avis-card {
+    flex: 0 0 calc((100% - 3rem) / 3); /* 3 cartes visibles */
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1.8rem 1.2rem;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.2s;
+}
+/* Toutes les cartes ont la même apparence */
+.avis-card .avatar {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    overflow: hidden;
+}
+.avis-card .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.avis-card .name {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+.avis-card .role {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+.avis-card .stars {
+    color: #f59e0b;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+}
+.avis-card .quote {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #4b5563;
+    font-style: italic;
+}
+.avis-slider-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.avis-slider-btn:hover {
+    background: rgba(255,255,255,0.4);
+    transform: scale(1.05);
+}
+/* Responsive : sur mobile, 1 carte visible */
+@media (max-width: 768px) {
+    .avis-card {
+        flex: 0 0 calc(100% - 1rem);
+        margin: 0 auto;
+    }
+    .avis-slider-track {
+        gap: 1rem;
+    }
+}
+
+
+/*partenaire*/
+/* Partenaires – défilement infini continu (géré par JavaScript) */
+.partenaire-item {
+    flex-shrink: 0;
+    width: 150px;
+    height: 110px;
+    background: white;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: help;
+    margin-right: 2rem; /* espace entre les blocs */
+}
+.partenaire-item img {
+    max-width: 110px;
+    max-height: 75px;
+    object-fit: contain;
+}
+.partenaire-item span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #f97316;
+    text-align: center;
+    padding: 0 0.5rem;
+}
+/* Infobulle au survol (sans arrêter l'animation) */
+.partenaire-item[title] {
+    position: relative;
+}
+.partenaire-item[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0a2e5a;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 30;
+    pointer-events: none;
+    font-weight: normal;
+    letter-spacing: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+/* Responsive */
+@media (max-width: 640px) {
+    .partenaire-item {
+        width: 120px;
+        height: 90px;
+        margin-right: 1rem;
+    }
+    .partenaire-item img {
+        max-width: 90px;
+        max-height: 60px;
+    }
+}
+
+</style>
+
 </head>
 <body class="bg-white">
 
@@ -844,76 +1009,99 @@
         </div>
     </section>
 
-    <section id="partenaires-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header">
-        <div class="container mx-auto px-4 md:px-6">
-            <div class="text-center mb-10 md:mb-16">
-                <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4" style="background: #f97316; color: white; box-shadow: 0 2px 8px rgba(249,115,22,0.3);">🤝 Confiance & Excellence</span>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4"><span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500">Ils nous font confiance</span></h2>
-                <p class="text-orange-800 text-sm md:text-base uppercase tracking-wide mt-2 font-medium">Nos partenaires et clients</p>
-                <div class="w-24 h-1 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500 mx-auto mt-4 rounded-full"></div>
-            </div>
-            @if(isset($partenaires) && $partenaires->count())
-            <div class="relative overflow-hidden group" id="partenairesContainer">
-                <div class="overflow-hidden">
-                    <div class="flex gap-6 md:gap-8 py-4 md:py-6" id="marqueeTrack" style="will-change: transform;">
-                        @for($i = 0; $i < 4; $i++)
-                            @foreach($partenaires as $partenaire)
-                            <div class="flex-shrink-0 w-48 h-32 bg-white rounded-xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200">
-                                @if($partenaire->logo)<img src="{{ asset('storage/'.e($partenaire->logo)) }}" alt="{{ e($partenaire->nom_entreprise) }}" class="max-w-full max-h-full p-3 object-contain">@else<span class="text-orange-700 text-sm font-semibold text-center px-2">{{ e($partenaire->nom_entreprise) }}</span>@endif
-                            </div>
-                            @endforeach
-                        @endfor
-                    </div>
-                </div>
-                <button onclick="scrollMarqueeManual('left')" class="scroll-arrow left" style="background: white; color: #f97316; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><i class="fas fa-chevron-left text-xl"></i></button>
-                <button onclick="scrollMarqueeManual('right')" class="scroll-arrow right" style="background: white; color: #f97316; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><i class="fas fa-chevron-right text-xl"></i></button>
-            </div>
-            @else
-            <div class="text-center py-12 md:py-20 bg-gray-50 rounded-2xl border border-gray-200"><p class="text-orange-600 text-base md:text-xl">Aucun partenaire pour le moment.</p></div>
-            @endif
+   <!-- ==================== SECTION PARTENAIRES (DÉFILEMENT INFINI CONTINU) ==================== -->
+<section id="partenaires-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header">
+    <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center mb-10 md:mb-16">
+            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4" style="background: #f97316; color: white; box-shadow: 0 2px 8px rgba(249,115,22,0.3);">🤝 Confiance & Excellence</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4"><span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500">Ils nous font confiance</span></h2>
+            <p class="text-orange-800 text-sm md:text-base uppercase tracking-wide mt-2 font-medium">Nos partenaires et clients</p>
+            <div class="w-24 h-1 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500 mx-auto mt-4 rounded-full"></div>
         </div>
-    </section>
 
-    <section id="avis-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header">
-        <div class="container mx-auto px-4 md:px-6">
-            <div class="text-center mb-10 md:mb-14">
-                <span class="section-badge badge-purple">⭐ Témoignages</span>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 section-title-purple" style="color:#f0f0f0;">Ce qu'ils disent de nous</h2>
-                <p class="text-purple-200 text-sm md:text-base uppercase tracking-wide font-medium">Retours réels de nos clients et partenaires</p>
-            </div>
-            @if(isset($avis) && $avis->count())
-            <div class="avis-slider-wrapper px-2 md:px-4">
-                <button class="avis-slider-btn" id="avisPrevBtn" aria-label="Précédent">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="32,8 16,24 32,40" fill="#f5c518" stroke="#e6a800" stroke-width="1"/></svg>
-                </button>
-                <div class="avis-slider-track-outer" id="avisTrackOuter">
-                    <div class="avis-slider-track" id="avisTrack">
-                        @foreach($avis as $a)
-                        <div class="avis-card-new" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div class="avis-card-header" style="justify-content: center;">
-                                @if($a->logo_entreprise)<img src="{{ asset('storage/'.e($a->logo_entreprise)) }}" class="avis-avatar" alt="{{ e($a->entreprise_nom) }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover; margin:0 auto;">@else<div class="avis-avatar" style="margin:0 auto;">{{ strtoupper(substr($a->entreprise_nom, 0, 1)) }}</div>@endif
-                            </div>
-                            <div class="avis-author-info" style="text-align: center; margin-top: 0.5rem;">
-                                <div class="avis-author-name-new" style="font-weight: 700; font-size: 1rem;">{{ Str::limit($a->entreprise_nom, 30) }}</div>
-                                <div class="avis-author-role-new" style="font-size: 0.85rem; color: #6b7280;">{{ $a->contact_fonction ?? 'Client' }}</div>
-                            </div>
-                            <div class="avis-stars-new" style="justify-content: center; margin: 0.5rem 0;">
-                                @for($i = 1; $i <= 5; $i++) @if($i <= $a->note)<i class="fas fa-star"></i>@else<i class="far fa-star" style="color:#d1d5db;"></i>@endif @endfor
-                            </div>
-                            <p class="avis-text" style="text-align: center; max-width: 90%; margin: 0 auto;">"{{ Str::limit($a->contenu, 180) }}"</p>
+        @if(isset($partenaires) && $partenaires->count())
+        <div class="relative overflow-hidden">
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200/50">
+                <div class="overflow-hidden w-full">
+                    <div id="marqueeContainer" class="relative w-full">
+                        <div id="marqueeTrack" class="flex" style="will-change: transform;">
+                            <!-- Contenu des logos (dupliqué plusieurs fois pour une boucle fluide) -->
+                            @for ($i = 0; $i < 3; $i++)
+                                @foreach($partenaires as $partenaire)
+                                <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}">
+                                    @if($partenaire->logo)
+                                        <img src="{{ asset('storage/'.e($partenaire->logo)) }}" alt="{{ e($partenaire->nom_entreprise) }}">
+                                    @else
+                                        <span>{{ e($partenaire->nom_entreprise) }}</span>
+                                    @endif
+                                </div>
+                                @endforeach
+                            @endfor
                         </div>
-                        @endforeach
                     </div>
                 </div>
-                <button class="avis-slider-btn" id="avisNextBtn" aria-label="Suivant">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,8 32,24 16,40" fill="#f5c518" stroke="#e6a800" stroke-width="1"/></svg>
-                </button>
             </div>
-            @else
-            <div class="text-center py-12 md:py-20 bg-white rounded-2xl border border-purple-100"><p class="text-purple-400 text-base md:text-xl">Aucun avis pour le moment.</p></div>
-            @endif
         </div>
-    </section>
+        @else
+        <div class="text-center py-12 md:py-20 bg-gray-50 rounded-2xl border border-gray-200"><p class="text-orange-600 text-base md:text-xl">Aucun partenaire pour le moment.</p></div>
+        @endif
+    </div>
+</section>
+<!-- ==================== SECTION AVIS (SLIDER HORIZONTAL SIMPLE) ==================== -->
+<section id="avis-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header" style="background: linear-gradient(135deg, #4c1d95 0%, #2e1065 100%);">
+    <div class="container mx-auto px-4 md:px-6">
+
+        <div class="text-center mb-10 md:mb-14">
+            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4" style="background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(4px);">⭐ Témoignages</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3">Ce qu'ils disent de nous</h2>
+            <p class="text-purple-200 text-sm md:text-base uppercase tracking-wide font-medium">Retours réels de nos clients et partenaires</p>
+            <div class="w-16 h-0.5 bg-purple-300 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        @if(isset($avis) && $avis->count())
+        <div class="avis-slider">
+            <button class="avis-slider-btn prev" id="avisPrevBtn">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+            <div class="avis-slider-viewport">
+                <div class="avis-slider-track" id="avisTrack">
+                    @foreach($avis as $a)
+                    <div class="avis-card">
+                        <div class="avatar">
+                            @if($a->logo_entreprise)
+                                <img src="{{ asset('storage/'.e($a->logo_entreprise)) }}" alt="{{ e($a->entreprise_nom) }}">
+                            @else
+                                <span>{{ strtoupper(substr($a->entreprise_nom, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <div class="name">{{ Str::limit($a->entreprise_nom, 30) }}</div>
+                        <div class="role">{{ $a->contact_fonction ?? 'Client' }}</div>
+                        <div class="stars">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= $a->note) <i class="fas fa-star"></i> @else <i class="far fa-star"></i> @endif
+                            @endfor
+                        </div>
+                        <p class="quote">"{{ Str::limit($a->contenu, 180) }}"</p>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            <button class="avis-slider-btn next" id="avisNextBtn">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+        </div>
+        @else
+        <div class="text-center py-12 md:py-20 bg-white/10 rounded-2xl">
+            <p class="text-white/70 text-base md:text-xl">Aucun avis pour le moment.</p>
+        </div>
+        @endif
+
+    </div>
+</section>
+
+
+
+
 <section id="blog" class="py-24 md:py-32 scroll-mt-header" style="background: #f8fafc;">
     <div class="container mx-auto px-4 md:px-8">
         
@@ -1317,6 +1505,128 @@
             });
         }
     })();
+
+  /*avis*/
+(function() {
+    function initSlider() {
+        const track = document.getElementById('avisTrack');
+        if (!track) return;
+        const cards = Array.from(track.children);
+        if (cards.length === 0) return;
+        const prevBtn = document.getElementById('avisPrevBtn');
+        const nextBtn = document.getElementById('avisNextBtn');
+        if (!prevBtn || !nextBtn) return;
+
+        let currentIndex = 0;
+        let visibleCount = 3;
+        let cardWidth = 0;
+        let gap = 24; // correspond au gap CSS (1.5rem = 24px)
+
+        function updateLayout() {
+            const container = track.parentElement;
+            const containerWidth = container.clientWidth;
+            if (window.innerWidth < 768) {
+                visibleCount = 1;
+                gap = 16;
+            } else {
+                visibleCount = 3;
+                gap = 24;
+            }
+            // Calcul de la largeur d'une carte en fonction du gap
+            cardWidth = (containerWidth - (gap * (visibleCount - 1))) / visibleCount;
+            for (let i = 0; i < cards.length; i++) {
+                cards[i].style.flex = `0 0 ${cardWidth}px`;
+            }
+        }
+
+        function slideToIndex() {
+            const offset = -currentIndex * (cardWidth + gap);
+            track.style.transform = `translateX(${offset}px)`;
+            // Désactiver les boutons aux extrémités
+            const maxIndex = Math.max(0, cards.length - visibleCount);
+            prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
+            nextBtn.style.opacity = currentIndex >= maxIndex ? '0.4' : '1';
+        }
+
+        function next() {
+            const maxIndex = Math.max(0, cards.length - visibleCount);
+            if (currentIndex < maxIndex) {
+                currentIndex++;
+                slideToIndex();
+            }
+        }
+
+        function prev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                slideToIndex();
+            }
+        }
+
+        prevBtn.addEventListener('click', prev);
+        nextBtn.addEventListener('click', next);
+
+        // Initialisation
+        updateLayout();
+        slideToIndex();
+
+        // Redimensionnement
+        window.addEventListener('resize', () => {
+            updateLayout();
+            slideToIndex();
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSlider);
+    } else {
+        initSlider();
+    }
+})();
+    (function() {
+        const track = document.getElementById('marqueeTrack');
+        if (!track) return;
+        let speed = 1;          // pixels par frame (ajuste la vitesse)
+        let position = 0;
+        let animationId = null;
+        let isHovering = false;
+
+        // Duplique le contenu pour que le défilement soit infini (déjà fait en HTML avec 3 copies, mais on peut aussi cloner)
+        // Assure que la largeur totale est > largeur du conteneur
+        function startMarquee() {
+            if (animationId) cancelAnimationFrame(animationId);
+            function step() {
+                if (!isHovering) {
+                    position -= speed;
+                    const trackWidth = track.scrollWidth;
+                    const containerWidth = track.parentElement.clientWidth;
+                    // Si la position dépasse la largeur d'un jeu de logos, on réinitialise en douceur
+                    if (Math.abs(position) >= trackWidth / 3) {
+                        position = 0;
+                    }
+                    track.style.transform = `translateX(${position}px)`;
+                }
+                animationId = requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        // Pause au survol (optionnel, tu peux désactiver la pause si tu veux)
+        const container = document.querySelector('#partenaires-section .overflow-hidden');
+        if (container) {
+            container.addEventListener('mouseenter', () => { isHovering = true; });
+            container.addEventListener('mouseleave', () => { isHovering = false; });
+        }
+
+        startMarquee();
+
+        // Redimensionnement : ajuste la largeur du track (rien de spécial à faire)
+        window.addEventListener('resize', () => {
+            // on ne fait rien de particulier, le track s'adapte
+        });
+    })();
+
 </script>
+
 </body>
 </html>
