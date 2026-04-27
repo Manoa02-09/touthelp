@@ -11,13 +11,11 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            /* Couleur de fond plus sombre pour casser le blanc */
             background-color: #e2e8f0; 
             color: #1e293b; 
             margin: 0; 
         }
         
-        /* HOVER LIGNE BLEU MARINE TRÈS VISIBLE */
         .nav-link {
             position: relative;
             font-weight: 700;
@@ -28,15 +26,14 @@
             transition: color 0.3s ease;
         }
 
-        /* La ligne horizontale bleue */
         .nav-link::after {
             content: '';
             position: absolute;
             width: 0;
-            height: 4px; /* Épaisseur bien visible */
+            height: 4px;
             bottom: -5px;
             left: 0;
-            background-color: #001f3f; /* BLEU MARINE */
+            background-color: #001f3f;
             transition: width 0.3s ease-in-out;
         }
 
@@ -45,12 +42,11 @@
         }
 
         .nav-link:hover::after {
-            width: 100%; /* La ligne s'étire au survol */
+            width: 100%;
         }
 
-        /* STYLE DE L'ARTICLE "PAPIER" */
         .article-card {
-            background-color: #fdfdfd; /* Blanc cassé type papier */
+            background-color: #fdfdfd;
             border: 1px solid #cbd5e1;
             padding: 3rem;
             border-radius: 4px;
@@ -64,7 +60,6 @@
             color: #334155;
         }
 
-        /* Bordure d'image avec ombre */
         .img-border {
             border: 2px solid #001f3f;
             padding: 10px;
@@ -114,7 +109,7 @@
             </div>
 
             <footer class="mt-12 text-right italic text-slate-500 font-bold">
-                Mahefa A. RAVALISON
+                {{ $article->auteur ?? 'Auteur non renseigné' }}
             </footer>
         </div>
     </main>
