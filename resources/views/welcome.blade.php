@@ -22,6 +22,7 @@
         rel="stylesheet">
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <style>
+        /* === STYLES EXISTANTS CONSERVÉS === */
         * {
             margin: 0;
             padding: 0;
@@ -122,6 +123,7 @@
             gap: 12px;
         }
 
+        /* CHAT MODAL RESPONSIVE */
         .chat-modal {
             display: none;
             position: fixed;
@@ -607,7 +609,7 @@
 
         #accueil {
             background-color: #ffffff;
-            height: calc(100vh - 110px);
+            min-height: calc(100vh - 110px);
             display: flex;
             align-items: center;
         }
@@ -627,7 +629,6 @@
             background-color: #ffffff !important;
         }
 
-        /* AVIS */
         #avis-section {
             background-color: #0a2e5a;
         }
@@ -749,7 +750,6 @@
             display: none;
         }
 
-        /* Catalogue */
         .catalogue-card {
             background: white;
             border-radius: 1.5rem;
@@ -827,25 +827,6 @@
 
         .catalogue-card-link:hover i {
             transform: translateX(4px);
-        }
-
-        #partenaires-section .partenaire-badge {
-            flex-shrink: 0;
-            width: 130px;
-            height: 130px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.12), 0 1.5px 6px rgba(16, 185, 129, 0.08);
-            border: 2px solid #A7F3D0;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        #partenaires-section .partenaire-badge:hover {
-            transform: scale(1.07) translateY(-4px);
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.18);
         }
 
         .section-badge {
@@ -931,7 +912,7 @@
             right: 0;
         }
 
-        /* ══ À PROPOS ══ */
+        /* === SECTION À PROPOS (styles existants) === */
         #apropos {
             background: #fff;
             padding: 0;
@@ -946,13 +927,11 @@
             align-items: center;
         }
 
-        /* HERO IMAGE FULL WIDTH */
         .apropos-bg-img {
             position: absolute;
             inset: 0;
             background-image: url('{{ asset("images/apropos1.jpg") }}');
             background-size: cover;
-            /* ✅ FIX PRINCIPAL */
             background-position: center;
             background-repeat: no-repeat;
         }
@@ -1041,7 +1020,6 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Carte blanche principale */
         .apropos-main-card {
             background: #fff;
             margin: -36px 40px 0;
@@ -1107,7 +1085,6 @@
             font-weight: 700;
         }
 
-        /* Droite : image + citation */
         .apropos-img-quote {
             position: relative;
         }
@@ -1116,7 +1093,6 @@
             width: 100%;
             height: 320px;
             object-fit: cover;
-            /* ✅ FIX PRINCIPAL */
             border-radius: 16px;
             display: block;
         }
@@ -1169,7 +1145,6 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Séparateur */
         .apropos-sep {
             text-align: center;
             color: #d1d5db;
@@ -1178,7 +1153,6 @@
             padding: 36px 0 12px;
         }
 
-        /* Trois cartes */
         .apropos-cards-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1243,514 +1217,31 @@
             font-weight: 300;
         }
 
-        /* Responsive À propos */
-        @media (max-width: 1024px) {
-            .apropos-main-card {
-                margin: -24px 16px 0;
-                padding: 36px 28px;
-            }
-
-            .apropos-two-col {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .apropos-cards-grid {
-                grid-template-columns: 1fr;
-                padding: 0 16px 48px;
-            }
-
-            .apropos-hero-text {
-                padding: 48px 28px 64px;
-            }
+        /* Partenaires infobulle */
+        .partenaire-item[title] {
+            position: relative;
         }
 
-        @media (max-width: 640px) {
-            .apropos-hero-text {
-                padding: 40px 20px 56px;
-            }
-
-            .apropos-main-card {
-                margin: -20px 12px 0;
-                padding: 28px 20px;
-            }
-
-            .apropos-cards-grid {
-                padding: 0 12px 40px;
-            }
-        }
-
-        .chat-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-header-avatar {
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .chat-header-name {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .chat-header-status {
-            font-size: 11px;
-            opacity: 0.8;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .chat-status-dot {
-            width: 6px;
-            height: 6px;
-            background: #4ade80;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .chat-close-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .chat-close-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .chat-body {
-            flex: 1;
-            overflow-y: auto;
-            background-color: #fef9f9;
-            background-image: radial-gradient(circle at 10px 10px, rgba(230, 57, 70, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            max-height: 380px;
-        }
-
-        .chat-messages-area {
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-height: 100px;
-        }
-
-        .chat-input-area {
-            background: white;
-            border-top: 1px solid #ffe0e0;
-            padding: 10px 12px;
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-            flex-shrink: 0;
-        }
-
-        .chat-textarea {
-            flex: 1;
-            border: 1px solid #ffe0e0;
-            border-radius: 20px;
-            padding: 9px 14px;
-            font-size: 13px;
-            resize: none;
-            outline: none;
-            max-height: 100px;
-            line-height: 1.4;
-            transition: border-color 0.2s;
-        }
-
-        .chat-textarea:focus {
-            border-color: #e63946;
-        }
-
-        .chat-send-btn {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #e63946, #ff6b6b);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: transform 0.15s, opacity 0.15s;
-        }
-
-        .chat-send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .chat-send-btn:active {
-            transform: scale(0.95);
-        }
-
-        .chat-send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .chat-init-form {
-            padding: 16px;
-        }
-
-        .chat-init-form input,
-        .chat-init-form textarea {
-            width: 100%;
-            padding: 9px 12px;
-            margin-bottom: 10px;
-            border: 1px solid #ffe0e0;
-            border-radius: 10px;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-            background: white;
-            color: #1f2937;
-        }
-
-        .chat-init-form input:focus,
-        .chat-init-form textarea:focus {
-            border-color: #e63946;
-        }
-
-        .chat-init-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #e63946, #ff6b6b);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .chat-init-btn:hover {
-            opacity: 0.9;
-        }
-
-        .chat-init-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .bubble-sent {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .bubble-sent-inner {
-            background: linear-gradient(135deg, #e63946, #ff6b6b);
-            color: white;
-            border-radius: 18px 18px 4px 18px;
-            padding: 9px 13px;
-            max-width: 75%;
-            box-shadow: 0 2px 6px rgba(230, 57, 70, 0.25);
-            word-break: break-word;
-        }
-
-        .bubble-received {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        .bubble-received-avatar {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #e63946, #ff6b6b);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: white;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .bubble-received-inner {
-            background: white;
-            color: #1f2937;
-            border-radius: 18px 18px 18px 4px;
-            padding: 9px 13px;
-            max-width: 75%;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
-            word-break: break-word;
-        }
-
-        .bubble-text {
-            font-size: 13px;
-            line-height: 1.45;
-        }
-
-        .bubble-time {
-            font-size: 10px;
-            margin-top: 3px;
-            text-align: right;
-            opacity: 0.65;
-        }
-
-        .bubble-time-left {
-            font-size: 10px;
-            margin-top: 3px;
-            opacity: 0.55;
-        }
-
-        .pending-tag {
-            text-align: center;
-            font-size: 11px;
-            color: #e63946;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            padding: 4px 12px;
-            margin: 6px auto;
-            width: fit-content;
-            border: 1px solid #ffe0e0;
-        }
-
-        .change-identity-btn {
-            font-size: 11px;
-            color: #e63946;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            width: 100%;
-            padding: 6px;
-            display: block;
-            transition: color 0.15s;
-        }
-
-        .change-identity-btn:hover {
-            color: #c1121f;
-        }
-
-        .robot-icon {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #e63946, #ff6b6b);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(230, 57, 70, 0.4);
-            transition: all 0.3s ease;
-            z-index: 9999;
-        }
-
-        .robot-icon:hover {
-            transform: scale(1.1);
-        }
-
-        .robot-icon i {
-            font-size: 28px;
-            color: white;
-        }
-
-        .robot-badge {
+        .partenaire-item[title]:hover::after {
+            content: attr(title);
             position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ef4444;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a2e5a;
             color: white;
-            font-size: 11px;
-            font-weight: bold;
-            min-width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 2px solid white;
-            animation: badgePulse 0.6s ease-in-out;
-        }
-
-        @keyframes badgePulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.2);
-                background-color: #ef4444;
-            }
-        }
-
-        .chat-footer {
-            background: white;
-            padding: 6px;
-            text-align: center;
-            font-size: 11px;
-            color: #e63946;
-            border-top: 1px solid #ffe0e0;
-            flex-shrink: 0;
-        }
-
-        /* Général */
-        body {
-            overflow-x: hidden;
-            padding-top: 92px;
-        }
-
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .line-clamp-4 {
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #e63946;
-            border-radius: 10px;
-        }
-
-        /* Partenaires section */
-        #partenaires-section .partenaire-badge {
-            flex-shrink: 0;
-            width: 130px;
-            height: 130px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.12), 0 1.5px 6px rgba(16, 185, 129, 0.08);
-            border: 2px solid #A7F3D0;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        #partenaires-section .partenaire-badge:hover {
-            transform: scale(1.07) translateY(-4px);
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.18);
-        }
-
-        /* Avis section */
-        #avis-section .avis-card {
-            flex-shrink: 0;
-            width: 340px;
-            background: white;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.12), 0 2px 8px rgba(245, 158, 11, 0.07);
-            padding: 2rem;
-            border: 1.5px solid #FDE68A;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+            z-index: 30;
+            pointer-events: none;
+            font-weight: normal;
+            letter-spacing: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        #avis-section .avis-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 14px 40px rgba(245, 158, 11, 0.18);
-        }
-
-        /* Blog section */
-        #blog .blog-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 6px 24px rgba(109, 40, 217, 0.09), 0 2px 8px rgba(109, 40, 217, 0.05);
-            overflow: hidden;
-            border: 1.5px solid #DDD6FE;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            transition: transform 0.22s ease, box-shadow 0.22s ease;
-        }
-
-        #blog .blog-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 40px rgba(109, 40, 217, 0.16);
-        }
-
-        #blog .blog-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-bottom: 2px solid #DDD6FE;
-        }
-
-        .give-review-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            font-weight: 700;
-            padding: 0.85rem 2.5rem;
-            border-radius: 14px;
-            font-size: 1.05rem;
-            transition: opacity 0.2s, transform 0.15s;
-            text-decoration: none;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
-        }
-
-        .give-review-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.03);
-        }
-
-        /* AVIS - Carrousel centré (style Coverflow) */
-        /* Slider horizontal – 3 cartes visibles, taille identique */
+        /* Styles pour le slider des avis (responsive) */
         .avis-slider {
             position: relative;
             display: flex;
@@ -1768,12 +1259,10 @@
             display: flex;
             transition: transform 0.4s ease;
             gap: 1.5rem;
-            /* espacement entre cartes */
         }
 
         .avis-card {
             flex: 0 0 calc((100% - 3rem) / 3);
-            /* 3 cartes visibles */
             background: white;
             border-radius: 1.5rem;
             padding: 1.8rem 1.2rem;
@@ -1783,7 +1272,6 @@
             transition: all 0.2s;
         }
 
-        /* Toutes les cartes ont la même apparence */
         .avis-card .avatar {
             width: 70px;
             height: 70px;
@@ -1831,40 +1319,6 @@
             font-style: italic;
         }
 
-        .avis-slider-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .avis-slider-btn:hover {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        /* Responsive : sur mobile, 1 carte visible */
-        @media (max-width: 768px) {
-            .avis-card {
-                flex: 0 0 calc(100% - 1rem);
-                margin: 0 auto;
-            }
-
-            .avis-slider-track {
-                gap: 1rem;
-            }
-        }
-
-
-        /*partenaire*/
-        /* Partenaires – défilement infini continu (géré par JavaScript) */
         .partenaire-item {
             flex-shrink: 0;
             width: 150px;
@@ -1879,7 +1333,6 @@
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: help;
             margin-right: 2rem;
-            /* espace entre les blocs */
         }
 
         .partenaire-item img {
@@ -1896,74 +1349,234 @@
             padding: 0 0.5rem;
         }
 
-        /* Infobulle au survol (sans arrêter l'animation) */
-        .partenaire-item[title] {
+        /* === STYLES POUR LE CARROUSEL BLOG === */
+        .blog-slider {
             position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
         }
 
-        .partenaire-item[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: -32px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0a2e5a;
+        .blog-slider-viewport {
+            overflow: hidden;
+            flex: 1;
+            border-radius: 2rem;
+        }
+
+        .blog-slider-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            gap: 1.5rem;
+        }
+
+        .blog-card {
+            flex: 0 0 calc((100% - 4.5rem) / 4);
+            background: white;
+            border-radius: 2rem;
+            overflow: hidden;
+            border: 2.5px solid #0f172a;
+            transition: all 0.3s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-slider-btn {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #0f172a;
+        }
+
+        .blog-slider-btn:hover {
+            background: #f97316;
             color: white;
-            font-size: 0.7rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            white-space: nowrap;
-            z-index: 30;
-            pointer-events: none;
-            font-weight: normal;
-            letter-spacing: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
         }
 
-        /* Responsive */
-        @media (max-width: 640px) {
+        .blog-slider-btn:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .blog-card {
+                flex: 0 0 calc(100% - 0rem);
+            }
+            .blog-slider-track {
+                gap: 1rem;
+            }
+            .blog-slider-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* === NOUVEAUX STYLES RESPONSIVES === */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+
+            header {
+                top: 28px;
+            }
+
+            .scroll-mt-header {
+                scroll-margin-top: 80px;
+            }
+
+            #accueil,
+            #expertise {
+                min-height: auto;
+                padding: 3rem 0;
+            }
+
+            .apropos-hero-text {
+                padding: 48px 24px 64px;
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .apropos-hero-title {
+                font-size: clamp(32px, 8vw, 48px);
+            }
+
+            .apropos-main-card {
+                margin: -24px 16px 0;
+                padding: 32px 20px;
+            }
+
+            .apropos-two-col {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .apropos-cards-grid {
+                grid-template-columns: 1fr;
+                padding: 0 16px 48px;
+            }
+
+            .avis-slider-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .avis-slider-btn svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .avis-card {
+                flex: 0 0 calc(100% - 1rem);
+                padding: 1.2rem;
+            }
+
+            .avis-card .avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .catalogue-card img {
+                height: 180px;
+            }
+
+            .catalogue-card-body {
+                padding: 1.2rem;
+            }
+
+            .catalogue-card-title {
+                font-size: 1.2rem;
+            }
+
             .partenaire-item {
-                width: 120px;
+                width: 110px;
                 height: 90px;
                 margin-right: 1rem;
             }
 
             .partenaire-item img {
                 max-width: 90px;
-                max-height: 60px;
+                max-height: 65px;
+            }
+
+            .chat-modal {
+                width: calc(100% - 20px);
+                right: 10px;
+                left: 10px;
+                bottom: 80px;
+                border-radius: 16px;
+            }
+
+            .chat-body {
+                max-height: 50vh;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid-cols-3 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            .text-5xl {
+                font-size: 2.5rem;
+            }
+
+            .text-6xl {
+                font-size: 3rem;
+            }
+
+            .text-7xl {
+                font-size: 3.5rem;
             }
         }
     </style>
-
 </head>
 
 <body class="bg-white">
 
-    <!-- Bande bleue marine avec email et téléphone visibles -->
-    <div
-        style="position: fixed; top: 0; left: 0; width: 100%; background-color: #0a2e5a; height: 32px; display: flex; align-items: center; z-index: 60;">
-        <div class="container mx-auto px-4 md:px-6 flex justify-between items-center w-full">
+    <!-- Bande bleue marine avec email et téléphone -->
+    <div class="fixed top-0 left-0 w-full bg-[#0a2e5a] h-7 md:h-8 flex items-center z-60">
+        <div class="container mx-auto px-3 md:px-6 flex justify-between items-center w-full">
             <div class="flex items-center gap-2">
                 <i class="fas fa-envelope text-yellow-300 text-xs"></i>
                 <a href="mailto:info@touthelp.com"
-                    class="text-white text-xs hover:text-yellow-300 transition font-medium">info@touthelp.com</a>
+                    class="text-white text-[11px] md:text-xs hover:text-yellow-300 transition font-medium">info@touthelp.com</a>
             </div>
             <div class="flex items-center gap-2">
                 <i class="fas fa-phone-alt text-green-300 text-xs"></i>
-                <a href="tel:+261384839743" class="text-white text-xs hover:text-green-300 transition font-medium">038
-                    48 397 43</a>
+                <a href="tel:+261384839743"
+                    class="text-white text-[11px] md:text-xs hover:text-green-300 transition font-medium">038 48 397 43</a>
             </div>
         </div>
     </div>
 
-    <header
-        style="position: fixed; top: 32px; left: 0; width: 100%; background-color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 50; padding: 0.75rem 0;">
-        <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
+    <header class="fixed top-7 md:top-8 left-0 w-full bg-white shadow-md z-50 py-2 md:py-3 border-b-4 border-[#0a2e5a]">
+        <div class="container mx-auto px-3 md:px-6 flex justify-between items-center">
             <div class="flex items-center space-x-2 md:space-x-3">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-10 md:h-12 lg:h-14">
-                <span class="text-xl md:text-2xl font-bold text-green-900"
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-8 md:h-12 lg:h-14 w-auto">
+                <span class="text-lg md:text-2xl font-bold text-green-900"
                     style="font-family:'Playfair Display',serif;letter-spacing:0.05em;">TOUT HELP</span>
             </div>
+            <!-- Menu desktop -->
             <nav class="hidden md:flex space-x-6 lg:space-x-10">
                 <a href="#accueil" class="nav-link text-gray-700 text-sm lg:text-base">ACCUEIL</a>
                 <a href="#apropos" class="nav-link text-gray-700 text-sm lg:text-base">À PROPOS</a>
@@ -1972,13 +1585,25 @@
                 <a href="#blog" class="nav-link text-gray-700 text-sm lg:text-base">BLOG</a>
                 <a href="#contact" class="nav-link text-gray-700 text-sm lg:text-base">CONTACT</a>
             </nav>
+            <!-- Bouton burger mobile -->
+            <button id="mobileMenuBtn" class="md:hidden text-gray-800 text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
+        <!-- Menu mobile déroulant -->
+        <nav id="mobileMenu" class="hidden md:hidden absolute top-full left-0 w-full bg-white shadow-lg flex flex-col p-4 space-y-3 border-t border-gray-100 z-50">
+            <a href="#accueil" class="nav-link text-gray-700 text-sm">ACCUEIL</a>
+            <a href="#apropos" class="nav-link text-gray-700 text-sm">À PROPOS</a>
+            <a href="#expertise" class="nav-link text-gray-700 text-sm">EXPERTISE</a>
+            <a href="#catalogue" class="nav-link text-gray-700 text-sm">CATALOGUE</a>
+            <a href="#blog" class="nav-link text-gray-700 text-sm">BLOG</a>
+            <a href="#contact" class="nav-link text-gray-700 text-sm">CONTACT</a>
+        </nav>
     </header>
 
-    <!-- ══ SECTION ACCUEIL ══ -->
-    <section id="accueil" class="relative bg-white overflow-hidden scroll-mt-header">
-        <div
-            class="container mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+    <!-- SECTION ACCUEIL -->
+    <section id="accueil" class="relative bg-white overflow-hidden scroll-mt-header py-12 md:py-0">
+        <div class="container mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
             <div class="lg:w-1/2 z-10 text-center lg:text-left">
                 <div
                     class="inline-flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold text-gray-500 mb-2 tracking-widest uppercase mx-auto lg:mx-0">
@@ -2015,22 +1640,16 @@
         </div>
     </section>
 
-    <!-- ══ SECTION À PROPOS (IMAGE ENTIÈRE, SANS COUPURE) - VERSION UI/UX OPTIMISÉE ══ -->
+    <!-- SECTION À PROPOS -->
     <section id="apropos" class="scroll-mt-header">
-
-        <!-- BANNIÈRE HERO (hauteur adaptée à l'image) -->
         <div class="apropos-hero-banner"
             style="position: relative; width: 100%; min-height: 450px; border-radius: 0; overflow: hidden;">
-            <!-- Image de fond (aproposten.jpg) - visible en entier -->
             <div class="apropos-bg-img"
                 style="position: absolute; inset: 0; background-image: url('{{ asset('images/aproposken.jpg') }}'); background-size: cover; background-position: center 20%; background-repeat: no-repeat;">
             </div>
-            <!-- Overlay : bleu visible à gauche, transparent à droite -->
             <div class="apropos-overlay"
                 style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,46,90,0.95) 0%, rgba(10,46,90,0.7) 30%, rgba(10,46,90,0.2) 70%, rgba(10,46,90,0) 100%);">
             </div>
-
-            <!-- TITRE CENTRÉ (texte + grand) -->
             <div class="apropos-hero-text"
                 style="position: relative; z-index: 2; margin-left: auto; margin-right: auto; text-align: center; max-width: 800px; padding: 100px 20px;">
                 <h2 class="apropos-hero-title"
@@ -2047,13 +1666,10 @@
             </div>
         </div>
 
-        <!-- CARTE PRINCIPALE -->
         <div style="margin-top: -36px; padding-bottom: 64px; width: 100%;">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden"
                 style="box-shadow: 0 8px 48px rgba(10,46,90,0.13), 0 2px 12px rgba(10,46,90,0.07); margin: 0;">
-                <div class="flex flex-col lg:flex-row gap-6 p-8 md:p-12">
-
-                    <!-- GAUCHE : NOTRE HISTOIRE -->
+                <div class="flex flex-col lg:flex-row gap-6 p-6 md:p-12">
                     <div class="lg:w-1/2">
                         <div class="flex items-center gap-4 mb-5">
                             <div class="w-14 h-14 bg-[#0a2e5a] rounded-xl flex items-center justify-center">
@@ -2062,7 +1678,6 @@
                             <span class="text-2xl md:text-3xl font-bold text-[#0f2439]"
                                 style="font-family: 'Playfair Display', serif;">Notre histoire</span>
                         </div>
-
                         <div class="space-y-3 text-gray-600 leading-relaxed text-base md:text-lg">
                             <p>
                                 Nous vivons dans un monde en constante évolution, où le succès repose sur la capacité à
@@ -2076,11 +1691,8 @@
                                     d'expérience</strong> dans des secteurs variés.
                             </p>
                         </div>
-
-                        <!-- BLOCS VALEURS, VISION, MISSION (textes agrandis) -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                            <div style="background:#fff7ed; border:1px solid #fed7aa;"
-                                class="p-5 rounded-xl text-center">
+                            <div style="background:#fff7ed; border:1px solid #fed7aa;" class="p-5 rounded-xl text-center">
                                 <i class="fas fa-handshake text-2xl mb-2" style="color:#c2410c;"></i>
                                 <h4 class="font-bold text-base" style="color:#9a3412;">Nos valeurs</h4>
                                 <p class="text-sm mt-1 leading-relaxed" style="color:#78350f;">
@@ -2088,9 +1700,7 @@
                                     réussite individuelle et collective.
                                 </p>
                             </div>
-
-                            <div style="background:#ecfdf5; border:1px solid #a7f3d0;"
-                                class="p-5 rounded-xl text-center">
+                            <div style="background:#ecfdf5; border:1px solid #a7f3d0;" class="p-5 rounded-xl text-center">
                                 <i class="fas fa-eye text-2xl mb-2" style="color:#065f46;"></i>
                                 <h4 class="font-bold text-base" style="color:#065f46;">Notre vision</h4>
                                 <p class="text-sm mt-1 leading-relaxed" style="color:#064e3b;">
@@ -2098,9 +1708,7 @@
                                     notre impact durable.
                                 </p>
                             </div>
-
-                            <div style="background:#f5f3ff; border:1px solid #c4b5fd;"
-                                class="p-5 rounded-xl text-center">
+                            <div style="background:#f5f3ff; border:1px solid #c4b5fd;" class="p-5 rounded-xl text-center">
                                 <i class="fas fa-rocket text-2xl mb-2" style="color:#6d28d9;"></i>
                                 <h4 class="font-bold text-base" style="color:#5b21b6;">Notre mission</h4>
                                 <p class="text-sm mt-1 leading-relaxed" style="color:#4c1d95;">
@@ -2111,12 +1719,9 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- DROITE : IMAGE + CITATION OBJECTIF (textes légèrement agrandis) -->
                     <div class="lg:w-1/2 relative">
                         <img src="{{ asset('images/apropos2.jpg') }}" alt="Notre histoire"
                             class="w-full h-80 object-cover rounded-2xl shadow-md" style="filter: brightness(0.85);">
-
                         <div
                             class="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#0a2e5a] to-[#1a4580] rounded-b-2xl p-6">
                             <div
@@ -2131,15 +1736,15 @@
                                 objectif</p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
     </section>
-    <section id="expertise" class="bg-white scroll-mt-header py-16 md:py-20">
+
+    <!-- SECTION EXPERTISE -->
+    <section id="expertise" class="bg-white scroll-mt-header py-12 md:py-20">
         <div class="container mx-auto px-4 md:px-6">
-            <div class="text-center mb-12 md:mb-16">
+            <div class="text-center mb-10 md:mb-16">
                 <span class="section-badge badge-orange inline-block mb-3">✨ Notre savoir-faire</span>
                 <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-3 md:mb-4">
                     EXPERTISE <span
@@ -2152,7 +1757,8 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <!-- Carte 1 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-green-500"></div>
@@ -2160,7 +1766,8 @@
                         <div class="text-center">
                             <div
                                 class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4 md:mb-5 transition-transform group-hover:scale-110">
-                                <i class="fas fa-users text-2xl md:text-3xl text-teal-600"></i></div>
+                                <i class="fas fa-users text-2xl md:text-3xl text-teal-600"></i>
+                            </div>
                             <h3 class="text-xl md:text-2xl font-bold text-gray-800">FORMATIONS INTER-ENTREPRISES</h3>
                             <p class="text-xs md:text-sm text-teal-600 font-semibold uppercase mt-1 tracking-widest">
                                 SYNERGIE & RÉSEAUX D'ÉLITE</p>
@@ -2174,7 +1781,7 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-
+                <!-- Carte 2 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-500"></div>
@@ -2182,7 +1789,8 @@
                         <div class="text-center">
                             <div
                                 class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4 md:mb-5 transition-transform group-hover:scale-110">
-                                <i class="fas fa-building text-2xl md:text-3xl text-orange-600"></i></div>
+                                <i class="fas fa-building text-2xl md:text-3xl text-orange-600"></i>
+                            </div>
                             <h3 class="text-xl md:text-2xl font-bold text-gray-800">FORMATIONS INTRA-ENTREPRISE</h3>
                             <p class="text-xs md:text-sm text-orange-600 font-semibold uppercase mt-1 tracking-widest">
                                 100% PERSONNALISÉ</p>
@@ -2197,7 +1805,7 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-
+                <!-- Carte 3 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
@@ -2205,7 +1813,8 @@
                         <div class="text-center">
                             <div
                                 class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4 md:mb-5 transition-transform group-hover:scale-110">
-                                <i class="fas fa-clipboard-list text-2xl md:text-3xl text-purple-600"></i></div>
+                                <i class="fas fa-clipboard-list text-2xl md:text-3xl text-purple-600"></i>
+                            </div>
                             <h3 class="text-xl md:text-2xl font-bold text-gray-800">ACCOMPAGNEMENT & AUDIT</h3>
                             <p class="text-xs md:text-sm text-purple-600 font-semibold uppercase mt-1 tracking-widest">
                                 STRUCTURATION & PERFORMANCE</p>
@@ -2222,7 +1831,7 @@
                 </div>
             </div>
 
-            <div class="mt-20 rounded-[2rem] shadow-sm py-8 px-4 border border-amber-100"
+            <div class="mt-12 md:mt-20 rounded-[2rem] shadow-sm py-8 px-4 border border-amber-100"
                 style="background: linear-gradient(to right, #fdfbf7, #f5e6d3);">
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-amber-200">
@@ -2263,10 +1872,10 @@
         </div>
     </section>
 
-    <!-- SECTION CATALOGUE – LIENS VERS PAGES DÉDIÉES (plus de modale) -->
-    <section id="catalogue" class="py-16 md:py-24 lg:py-32 scroll-mt-header">
+    <!-- SECTION CATALOGUE -->
+    <section id="catalogue" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-[#0a2e5a]">
         <div class="container mx-auto px-4 md:px-6">
-            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+            <div class="text-center max-w-3xl mx-auto mb-10 md:mb-16">
                 <span
                     class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/30 backdrop-blur-sm"><i
                         class="fas fa-book-open"></i> Notre offre de formation</span>
@@ -2277,7 +1886,7 @@
                 <div class="w-20 h-1 bg-white/50 mx-auto mt-4 rounded-full"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 @forelse($catalogues as $catalogue)
                     <div class="catalogue-card">
                         @if($catalogue->image)<img src="{{ asset('storage/' . e($catalogue->image)) }}"
@@ -2288,7 +1897,6 @@
                             <h3 class="catalogue-card-title">{{ e($catalogue->titre) }}</h3>
                             <p class="catalogue-card-desc line-clamp-3">{{ Str::limit(e($catalogue->description), 140) }}
                             </p>
-                            <!-- Lien vers la page dédiée au lieu du bouton modale -->
                             <a href="{{ route('catalogue.show', $catalogue->id) }}" class="catalogue-card-link">
                                 En savoir plus <i class="fas fa-arrow-right"></i>
                             </a>
@@ -2303,8 +1911,8 @@
         </div>
     </section>
 
-    <!-- ==================== SECTION PARTENAIRES (DÉFILEMENT INFINI CONTINU) ==================== -->
-    <section id="partenaires-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header">
+    <!-- SECTION PARTENAIRES (défilement infini) -->
+    <section id="partenaires-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-white">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center mb-10 md:mb-16">
                 <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4"
@@ -2326,7 +1934,6 @@
                         <div class="overflow-hidden w-full">
                             <div id="marqueeContainer" class="relative w-full">
                                 <div id="marqueeTrack" class="flex" style="will-change: transform;">
-                                    <!-- Contenu des logos (dupliqué plusieurs fois pour une boucle fluide) -->
                                     @for ($i = 0; $i < 3; $i++)
                                         @foreach($partenaires as $partenaire)
                                             <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}">
@@ -2351,14 +1958,14 @@
             @endif
         </div>
     </section>
-    <!-- ==================== SECTION AVIS (SLIDER HORIZONTAL SIMPLE) ==================== -->
-    <section id="avis-section" class="py-16 md:py-24 lg:py-32 scroll-mt-header"
+
+    <!-- SECTION AVIS (slider horizontal) -->
+    <section id="avis-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header"
         style="background: linear-gradient(135deg, #4c1d95 0%, #2e1065 100%);">
         <div class="container mx-auto px-4 md:px-6">
-
             <div class="text-center mb-10 md:mb-14">
                 <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4"
-                    style="background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(4px);">⭐
+                    style="background: rgba(69, 218, 64, 0.73); color: white; backdrop-filter: blur(4px);">⭐
                     Témoignages</span>
                 <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3">Ce qu'ils disent de
                     nous</h2>
@@ -2370,7 +1977,7 @@
             @if(isset($avis) && $avis->count())
                 <div class="avis-slider">
                     <button class="avis-slider-btn prev" id="avisPrevBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
                             <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -2399,7 +2006,7 @@
                         </div>
                     </div>
                     <button class="avis-slider-btn next" id="avisNextBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
                             <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -2409,134 +2016,131 @@
                     <p class="text-white/70 text-base md:text-xl">Aucun avis pour le moment.</p>
                 </div>
             @endif
-
         </div>
     </section>
 
-
-
-
-    <section id="blog" class="py-24 md:py-32 scroll-mt-header" style="background: #f8fafc;">
+    <!-- SECTION BLOG (CARROUSEL HORIZONTAL) -->
+    <section id="blog" class="py-12 md:py-24 lg:py-32 scroll-mt-header" style="background: #f8fafc;">
         <div class="container mx-auto px-4 md:px-8">
-
-            <div class="text-center mb-20">
-                <h2 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter inline-block">
+            <div class="text-center mb-12 md:mb-20">
+                <h2 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tighter inline-block">
                     <span class="text-slate-900">BLOG & </span>
                     <span
                         style="background: linear-gradient(to right, #f97316, #ef4444, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                         ACTUALITÉS
                     </span>
                 </h2>
-                <p class="text-slate-500 text-lg md:text-xl font-medium mt-2">Conseils d'experts, études de cas et
+                <p class="text-slate-500 text-base md:text-xl font-medium mt-2">Conseils d'experts, études de cas et
                     actualités</p>
                 <div class="w-20 h-1.5 bg-orange-500 mx-auto mt-6 rounded-full"></div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-                @forelse($articles as $article)
-                    <article
-                        class="group bg-[#ffffff] rounded-[3rem] overflow-hidden border-[2.5px] border-slate-950 transition-all duration-500 hover:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.15)] flex flex-col text-center relative shadow-sm">
-
-                        <div class="relative h-64 m-4 overflow-hidden rounded-[2.2rem] border-[1.5px] border-slate-900">
-                            @if($article->image_une)
-                                <img src="{{ asset('storage/' . e($article->image_une)) }}"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                            @else
-                                <div class="w-full h-full bg-slate-50 flex items-center justify-center">
-                                    <i class="fas fa-image text-4xl text-slate-200"></i>
-                                </div>
-                            @endif
-
-                            <div class="absolute top-4 left-0 right-0 flex justify-center">
-                                <span
-                                    class="bg-[#f97316] text-white text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-xl border border-white/20">
-                                    Article Premium
-                                </span>
-                            </div>
+            @if(isset($articles) && $articles->count())
+                <div class="blog-slider">
+                    <button class="blog-slider-btn" id="blogPrevBtn">
+                        <i class="fas fa-chevron-left text-xl"></i>
+                    </button>
+                    <div class="blog-slider-viewport">
+                        <div class="blog-slider-track" id="blogTrack">
+                            @foreach($articles as $article)
+                                <article class="blog-card group">
+                                    <div class="relative h-64 m-4 overflow-hidden rounded-[2.2rem] border-[1.5px] border-slate-900">
+                                        @if($article->image_une)
+                                            <img src="{{ asset('storage/' . e($article->image_une)) }}"
+                                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                        @else
+                                            <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                                                <i class="fas fa-image text-4xl text-slate-200"></i>
+                                            </div>
+                                        @endif
+                                        <div class="absolute top-4 left-0 right-0 flex justify-center">
+                                            <span
+                                                class="bg-[#f97316] text-white text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-xl border border-white/20">
+                                                Article Premium
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="p-6 pt-2 flex flex-col items-center">
+                                        <div
+                                            class="flex items-center gap-2 text-orange-600 text-xs font-black mb-5 bg-orange-50/50 px-4 py-2 rounded-xl border border-orange-100">
+                                            <i class="far fa-calendar-alt"></i>
+                                            {{ $article->date_publication->format('d M Y') }}
+                                        </div>
+                                        <h3
+                                            class="font-black text-slate-900 text-xl md:text-2xl mb-4 leading-tight min-h-[3.5rem] line-clamp-2 text-center">
+                                            {{ $article->titre }}
+                                        </h3>
+                                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-6 font-medium px-2 text-center">
+                                            {{ Str::limit($article->extrait ?? $article->contenu, 90) }}
+                                        </p>
+                                        <div class="w-full mt-auto">
+                                            <a href="{{ route('blog.show', $article->slug) }}"
+                                                class="inline-flex items-center justify-center gap-3 w-full py-4 bg-black text-white rounded-2xl font-black text-xs tracking-[0.2em] transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-xl">
+                                                <span>LIRE L'ARTICLE</span>
+                                                <i class="fas fa-arrow-right text-[10px]"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </article>
+                            @endforeach
                         </div>
-
-                        <div class="p-8 pt-2 flex flex-col items-center">
-
-                            <div
-                                class="flex items-center gap-2 text-orange-600 text-xs font-black mb-5 bg-orange-50/50 px-4 py-2 rounded-xl border border-orange-100">
-                                <i class="far fa-calendar-alt"></i>
-                                {{ $article->date_publication->format('d M Y') }}
-                            </div>
-
-                            <h3 class="font-black text-slate-900 text-2xl mb-4 leading-tight min-h-[3.5rem] line-clamp-2">
-                                {{ $article->titre }}
-                            </h3>
-
-                            <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-10 font-medium px-2">
-                                {{ Str::limit($article->extrait ?? $article->contenu, 90) }}
-                            </p>
-
-                            <div class="w-full mt-auto">
-                                <a href="{{ route('blog.show', $article->slug) }}"
-                                    class="inline-flex items-center justify-center gap-3 w-full py-4 bg-[#000000] text-white rounded-2xl font-black text-xs tracking-[0.2em] transition-all duration-300 hover:bg-orange-600 hover:scale-[1.02] shadow-xl">
-                                    <span>LIRE L'ARTICLE</span>
-                                    <i class="fas fa-arrow-right text-[10px]"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                @empty
-                    <div class="col-span-full text-center py-20">
-                        <p class="text-slate-400 text-xl font-bold italic">Aucune actualité pour le moment...</p>
                     </div>
-                @endforelse
-            </div>
+                    <button class="blog-slider-btn" id="blogNextBtn">
+                        <i class="fas fa-chevron-right text-xl"></i>
+                    </button>
+                </div>
+            @else
+                <div class="text-center py-20">
+                    <p class="text-slate-400 text-xl font-bold italic">Aucune actualité pour le moment...</p>
+                </div>
+            @endif
         </div>
     </section>
 
-    <!-- [FIN DES SECTIONS PRÉCÉDENTES (ACCUEIL, APROPOS, EXPERTISE, CATALOGUE, PARTENAIRES, AVIS, BLOG) — TOUT LE DESIGN EST CONSERVÉ] -->
-
+    <!-- FOOTER / CONTACT -->
     <footer id="contact" class="scroll-mt-header">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2.5rem 2.5rem 0 0;"
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2rem 2rem 0 0;"
             class="text-white pt-12 pb-8">
             <div class="container mx-auto px-4">
-                <div class="flex flex-col lg:flex-row items-center gap-10">
+                <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-10">
                     <div class="lg:w-1/2 hidden lg:flex justify-center">
                         <img src="{{ asset('images/dame.png') }}" alt="Contact"
                             class="max-h-[350px] w-auto drop-shadow-2xl">
                     </div>
                     <div class="lg:w-1/2 w-full">
-                        <h3 class="text-3xl font-black mb-6 text-center lg:text-left">Contactez-nous</h3>
-                        <div class="lg:w-1/2 w-full">
-    <form id="footerContactForm" class="space-y-4">
-        @csrf
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" name="nom" id="footer_nom" placeholder="Nom complet *" 
-                   class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
-            <input type="email" name="email" id="footer_email" placeholder="Email *" 
-                   class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required>
-        </div>
-        
-        <!-- Champ téléphone seul (centré ou pleine largeur) -->
-        <div>
-            <input type="tel" name="telephone" id="footer_telephone" placeholder="Téléphone" 
-                   class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition">
-        </div>
-        
-        <textarea name="message" rows="3" id="footer_message" placeholder="Votre message *" 
-                  class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition" required></textarea>
-        
-        <button type="submit" id="footerSubmitBtn" 
-                class="w-full bg-white text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-50 transition shadow-lg transform hover:-translate-y-1">
-            Envoyer
-        </button>
-    </form>
-    <div id="footerContactSuccess" class="hidden mt-3 p-2 bg-green-800/30 text-green-200 text-sm text-center rounded-xl"></div>
-    <div id="footerContactError" class="hidden mt-3 p-2 bg-red-800/30 text-red-200 text-sm text-center rounded-xl"></div>
-</div>
-                        <div id="footerContactSuccess"
-                            class="hidden mt-3 p-2 bg-green-800/30 text-green-200 text-sm text-center rounded-xl"></div>
-                        <div id="footerContactError"
-                            class="hidden mt-3 p-2 bg-red-800/30 text-red-200 text-sm text-center rounded-xl"></div>
+                        <h3 class="text-2xl md:text-3xl font-black mb-6 text-center lg:text-left">Contactez-nous</h3>
+                        <div class="w-full">
+                            <form id="footerContactForm" class="space-y-4">
+                                @csrf
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <input type="text" name="nom" id="footer_nom" placeholder="Nom complet *"
+                                        class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
+                                        required>
+                                    <input type="email" name="email" id="footer_email" placeholder="Email *"
+                                        class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
+                                        required>
+                                </div>
+                                <div>
+                                    <input type="tel" name="telephone" id="footer_telephone" placeholder="Téléphone"
+                                        class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition">
+                                </div>
+                                <textarea name="message" rows="3" id="footer_message" placeholder="Votre message *"
+                                    class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
+                                    required></textarea>
+                                <button type="submit" id="footerSubmitBtn"
+                                    class="w-full bg-white text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-50 transition shadow-lg transform hover:-translate-y-1">
+                                    Envoyer
+                                </button>
+                            </form>
+                            <div id="footerContactSuccess"
+                                class="hidden mt-3 p-2 bg-green-800/30 text-green-200 text-sm text-center rounded-xl"></div>
+                            <div id="footerContactError"
+                                class="hidden mt-3 p-2 bg-red-800/30 text-red-200 text-sm text-center rounded-xl"></div>
+                        </div>
                     </div>
-                    <div class="border-t border-gray-700 pt-6 mt-8 text-center">
-                        <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p>
-                    </div>
+                </div>
+                <div class="border-t border-gray-700 pt-6 mt-8 text-center">
+                    <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p>
                 </div>
             </div>
         </div>
@@ -2555,8 +2159,6 @@
                             <a href="#catalogue" class="hover:text-white transition">Catalogue</a>
                         </nav>
                     </div>
-
-                    <!-- Message du développeur -->
                     <div
                         class="w-full max-w-2xl bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-center backdrop-blur-sm">
                         <p class="text-indigo-400 text-[10px] uppercase font-bold tracking-[0.2em] mb-2">Partenaire
@@ -2572,7 +2174,6 @@
                             rabearisaoninamanoa@gmail.com
                         </a>
                     </div>
-
                     <p class="text-gray-600 text-[10px] uppercase tracking-widest">
                         &copy; {{ date('Y') }} Tout Help Madagascar &bull; Tous droits réservés
                     </p>
@@ -2581,12 +2182,11 @@
         </div>
     </footer>
 
-    <!-- CHAT MODAL (identique) -->
+    <!-- CHAT MODAL -->
     <div class="robot-icon" id="robotIcon" role="button" aria-label="Ouvrir le support">
         <i class="fas fa-robot"></i>
         <span id="robotBadge" class="robot-badge" style="display:none;" aria-live="polite">0</span>
     </div>
-
     <div class="chat-modal" id="chatModal" role="dialog" aria-modal="true" aria-label="Chat support">
         <div class="chat-header">
             <div class="chat-header-left">
@@ -2613,14 +2213,10 @@
             <div style="text-align:center;margin-bottom:12px;">
                 <p style="font-size:13px;color:#e63946;">Bonjour ! 👋 Pour commencer, présentez-vous :</p>
             </div>
-            <input type="text" id="initNom" placeholder="Votre nom complet *" maxlength="150" autocomplete="name"
-                aria-label="Nom">
-            <input type="email" id="initEmail" placeholder="Votre email *" maxlength="150" autocomplete="email"
-                aria-label="Email">
-            <input type="tel" id="initTel" placeholder="Votre téléphone (optionnel)" maxlength="30" autocomplete="tel"
-                aria-label="Téléphone">
-            <textarea id="initMessage" rows="2" placeholder="Votre message *" style="resize:none;" maxlength="1000"
-                aria-label="Message"></textarea>
+            <input type="text" id="initNom" placeholder="Votre nom complet *" maxlength="150" autocomplete="name">
+            <input type="email" id="initEmail" placeholder="Votre email *" maxlength="150" autocomplete="email">
+            <input type="tel" id="initTel" placeholder="Votre téléphone (optionnel)" maxlength="30" autocomplete="tel">
+            <textarea id="initMessage" rows="2" placeholder="Votre message *" style="resize:none;" maxlength="1000"></textarea>
             <button class="chat-init-btn" id="initSendBtn" onclick="submitInitForm()"><i
                     class="fas fa-paper-plane mr-2"></i> Démarrer la conversation</button>
         </div>
@@ -2680,31 +2276,22 @@
 
             async function sendQuickMessage() { if (isSending) return; const ta = document.getElementById('chatTextarea'); const msg = ta.value.trim(); if (!msg || !currentEmail) return; const btn = document.getElementById('chatSendBtn'); isSending = true; btn.disabled = true; ta.value = ''; ta.style.height = 'auto'; const result = await sendMessageAPI(currentNom, currentEmail, '', msg); if (result.success) { lastMessagesHash = ''; await loadMessages(true); } else if (result.message) { flashError(result.message); ta.value = msg; } btn.disabled = false; isSending = false; }
 
-            // FORMULAIRE DE CONTACT EN BAS DE PAGE
             const footerForm = document.getElementById('footerContactForm');
             if (footerForm) {
                 footerForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     if (isSending) return;
-
                     const nom = document.getElementById('footer_nom').value.trim();
                     const email = document.getElementById('footer_email').value.trim();
                     const tel = document.getElementById('footer_telephone').value.trim();
                     const msg = document.getElementById('footer_message').value.trim();
-
-                    if (!nom || !email || !msg) {
-                        flashError('Merci de remplir tous les champs obligatoires.');
-                        return;
-                    }
-
+                    if (!nom || !email || !msg) { flashError('Merci de remplir tous les champs obligatoires.'); return; }
                     const btn = document.getElementById('footerSubmitBtn');
                     const originalText = btn.innerHTML;
                     isSending = true;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Envoi...';
                     btn.disabled = true;
-
                     const result = await sendMessageAPI(nom, email, tel, msg);
-
                     if (result.success) {
                         currentEmail = email.trim().substring(0, MAX_EMAIL_LENGTH);
                         currentNom = nom.trim().substring(0, MAX_NAME_LENGTH);
@@ -2715,23 +2302,13 @@
                         await loadMessages(true);
                         startPolling();
                         setupPusherListener();
-
                         const successDiv = document.getElementById('footerContactSuccess');
-                        if (successDiv) {
-                            successDiv.textContent = 'Message envoyé avec succès ! La conversation a été ouverte.';
-                            successDiv.classList.remove('hidden');
-                            setTimeout(() => successDiv.classList.add('hidden'), 5000);
-                        }
+                        if (successDiv) { successDiv.textContent = 'Message envoyé avec succès ! La conversation a été ouverte.'; successDiv.classList.remove('hidden'); setTimeout(() => successDiv.classList.add('hidden'), 5000); }
                     } else if (result.message) {
                         const errorDiv = document.getElementById('footerContactError');
-                        if (errorDiv) {
-                            errorDiv.textContent = result.message;
-                            errorDiv.classList.remove('hidden');
-                            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-                        }
+                        if (errorDiv) { errorDiv.textContent = result.message; errorDiv.classList.remove('hidden'); setTimeout(() => errorDiv.classList.add('hidden'), 5000); }
                         flashError(result.message);
                     }
-
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     isSending = false;
@@ -2742,56 +2319,28 @@
 
             function resetChat() { currentEmail = ''; currentNom = ''; lastMessageId = null; lastMessagesHash = ''; unreadCount = 0; updateBadge(); stopPolling(); pusherListenerSet = false; document.getElementById('chatInitForm').style.display = 'block'; document.getElementById('chatInputArea').style.display = 'none'; document.getElementById('changeIdentityBar').style.display = 'none'; const area = document.getElementById('chatMessagesArea'); if (area) area.innerHTML = '';['initNom', 'initEmail', 'initTel', 'initMessage'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); const btn = document.getElementById('initSendBtn'); if (btn) { btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Démarrer la conversation'; btn.disabled = false; } isSending = false; }
 
-            // Configuration Pusher (remplace Echo/Reverb)
             function setupPusherListener() {
                 if (pusherListenerSet) return;
-
                 function initPusher() {
-                    if (typeof Pusher === 'undefined') {
-                        wsRetryCount++;
-                        if (wsRetryCount < 30) setTimeout(initPusher, 500);
-                        return;
-                    }
-
+                    if (typeof Pusher === 'undefined') { wsRetryCount++; if (wsRetryCount < 30) setTimeout(initPusher, 500); return; }
                     const pusherKey = '{{ env("PUSHER_APP_KEY") }}';
                     const pusherCluster = '{{ env("PUSHER_APP_CLUSTER") }}';
-
-                    if (!pusherKey || pusherKey === '') {
-                        return;
-                    }
-
+                    if (!pusherKey || pusherKey === '') { return; }
                     try {
-                        const pusher = new Pusher(pusherKey, {
-                            cluster: pusherCluster,
-                            encrypted: true
-                        });
-
-                        if (pusherChannel) {
-                            try { pusherChannel.unbind_all(); } catch (e) { }
-                        }
-
+                        const pusher = new Pusher(pusherKey, { cluster: pusherCluster, encrypted: true });
+                        if (pusherChannel) { try { pusherChannel.unbind_all(); } catch (e) { } }
                         pusherChannel = pusher.subscribe('new-messages');
-
                         pusherChannel.bind('App\\Events\\NewMessageReceived', (event) => {
                             if (currentEmail && currentEmail === event.email_client) {
                                 lastMessagesHash = '';
                                 loadMessages(true);
                                 const modal = document.getElementById('chatModal');
-                                if (modal && modal.classList.contains('active')) {
-                                    playNotifSound();
-                                } else {
-                                    unreadCount++;
-                                    updateBadge();
-                                    showRobotNotification();
-                                    playNotifSound();
-                                }
+                                if (modal && modal.classList.contains('active')) { playNotifSound(); } else { unreadCount++; updateBadge(); showRobotNotification(); playNotifSound(); }
                             }
                         });
-
                         pusherListenerSet = true;
                     } catch (e) { }
                 }
-
                 initPusher();
             }
 
@@ -2809,7 +2358,7 @@
             });
         })();
 
-        /*avis*/
+        /* Slider avis */
         (function () {
             function initSlider() {
                 const track = document.getElementById('avisTrack');
@@ -2819,9 +2368,78 @@
                 const prevBtn = document.getElementById('avisPrevBtn');
                 const nextBtn = document.getElementById('avisNextBtn');
                 if (!prevBtn || !nextBtn) return;
-
                 let currentIndex = 0;
                 let visibleCount = 3;
+                let cardWidth = 0;
+                let gap = 24;
+                function updateLayout() {
+                    const container = track.parentElement;
+                    const containerWidth = container.clientWidth;
+                    if (window.innerWidth < 768) { visibleCount = 1; gap = 16; } else { visibleCount = 3; gap = 24; }
+                    cardWidth = (containerWidth - (gap * (visibleCount - 1))) / visibleCount;
+                    for (let i = 0; i < cards.length; i++) { cards[i].style.flex = `0 0 ${cardWidth}px`; }
+                }
+                function slideToIndex() {
+                    const offset = -currentIndex * (cardWidth + gap);
+                    track.style.transform = `translateX(${offset}px)`;
+                    const maxIndex = Math.max(0, cards.length - visibleCount);
+                    prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
+                    nextBtn.style.opacity = currentIndex >= maxIndex ? '0.4' : '1';
+                }
+                function next() { const maxIndex = Math.max(0, cards.length - visibleCount); if (currentIndex < maxIndex) { currentIndex++; slideToIndex(); } }
+                function prev() { if (currentIndex > 0) { currentIndex--; slideToIndex(); } }
+                prevBtn.addEventListener('click', prev);
+                nextBtn.addEventListener('click', next);
+                updateLayout();
+                slideToIndex();
+                window.addEventListener('resize', () => { updateLayout(); slideToIndex(); });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSlider); else initSlider();
+        })();
+
+        /* Marquee partenaires */
+        (function () {
+            const track = document.getElementById('marqueeTrack');
+            if (!track) return;
+            let speed = 1;
+            let position = 0;
+            let animationId = null;
+            let isHovering = false;
+            function startMarquee() {
+                if (animationId) cancelAnimationFrame(animationId);
+                function step() {
+                    if (!isHovering) {
+                        position -= speed;
+                        const trackWidth = track.scrollWidth;
+                        const containerWidth = track.parentElement.clientWidth;
+                        if (Math.abs(position) >= trackWidth / 3) { position = 0; }
+                        track.style.transform = `translateX(${position}px)`;
+                    }
+                    animationId = requestAnimationFrame(step);
+                }
+                step();
+            }
+            const container = document.querySelector('#partenaires-section .overflow-hidden');
+            if (container) {
+                container.addEventListener('mouseenter', () => { isHovering = true; });
+                container.addEventListener('mouseleave', () => { isHovering = false; });
+            }
+            startMarquee();
+        })();
+
+        /* Carrousel Blog */
+        (function () {
+            function initBlogSlider() {
+                const track = document.getElementById('blogTrack');
+                if (!track) return;
+                const cards = Array.from(track.children);
+                if (cards.length === 0) return;
+                const prevBtn = document.getElementById('blogPrevBtn');
+                const nextBtn = document.getElementById('blogNextBtn');
+                if (!prevBtn || !nextBtn) return;
+
+                let currentIndex = 0;
+                let visibleCount = 4;
                 let cardWidth = 0;
                 let gap = 24;
 
@@ -2831,8 +2449,11 @@
                     if (window.innerWidth < 768) {
                         visibleCount = 1;
                         gap = 16;
+                    } else if (window.innerWidth < 1024) {
+                        visibleCount = 2;
+                        gap = 20;
                     } else {
-                        visibleCount = 3;
+                        visibleCount = 4;
                         gap = 24;
                     }
                     cardWidth = (containerWidth - (gap * (visibleCount - 1))) / visibleCount;
@@ -2846,7 +2467,9 @@
                     track.style.transform = `translateX(${offset}px)`;
                     const maxIndex = Math.max(0, cards.length - visibleCount);
                     prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
+                    prevBtn.style.cursor = currentIndex === 0 ? 'not-allowed' : 'pointer';
                     nextBtn.style.opacity = currentIndex >= maxIndex ? '0.4' : '1';
+                    nextBtn.style.cursor = currentIndex >= maxIndex ? 'not-allowed' : 'pointer';
                 }
 
                 function next() {
@@ -2867,6 +2490,18 @@
                 prevBtn.addEventListener('click', prev);
                 nextBtn.addEventListener('click', next);
 
+                // Swipe sur mobile
+                let touchStartX = 0;
+                let touchEndX = 0;
+                track.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                track.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    if (touchEndX < touchStartX - 50) next();
+                    if (touchEndX > touchStartX + 50) prev();
+                });
+
                 updateLayout();
                 slideToIndex();
 
@@ -2877,49 +2512,26 @@
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initSlider);
+                document.addEventListener('DOMContentLoaded', initBlogSlider);
             } else {
-                initSlider();
+                initBlogSlider();
             }
         })();
-        (function () {
-            const track = document.getElementById('marqueeTrack');
-            if (!track) return;
-            let speed = 1;
-            let position = 0;
-            let animationId = null;
-            let isHovering = false;
 
-            function startMarquee() {
-                if (animationId) cancelAnimationFrame(animationId);
-                function step() {
-                    if (!isHovering) {
-                        position -= speed;
-                        const trackWidth = track.scrollWidth;
-                        const containerWidth = track.parentElement.clientWidth;
-                        if (Math.abs(position) >= trackWidth / 3) {
-                            position = 0;
-                        }
-                        track.style.transform = `translateX(${position}px)`;
-                    }
-                    animationId = requestAnimationFrame(step);
-                }
-                step();
+        /* Menu burger mobile */
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobileMenu');
+            if (btn && menu) {
+                btn.addEventListener('click', function() {
+                    menu.classList.toggle('hidden');
+                });
+                menu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => menu.classList.add('hidden'));
+                });
             }
-
-            const container = document.querySelector('#partenaires-section .overflow-hidden');
-            if (container) {
-                container.addEventListener('mouseenter', () => { isHovering = true; });
-                container.addEventListener('mouseleave', () => { isHovering = false; });
-            }
-
-            startMarquee();
-
-            window.addEventListener('resize', () => { });
-        })();
-
+        });
     </script>
-
 </body>
 
 </html>
