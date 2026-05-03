@@ -1130,7 +1130,7 @@ function showToast(name, msg, c1, c2) {
     const av = document.getElementById('toastAv');
     if (av) {
         av.textContent      = String(name || '?').substring(0, 2).toUpperCase();
-        av.style.background = `linear-gradient(140deg, ${c1}, ${c2})`;
+        av.style.background = linear-gradient(140deg, ${c1}, ${c2});
     }
 
     const prog = document.getElementById('toastProgress');
@@ -1157,7 +1157,7 @@ document.getElementById('msToast')?.addEventListener('click', function(e) {
     /* Trouver la conv correspondante et la sélectionner */
     const name = document.getElementById('toastName')?.textContent;
     if (!name) return;
-    const conv = document.querySelector(`.ms-conv[data-name="${CSS.escape ? CSS.escape(name) : name}"]`);
+    const conv = document.querySelector(.ms-conv[data-name="${CSS.escape ? CSS.escape(name) : name}"]);
     conv?.click();
     hideToast();
 });
@@ -1187,7 +1187,7 @@ document.getElementById('permDismiss')?.addEventListener('click', () => {
 
 function notifBrowser(name, msg) {
     if (!browserNot || document.hasFocus()) return;
-    try { new Notification(`💬 ${name}`, { body: String(msg || '').substring(0, 100), icon: '/images/logo.jpg' }); }
+    try { new Notification(💬 ${name}, { body: String(msg || '').substring(0, 100), icon: '/images/logo.jpg' }); }
     catch {}
 }
 
@@ -1198,7 +1198,7 @@ function setRT(state) {
     const b = document.getElementById('rtBadge');
     const l = document.getElementById('rtLabel');
     if (!b || !l) return;
-    b.className = `ms-rt-badge ${state === 'connected' ? 'on' : state === 'disconnected' ? 'off' : ''}`;
+    b.className = ms-rt-badge ${state === 'connected' ? 'on' : state === 'disconnected' ? 'off' : ''};
     l.textContent = { connected:'Temps réel', disconnected:'Déconnecté', connecting:'Connexion…' }[state] || state;
 }
 
@@ -1221,7 +1221,7 @@ function checkRL() {
     const now = Date.now();
     if (!cntReset) cntReset = setTimeout(() => { sendCnt = 0; cntReset = null; }, 30000);
     if (now - lastSend < COOLDOWN) {
-        warn(`Attendez ${((COOLDOWN - (now - lastSend)) / 1000).toFixed(1)}s avant de renvoyer.`);
+        warn(Attendez ${((COOLDOWN - (now - lastSend)) / 1000).toFixed(1)}s avant de renvoyer.);
         return false;
     }
     if (sendCnt >= BURST) {
@@ -1236,7 +1236,7 @@ function checkRL() {
 ══════════════════════════ */
 function markNew(email) {
     newSet.add(email);
-    const it = document.querySelector(`.ms-conv[data-email="${cssEsc(email)}"]`);
+    const it = document.querySelector(.ms-conv[data-email="${cssEsc(email)}"]);
     if (!it) return;
     it.classList.add('new-flash');
     if (!it.querySelector('.ms-conv-badge')) {
@@ -1248,7 +1248,7 @@ function markNew(email) {
 
 function clearNew(email) {
     newSet.delete(email);
-    const it = document.querySelector(`.ms-conv[data-email="${cssEsc(email)}"]`);
+    const it = document.querySelector(.ms-conv[data-email="${cssEsc(email)}"]);
     if (!it) return;
     it.querySelector('.ms-conv-badge')?.remove();
     it.classList.remove('unread', 'new-flash');
@@ -1272,16 +1272,16 @@ async function loadConv(email) {
         </div>`;
 
     try {
-        const r = await fetch(`/admin/messages/conversation/${encodeURIComponent(email)}`, {
+        const r = await fetch(/admin/messages/conversation/${encodeURIComponent(email)}, {
             cache: 'no-store',
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         });
 
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) throw new Error(HTTP ${r.status});
         const msgs = await r.json();
 
         if (!Array.isArray(msgs) || msgs.length === 0) {
-            box.innerHTML = `<div style="text-align:center;padding:60px;font-size:13px;color:var(--text-muted)">Aucun message dans cette conversation</div>`;
+            box.innerHTML = <div style="text-align:center;padding:60px;font-size:13px;color:var(--text-muted)">Aucun message dans cette conversation</div>;
             return;
         }
 
@@ -1296,7 +1296,7 @@ async function loadConv(email) {
         renderMsgs(msgs, box);
 
     } catch(e) {
-        box.innerHTML = `<div style="text-align:center;padding:60px;font-size:13px;color:#ef4444">Erreur de chargement. Réessayez.</div>`;
+        box.innerHTML = <div style="text-align:center;padding:60px;font-size:13px;color:#ef4444">Erreur de chargement. Réessayez.</div>;
         console.warn('loadConv error:', e.message);
     }
 }
@@ -1308,7 +1308,7 @@ function renderMsgs(msgs, box) {
     for (const m of msgs) {
         const dateStr = fmtDate(m.created_at);
         if (dateStr !== lastDate) {
-            html += `<div class="ms-date-sep"><span>${esc(dateStr)}</span></div>`;
+            html += <div class="ms-date-sep"><span>${esc(dateStr)}</span></div>;
             lastDate = dateStr;
         }
 
@@ -1371,7 +1371,7 @@ async function sendMsg() {
 
     /* Bulle optimiste */
     const box   = document.getElementById('msMessages');
-    const optId = `opt-${Date.now()}`;
+    const optId = opt-${Date.now()};
 
     box?.insertAdjacentHTML('beforeend', `
         <div class="ms-row-r optimistic" id="${optId}">
@@ -1399,7 +1399,7 @@ async function sendMsg() {
             body: JSON.stringify({ email_client: cEmail, reponse_admin: msg })
         });
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(HTTP ${res.status});
         const data = await res.json();
 
         if (data.success !== false) {
@@ -1578,13 +1578,13 @@ function selectConv(el) {
 
     /* Header du chat */
     const tav = document.getElementById('threadAv');
-    if (tav) { tav.textContent = cInit; tav.style.background = `linear-gradient(145deg,${cC1},${cC2})`; }
+    if (tav) { tav.textContent = cInit; tav.style.background = linear-gradient(145deg,${cC1},${cC2}); }
     setEl('threadName', el.dataset.name);
     setEl('threadEmail', cEmail);
 
     /* Info panel */
     const iav = document.getElementById('infoAv');
-    if (iav) { iav.textContent = cInit; iav.style.background = `linear-gradient(145deg,${cC1},${cC2})`; }
+    if (iav) { iav.textContent = cInit; iav.style.background = linear-gradient(145deg,${cC1},${cC2}); }
     setEl('infoName',  el.dataset.name);
     setEl('infoEmail', cEmail);
     setEl('infoPhone', cPhone || 'Non renseigné');
@@ -1594,7 +1594,7 @@ function selectConv(el) {
     const hasRes = el.dataset.responded === '1';
     const infoSt = document.getElementById('infoStatus');
     if (infoSt) {
-        infoSt.className   = `ms-tag ${isArc ? 'arc' : (hasRes ? 'ok' : 'wait')}`;
+        infoSt.className   = ms-tag ${isArc ? 'arc' : (hasRes ? 'ok' : 'wait')};
         infoSt.textContent = isArc ? 'Archivé' : (hasRes ? 'Répondu' : 'En attente');
     }
 
@@ -1673,7 +1673,7 @@ function doRefresh() {
 
             /* Restaurer conv sélectionnée */
             if (cEmail) {
-                const sel = oldL.querySelector(`.ms-conv[data-email="${cssEsc(cEmail)}"]`);
+                const sel = oldL.querySelector(.ms-conv[data-email="${cssEsc(cEmail)}"]);
                 sel?.classList.add('sel');
             }
 
@@ -1741,7 +1741,7 @@ function initPusher() {
         if (email !== cEmail) {
             /* Autre conversation */
             markNew(email);
-            const it = document.querySelector(`.ms-conv[data-email="${cssEsc(email)}"]`);
+            const it = document.querySelector(.ms-conv[data-email="${cssEsc(email)}"]);
             const c1 = it?.dataset.c1 || '#2563a8';
             const c2 = it?.dataset.c2 || '#3b82c4';
             showToast(name, msg, c1, c2);

@@ -34,16 +34,68 @@
         }
 
         .scroll-mt-header {
-            scroll-margin-top: 110px;
+            scroll-margin-top: 120px;
         }
 
-        header {
+        /* === FIX HEADERS === */
+        /* Bande bleue marine - toujours fixée en haut */
+        .top-band {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0a2e5a !important;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            z-index: 60;
+        }
+
+        @media (min-width: 768px) {
+            .top-band {
+                height: 40px;
+            }
+        }
+
+        /* Header blanc - fixé juste sous la bande bleue */
+        .main-header {
+            position: fixed;
+            top: 36px;
+            left: 0;
+            width: 100%;
+            background: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 50;
             border-bottom: 4px solid #0a2e5a;
+            padding: 12px 0;
+            transition: box-shadow 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .main-header {
+                top: 40px;
+                padding: 16px 0;
+            }
+        }
+
+        body {
+            overflow-x: hidden;
+            padding-top: 120px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 110px;
+            }
+            .scroll-mt-header {
+                scroll-margin-top: 110px;
+            }
         }
 
         .nav-link {
             position: relative;
-            padding: 10px 0;
+            padding: 8px 0;
             transition: color 0.3s ease;
             font-weight: 800 !important;
             letter-spacing: 0.05em;
@@ -54,7 +106,7 @@
         .nav-link::after {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -8px;
             left: 0;
             width: 0;
             height: 3px;
@@ -557,12 +609,6 @@
             animation: robotShake 0.5s ease-in-out;
         }
 
-        body {
-            overflow-x: hidden;
-            padding-top: 92px;
-            font-family: 'Outfit', sans-serif;
-        }
-
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -609,14 +655,14 @@
 
         #accueil {
             background-color: #ffffff;
-            min-height: calc(100vh - 110px);
+            min-height: calc(100vh - 120px);
             display: flex;
             align-items: center;
         }
 
         #expertise {
             background-color: #ffffff;
-            min-height: calc(100vh - 110px);
+            min-height: calc(100vh - 120px);
             display: flex;
             align-items: center;
         }
@@ -645,23 +691,26 @@
             flex-shrink: 0;
             width: 48px;
             height: 48px;
-            background: transparent;
-            border: none;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background 0.2s;
         }
 
         .avis-slider-btn:hover {
             transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .avis-slider-btn svg {
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
+            stroke: white;
         }
 
         .avis-slider-track-outer {
@@ -912,7 +961,7 @@
             right: 0;
         }
 
-        /* === SECTION À PROPOS (styles existants) === */
+        /* === SECTION À PROPOS === */
         #apropos {
             background: #fff;
             padding: 0;
@@ -1241,7 +1290,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Styles pour le slider des avis (responsive) */
         .avis-slider {
             position: relative;
             display: flex;
@@ -1349,46 +1397,155 @@
             padding: 0 0.5rem;
         }
 
-        /* === STYLES POUR LE CARROUSEL BLOG === */
-        .blog-slider {
+        /* ============================================================
+           === SECTION BLOG — CARTES AVEC BORDS ARRONDIS ET CONTOURS NOIRS ===
+           SOLUTION POUR ÉVITER LA COUPURE DE LA TÊTE DE LA CARTE ANIMÉE
+           ============================================================
+        */
+        .blog-section {
+            background: #f8fafc;
+            position: relative;
+            overflow: visible !important;
+            /* Marge interne supplémentaire en haut pour que la carte puisse monter */
+            padding-top: 4rem !important;
+            padding-bottom: 8rem !important;
+        }
+
+        @media (min-width: 768px) {
+            .blog-section {
+                padding-top: 5rem !important;
+                padding-bottom: 10rem !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .blog-section {
+                padding-top: 6rem !important;
+                padding-bottom: 12rem !important;
+            }
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .blog-slider-container {
             position: relative;
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin: 2rem 0;
+            overflow: visible !important;
         }
 
-        .blog-slider-viewport {
-            overflow: hidden;
+        .blog-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: visible !important;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
             flex: 1;
             border-radius: 2rem;
+            /* TRÈS IMPORTANT: aucun overflow caché verticalement */
+            overflow-x: auto !important;
+            overflow-y: visible !important;
         }
 
-        .blog-slider-track {
+        .blog-scroll-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .blog-scroll-track {
             display: flex;
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             gap: 1.5rem;
+            width: max-content;
+            /* Espace en bas et en haut pour l'animation */
+            padding: 2rem 0 3rem 0;
+            overflow: visible !important;
         }
 
+        /* Desktop ≥ 1200px → 4 colonnes */
+        @media (min-width: 1200px) {
+            .blog-scroll-track {
+                --blog-cols: 4;
+            }
+            .blog-scroll-track .blog-card {
+                width: calc((var(--blog-wrapper-width, 100vw) - (var(--blog-cols) - 1) * 1.5rem) / var(--blog-cols));
+                min-width: 260px;
+                max-width: 380px;
+            }
+        }
+
+        /* Écran moyen 992px–1199px → 3 colonnes */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .blog-scroll-track {
+                --blog-cols: 3;
+            }
+            .blog-scroll-track .blog-card {
+                width: calc((var(--blog-wrapper-width, 100vw) - (var(--blog-cols) - 1) * 1.5rem) / var(--blog-cols));
+                min-width: 260px;
+                max-width: 400px;
+            }
+        }
+
+        /* Tablette 768px–991px → 2 colonnes */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .blog-scroll-track {
+                --blog-cols: 2;
+            }
+            .blog-scroll-track .blog-card {
+                width: calc((var(--blog-wrapper-width, 100vw) - 1 * 1.5rem) / 2);
+                min-width: 240px;
+                max-width: 480px;
+            }
+        }
+
+        /* Mobile < 768px → 1 colonne */
+        @media (max-width: 767px) {
+            .blog-scroll-track {
+                --blog-cols: 1;
+            }
+            .blog-scroll-track .blog-card {
+                width: calc(var(--blog-wrapper-width, 85vw));
+                min-width: 240px;
+                max-width: 420px;
+            }
+            .blog-scroll-track {
+                padding: 1rem 0 2rem 0;
+            }
+        }
+
+        /* Blog Card - STYLES AJOUTÉS : border-radius et contour noir + animation SANS COUPURE */
         .blog-card {
-            flex: 0 0 calc((100% - 4.5rem) / 4);
             background: white;
-            border-radius: 2rem;
-            overflow: hidden;
-            border: 2.5px solid #0f172a;
-            transition: all 0.3s ease;
+            border-radius: 2rem !important;
+            border: 2px solid #000000 !important;
+            overflow: visible !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            /* Marge positive pour que l'animation ait de l'espace */
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .blog-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .blog-slider-btn {
-            width: 48px;
-            height: 48px;
+        /* L'image à l'intérieur doit avoir ses propres bordures arrondies */
+        .blog-card .relative {
+            border-radius: 2rem 2rem 0 0;
+            overflow: hidden;
+            margin: 0 !important;
+        }
+
+        /* Flèches de navigation */
+        .blog-nav-btn {
+            width: 52px;
+            height: 52px;
             background: white;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #000000;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -1396,122 +1553,102 @@
             justify-content: center;
             transition: all 0.2s;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             color: #0f172a;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.9);
+            z-index: 10;
         }
 
-        .blog-slider-btn:hover {
+        .blog-nav-btn i {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .blog-nav-btn:hover {
             background: #f97316;
             color: white;
-            transform: scale(1.05);
+            transform: scale(1.08);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.95);
         }
 
-        .blog-slider-btn:active {
-            transform: scale(0.95);
+        .blog-nav-btn:active {
+            transform: scale(0.96);
         }
 
         @media (max-width: 768px) {
-            .blog-card {
-                flex: 0 0 calc(100% - 0rem);
+            .blog-nav-btn {
+                width: 44px;
+                height: 44px;
             }
-            .blog-slider-track {
-                gap: 1rem;
+            .blog-nav-btn i {
+                font-size: 1rem;
             }
-            .blog-slider-btn {
-                width: 40px;
-                height: 40px;
+            .blog-card:hover {
+                transform: translateY(-6px);
             }
         }
 
-        /* === NOUVEAUX STYLES RESPONSIVES === */
+        /* === RESPONSIVE GÉNÉRAL === */
         @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-            }
-
-            header {
-                top: 28px;
-            }
-
-            .scroll-mt-header {
-                scroll-margin-top: 80px;
-            }
-
             #accueil,
             #expertise {
                 min-height: auto;
                 padding: 3rem 0;
             }
-
             .apropos-hero-text {
                 padding: 48px 24px 64px;
                 max-width: 100%;
                 text-align: center;
             }
-
             .apropos-hero-title {
                 font-size: clamp(32px, 8vw, 48px);
             }
-
             .apropos-main-card {
                 margin: -24px 16px 0;
                 padding: 32px 20px;
             }
-
             .apropos-two-col {
                 grid-template-columns: 1fr;
                 gap: 32px;
             }
-
             .apropos-cards-grid {
                 grid-template-columns: 1fr;
                 padding: 0 16px 48px;
             }
-
             .avis-slider-btn {
                 width: 36px;
                 height: 36px;
             }
-
             .avis-slider-btn svg {
-                width: 28px;
-                height: 28px;
+                width: 20px;
+                height: 20px;
             }
-
             .avis-card {
                 flex: 0 0 calc(100% - 1rem);
                 padding: 1.2rem;
             }
-
             .avis-card .avatar {
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
             }
-
             .catalogue-card img {
                 height: 180px;
             }
-
             .catalogue-card-body {
                 padding: 1.2rem;
             }
-
             .catalogue-card-title {
                 font-size: 1.2rem;
             }
-
             .partenaire-item {
                 width: 110px;
                 height: 90px;
                 margin-right: 1rem;
             }
-
             .partenaire-item img {
                 max-width: 90px;
                 max-height: 65px;
             }
-
             .chat-modal {
                 width: calc(100% - 20px);
                 right: 10px;
@@ -1519,15 +1656,17 @@
                 bottom: 80px;
                 border-radius: 16px;
             }
-
             .chat-body {
                 max-height: 50vh;
             }
-
             .btn-primary,
             .btn-secondary {
                 padding: 10px 20px;
                 font-size: 0.9rem;
+            }
+            .blog-section {
+                padding-top: 3rem !important;
+                padding-bottom: 6rem !important;
             }
         }
 
@@ -1535,17 +1674,18 @@
             .grid-cols-3 {
                 grid-template-columns: repeat(1, minmax(0, 1fr));
             }
-
             .text-5xl {
                 font-size: 2.5rem;
             }
-
             .text-6xl {
                 font-size: 3rem;
             }
-
             .text-7xl {
                 font-size: 3.5rem;
+            }
+            .blog-section {
+                padding-top: 2rem !important;
+                padding-bottom: 5rem !important;
             }
         }
     </style>
@@ -1553,8 +1693,8 @@
 
 <body class="bg-white">
 
-    <!-- Bande bleue marine avec email et téléphone -->
-    <div class="fixed top-0 left-0 w-full bg-[#0a2e5a] h-7 md:h-8 flex items-center z-60">
+    <!-- Bande bleue marine fixée en haut -->
+    <div class="top-band">
         <div class="container mx-auto px-3 md:px-6 flex justify-between items-center w-full">
             <div class="flex items-center gap-2">
                 <i class="fas fa-envelope text-yellow-300 text-xs"></i>
@@ -1569,35 +1709,33 @@
         </div>
     </div>
 
-    <header class="fixed top-7 md:top-8 left-0 w-full bg-white shadow-md z-50 py-2 md:py-3 border-b-4 border-[#0a2e5a]">
+    <!-- Header blanc fixé sous la bande bleue -->
+    <header class="main-header">
         <div class="container mx-auto px-3 md:px-6 flex justify-between items-center">
             <div class="flex items-center space-x-2 md:space-x-3">
                 <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-8 md:h-12 lg:h-14 w-auto">
                 <span class="text-lg md:text-2xl font-bold text-green-900"
                     style="font-family:'Playfair Display',serif;letter-spacing:0.05em;">TOUT HELP</span>
             </div>
-            <!-- Menu desktop -->
             <nav class="hidden md:flex space-x-6 lg:space-x-10">
-                <a href="#accueil" class="nav-link text-gray-700 text-sm lg:text-base">ACCUEIL</a>
-                <a href="#apropos" class="nav-link text-gray-700 text-sm lg:text-base">À PROPOS</a>
-                <a href="#expertise" class="nav-link text-gray-700 text-sm lg:text-base">EXPERTISE</a>
-                <a href="#catalogue" class="nav-link text-gray-700 text-sm lg:text-base">CATALOGUE</a>
-                <a href="#blog" class="nav-link text-gray-700 text-sm lg:text-base">BLOG</a>
-                <a href="#contact" class="nav-link text-gray-700 text-sm lg:text-base">CONTACT</a>
+                <a href="#accueil" class="nav-link text-gray-700 text-sm lg:text-base" data-section="accueil">ACCUEIL</a>
+                <a href="#apropos" class="nav-link text-gray-700 text-sm lg:text-base" data-section="apropos">À PROPOS</a>
+                <a href="#expertise" class="nav-link text-gray-700 text-sm lg:text-base" data-section="expertise">EXPERTISE</a>
+                <a href="#catalogue" class="nav-link text-gray-700 text-sm lg:text-base" data-section="catalogue">CATALOGUE</a>
+                <a href="#blog" class="nav-link text-gray-700 text-sm lg:text-base" data-section="blog">BLOG</a>
+                <a href="#contact" class="nav-link text-gray-700 text-sm lg:text-base" data-section="contact">CONTACT</a>
             </nav>
-            <!-- Bouton burger mobile -->
             <button id="mobileMenuBtn" class="md:hidden text-gray-800 text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
-        <!-- Menu mobile déroulant -->
         <nav id="mobileMenu" class="hidden md:hidden absolute top-full left-0 w-full bg-white shadow-lg flex flex-col p-4 space-y-3 border-t border-gray-100 z-50">
-            <a href="#accueil" class="nav-link text-gray-700 text-sm">ACCUEIL</a>
-            <a href="#apropos" class="nav-link text-gray-700 text-sm">À PROPOS</a>
-            <a href="#expertise" class="nav-link text-gray-700 text-sm">EXPERTISE</a>
-            <a href="#catalogue" class="nav-link text-gray-700 text-sm">CATALOGUE</a>
-            <a href="#blog" class="nav-link text-gray-700 text-sm">BLOG</a>
-            <a href="#contact" class="nav-link text-gray-700 text-sm">CONTACT</a>
+            <a href="#accueil" class="nav-link text-gray-700 text-sm" data-section="accueil">ACCUEIL</a>
+            <a href="#apropos" class="nav-link text-gray-700 text-sm" data-section="apropos">À PROPOS</a>
+            <a href="#expertise" class="nav-link text-gray-700 text-sm" data-section="expertise">EXPERTISE</a>
+            <a href="#catalogue" class="nav-link text-gray-700 text-sm" data-section="catalogue">CATALOGUE</a>
+            <a href="#blog" class="nav-link text-gray-700 text-sm" data-section="blog">BLOG</a>
+            <a href="#contact" class="nav-link text-gray-700 text-sm" data-section="contact">CONTACT</a>
         </nav>
     </header>
 
@@ -1758,7 +1896,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                <!-- Carte 1 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-green-500"></div>
@@ -1781,7 +1918,6 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-                <!-- Carte 2 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-500"></div>
@@ -1805,7 +1941,6 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-                <!-- Carte 3 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
@@ -1911,7 +2046,7 @@
         </div>
     </section>
 
-    <!-- SECTION PARTENAIRES (défilement infini) -->
+    <!-- SECTION PARTENAIRES -->
     <section id="partenaires-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-white">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center mb-10 md:mb-16">
@@ -1931,22 +2066,34 @@
             @if(isset($partenaires) && $partenaires->count())
                 <div class="relative overflow-hidden">
                     <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200/50">
-                        <div class="overflow-hidden w-full">
-                            <div id="marqueeContainer" class="relative w-full">
-                                <div id="marqueeTrack" class="flex" style="will-change: transform;">
-                                    @for ($i = 0; $i < 3; $i++)
-                                        @foreach($partenaires as $partenaire)
-                                            <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}">
-                                                @if($partenaire->logo)
-                                                    <img src="{{ asset('storage/' . e($partenaire->logo)) }}"
-                                                        alt="{{ e($partenaire->nom_entreprise) }}">
-                                                @else
-                                                    <span>{{ e($partenaire->nom_entreprise) }}</span>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    @endfor
-                                </div>
+                        <div class="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+                            style="background: linear-gradient(to right, white, transparent);"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+                            style="background: linear-gradient(to left, white, transparent);"></div>
+                        <div class="overflow-hidden w-full" id="marqueeContainer">
+                            <div id="marqueeTrack" class="flex" style="will-change: transform;">
+                                @foreach($partenaires as $partenaire)
+                                    <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}"
+                                        style="margin-right: 2rem; flex-shrink: 0;">
+                                        @if($partenaire->logo)
+                                            <img src="{{ asset('storage/' . e($partenaire->logo)) }}"
+                                                alt="{{ e($partenaire->nom_entreprise) }}">
+                                        @else
+                                            <span>{{ e($partenaire->nom_entreprise) }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                                @foreach($partenaires as $partenaire)
+                                    <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}"
+                                        aria-hidden="true" style="margin-right: 2rem; flex-shrink: 0;">
+                                        @if($partenaire->logo)
+                                            <img src="{{ asset('storage/' . e($partenaire->logo)) }}"
+                                                alt="{{ e($partenaire->nom_entreprise) }}">
+                                        @else
+                                            <span>{{ e($partenaire->nom_entreprise) }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -1977,7 +2124,7 @@
             @if(isset($avis) && $avis->count())
                 <div class="avis-slider">
                     <button class="avis-slider-btn prev" id="avisPrevBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
                             <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -1997,7 +2144,11 @@
                                     <div class="role">{{ $a->contact_fonction ?? 'Client' }}</div>
                                     <div class="stars">
                                         @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= $a->note) <i class="fas fa-star"></i> @else <i class="far fa-star"></i> @endif
+                                            @if($i <= $a->note)
+                                                <i class="fas fa-star"></i>
+                                            @else
+                                                <i class="far fa-star"></i>
+                                            @endif
                                         @endfor
                                     </div>
                                     <p class="quote">"{{ Str::limit($a->contenu, 180) }}"</p>
@@ -2006,7 +2157,7 @@
                         </div>
                     </div>
                     <button class="avis-slider-btn next" id="avisNextBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
                             <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -2019,10 +2170,10 @@
         </div>
     </section>
 
-    <!-- SECTION BLOG (CARROUSEL HORIZONTAL) -->
-    <section id="blog" class="py-12 md:py-24 lg:py-32 scroll-mt-header" style="background: #f8fafc;">
+    <!-- SECTION BLOG - GRID RESPONSIVE AVEC FLÈCHES DE SCROLL -->
+    <section id="blog" class="scroll-mt-header blog-section">
         <div class="container mx-auto px-4 md:px-8">
-            <div class="text-center mb-12 md:mb-20">
+            <div class="blog-header">
                 <h2 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tighter inline-block">
                     <span class="text-slate-900">BLOG & </span>
                     <span
@@ -2036,15 +2187,16 @@
             </div>
 
             @if(isset($articles) && $articles->count())
-                <div class="blog-slider">
-                    <button class="blog-slider-btn" id="blogPrevBtn">
-                        <i class="fas fa-chevron-left text-xl"></i>
+                <div class="blog-slider-container">
+                    <button class="blog-nav-btn" id="blogPrevBtn">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
-                    <div class="blog-slider-viewport">
-                        <div class="blog-slider-track" id="blogTrack">
+                    <div class="blog-scroll-wrapper" id="blogScrollWrapper">
+                        <div class="blog-scroll-track" id="blogTrack">
                             @foreach($articles as $article)
                                 <article class="blog-card group">
-                                    <div class="relative h-64 m-4 overflow-hidden rounded-[2.2rem] border-[1.5px] border-slate-900">
+                                    <div
+                                        class="relative h-64 overflow-hidden rounded-t-2xl">
                                         @if($article->image_une)
                                             <img src="{{ asset('storage/' . e($article->image_une)) }}"
                                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -2060,7 +2212,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="p-6 pt-2 flex flex-col items-center">
+                                    <div class="p-6 pt-4 flex flex-col items-center">
                                         <div
                                             class="flex items-center gap-2 text-orange-600 text-xs font-black mb-5 bg-orange-50/50 px-4 py-2 rounded-xl border border-orange-100">
                                             <i class="far fa-calendar-alt"></i>
@@ -2085,8 +2237,8 @@
                             @endforeach
                         </div>
                     </div>
-                    <button class="blog-slider-btn" id="blogNextBtn">
-                        <i class="fas fa-chevron-right text-xl"></i>
+                    <button class="blog-nav-btn" id="blogNextBtn">
+                        <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             @else
@@ -2113,10 +2265,10 @@
                             <form id="footerContactForm" class="space-y-4">
                                 @csrf
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input type="text" name="nom" id="footer_nom" placeholder="Nom complet *"
+                                    <input type="text" name="nom" id="footer_nom" placeholder="Nom complet"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                         required>
-                                    <input type="email" name="email" id="footer_email" placeholder="Email *"
+                                    <input type="email" name="email" id="footer_email" placeholder="Email"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                         required>
                                 </div>
@@ -2124,7 +2276,7 @@
                                     <input type="tel" name="telephone" id="footer_telephone" placeholder="Téléphone"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition">
                                 </div>
-                                <textarea name="message" rows="3" id="footer_message" placeholder="Votre message *"
+                                <textarea name="message" rows="3" id="footer_message" placeholder="Votre message"
                                     class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                     required></textarea>
                                 <button type="submit" id="footerSubmitBtn"
@@ -2138,9 +2290,6 @@
                                 class="hidden mt-3 p-2 bg-red-800/30 text-red-200 text-sm text-center rounded-xl"></div>
                         </div>
                     </div>
-                </div>
-                <div class="border-t border-gray-700 pt-6 mt-8 text-center">
-                    <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p>
                 </div>
             </div>
         </div>
@@ -2175,7 +2324,7 @@
                         </a>
                     </div>
                     <p class="text-gray-600 text-[10px] uppercase tracking-widest">
-                        &copy; {{ date('Y') }} Tout Help Madagascar &bull; Tous droits réservés
+                        &copy; {{ date('Y') }} Tout Help &bull; Tous droits réservés
                     </p>
                 </div>
             </div>
@@ -2230,6 +2379,7 @@
     @vite(['resources/js/app.js'])
 
     <script>
+        // CHAT (inchangé)
         (function () {
             "use strict";
             let currentEmail = '', currentNom = '', unreadCount = 0, audioCtx = null, pusherListenerSet = false, pollInterval = null, isLoading = false, isSending = false, lastMessageId = null, lastRefreshTime = 0, lastMessagesHash = '', hasNewMessage = false, notificationTimeout = null, pusherChannel = null, wsRetryCount = 0;
@@ -2358,7 +2508,7 @@
             });
         })();
 
-        /* Slider avis */
+        // Slider avis
         (function () {
             function initSlider() {
                 const track = document.getElementById('avisTrack');
@@ -2397,118 +2547,116 @@
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSlider); else initSlider();
         })();
 
-        /* Marquee partenaires */
+        // Marquee partenaires
         (function () {
-            const track = document.getElementById('marqueeTrack');
-            if (!track) return;
-            let speed = 1;
-            let position = 0;
-            let animationId = null;
-            let isHovering = false;
-            function startMarquee() {
-                if (animationId) cancelAnimationFrame(animationId);
+            function initMarquee() {
+                const track = document.getElementById('marqueeTrack');
+                if (!track) return;
+                let speed = 0.8;
+                let position = 0;
+                let animationId = null;
+                let isHovering = false;
+                let halfWidth = 0;
+
+                function computeHalfWidth() { halfWidth = track.scrollWidth / 2; }
+
                 function step() {
                     if (!isHovering) {
                         position -= speed;
-                        const trackWidth = track.scrollWidth;
-                        const containerWidth = track.parentElement.clientWidth;
-                        if (Math.abs(position) >= trackWidth / 3) { position = 0; }
+                        if (Math.abs(position) >= halfWidth) { position = 0; }
                         track.style.transform = `translateX(${position}px)`;
                     }
                     animationId = requestAnimationFrame(step);
                 }
+
+                const container = document.getElementById('marqueeContainer');
+                if (container) {
+                    container.addEventListener('mouseenter', () => { isHovering = true; });
+                    container.addEventListener('mouseleave', () => { isHovering = false; });
+                }
+
+                window.addEventListener('load', () => { computeHalfWidth(); if (animationId) cancelAnimationFrame(animationId); step(); });
+                computeHalfWidth();
                 step();
+                window.addEventListener('resize', computeHalfWidth);
             }
-            const container = document.querySelector('#partenaires-section .overflow-hidden');
-            if (container) {
-                container.addEventListener('mouseenter', () => { isHovering = true; });
-                container.addEventListener('mouseleave', () => { isHovering = false; });
-            }
-            startMarquee();
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMarquee); else initMarquee();
         })();
 
-        /* Carrousel Blog */
+        // ============================================================
+        // Blog Slider
+        // ============================================================
         (function () {
             function initBlogSlider() {
-                const track = document.getElementById('blogTrack');
-                if (!track) return;
-                const cards = Array.from(track.children);
-                if (cards.length === 0) return;
+                const wrapper = document.getElementById('blogScrollWrapper');
+                const track   = document.getElementById('blogTrack');
                 const prevBtn = document.getElementById('blogPrevBtn');
                 const nextBtn = document.getElementById('blogNextBtn');
-                if (!prevBtn || !nextBtn) return;
 
-                let currentIndex = 0;
-                let visibleCount = 4;
-                let cardWidth = 0;
-                let gap = 24;
+                if (!wrapper || !track || !prevBtn || !nextBtn) return;
 
-                function updateLayout() {
-                    const container = track.parentElement;
-                    const containerWidth = container.clientWidth;
-                    if (window.innerWidth < 768) {
-                        visibleCount = 1;
-                        gap = 16;
-                    } else if (window.innerWidth < 1024) {
-                        visibleCount = 2;
-                        gap = 20;
-                    } else {
-                        visibleCount = 4;
-                        gap = 24;
-                    }
-                    cardWidth = (containerWidth - (gap * (visibleCount - 1))) / visibleCount;
-                    for (let i = 0; i < cards.length; i++) {
-                        cards[i].style.flex = `0 0 ${cardWidth}px`;
-                    }
+                function getColCount() {
+                    const w = window.innerWidth;
+                    if (w >= 1200) return 4;
+                    if (w >= 992)  return 3;
+                    if (w >= 768)  return 2;
+                    return 1;
                 }
 
-                function slideToIndex() {
-                    const offset = -currentIndex * (cardWidth + gap);
-                    track.style.transform = `translateX(${offset}px)`;
-                    const maxIndex = Math.max(0, cards.length - visibleCount);
-                    prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
-                    prevBtn.style.cursor = currentIndex === 0 ? 'not-allowed' : 'pointer';
-                    nextBtn.style.opacity = currentIndex >= maxIndex ? '0.4' : '1';
-                    nextBtn.style.cursor = currentIndex >= maxIndex ? 'not-allowed' : 'pointer';
+                const GAP = 24;
+
+                function applyCardWidths() {
+                    const cols        = getColCount();
+                    const wrapperW    = wrapper.clientWidth;
+                    const cardW       = (wrapperW - (cols - 1) * GAP) / cols;
+                    const cards = track.querySelectorAll('.blog-card');
+                    cards.forEach(card => {
+                        card.style.width    = cardW + 'px';
+                        card.style.minWidth = cardW + 'px';
+                        card.style.maxWidth = cardW + 'px';
+                        card.style.flexShrink = '0';
+                    });
                 }
 
-                function next() {
-                    const maxIndex = Math.max(0, cards.length - visibleCount);
-                    if (currentIndex < maxIndex) {
-                        currentIndex++;
-                        slideToIndex();
-                    }
+                function getScrollAmount() {
+                    const cols   = getColCount();
+                    const wrapperW = wrapper.clientWidth;
+                    const cardW  = (wrapperW - (cols - 1) * GAP) / cols;
+                    return cardW + GAP;
                 }
 
-                function prev() {
-                    if (currentIndex > 0) {
-                        currentIndex--;
-                        slideToIndex();
-                    }
+                function scrollLeft() {
+                    wrapper.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
                 }
 
-                prevBtn.addEventListener('click', prev);
-                nextBtn.addEventListener('click', next);
+                function scrollRight() {
+                    wrapper.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+                }
 
-                // Swipe sur mobile
-                let touchStartX = 0;
-                let touchEndX = 0;
-                track.addEventListener('touchstart', (e) => {
-                    touchStartX = e.changedTouches[0].screenX;
-                });
-                track.addEventListener('touchend', (e) => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    if (touchEndX < touchStartX - 50) next();
-                    if (touchEndX > touchStartX + 50) prev();
-                });
+                prevBtn.addEventListener('click', scrollLeft);
+                nextBtn.addEventListener('click', scrollRight);
 
-                updateLayout();
-                slideToIndex();
+                function updateButtons() {
+                    const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+                    prevBtn.style.opacity = wrapper.scrollLeft <= 10 ? '0.4' : '1';
+                    prevBtn.style.cursor  = wrapper.scrollLeft <= 10 ? 'not-allowed' : 'pointer';
+                    nextBtn.style.opacity = wrapper.scrollLeft >= maxScroll - 20 ? '0.4' : '1';
+                    nextBtn.style.cursor  = wrapper.scrollLeft >= maxScroll - 20 ? 'not-allowed' : 'pointer';
+                }
 
+                wrapper.addEventListener('scroll', updateButtons);
+
+                let resizeTimer;
                 window.addEventListener('resize', () => {
-                    updateLayout();
-                    slideToIndex();
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        applyCardWidths();
+                        updateButtons();
+                    }, 100);
                 });
+
+                applyCardWidths();
+                setTimeout(updateButtons, 200);
             }
 
             if (document.readyState === 'loading') {
@@ -2518,19 +2666,53 @@
             }
         })();
 
-        /* Menu burger mobile */
-        document.addEventListener('DOMContentLoaded', function() {
+        // Menu burger mobile
+        document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('mobileMenuBtn');
             const menu = document.getElementById('mobileMenu');
             if (btn && menu) {
-                btn.addEventListener('click', function() {
-                    menu.classList.toggle('hidden');
-                });
-                menu.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => menu.classList.add('hidden'));
-                });
+                btn.addEventListener('click', function () { menu.classList.toggle('hidden'); });
+                menu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => menu.classList.add('hidden')); });
             }
         });
+
+        // Active nav link
+        (function () {
+            function initActiveNav() {
+                const sections = ['accueil', 'apropos', 'expertise', 'catalogue', 'blog', 'contact'];
+                const navLinks = document.querySelectorAll('.nav-link[data-section]');
+
+                function setActive(sectionId) {
+                    navLinks.forEach(link => {
+                        if (link.dataset.section === sectionId) { link.classList.add('active'); }
+                        else { link.classList.remove('active'); }
+                    });
+                }
+
+                const observers = [];
+                const headerOffset = 120;
+                const options = { root: null, rootMargin: `-${headerOffset}px 0px -40% 0px`, threshold: 0 };
+                const visibleSections = new Set();
+
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const obs = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) { visibleSections.add(id); }
+                            else { visibleSections.delete(id); }
+                            let active = null;
+                            for (const s of sections) { if (visibleSections.has(s)) { active = s; break; } }
+                            if (active) setActive(active);
+                        });
+                    }, options);
+                    obs.observe(el);
+                    observers.push(obs);
+                });
+                setActive('accueil');
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initActiveNav); else initActiveNav();
+        })();
     </script>
 </body>
 
