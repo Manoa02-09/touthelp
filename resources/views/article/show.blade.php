@@ -7,110 +7,276 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Inter:wght@400;600;700&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #e2e8f0; 
-            color: #1e293b; 
-            margin: 0; 
-        }
-        
-        .nav-link {
-            position: relative;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            padding: 8px 0;
-            transition: color 0.3s ease;
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
         }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 4px;
-            bottom: -5px;
-            left: 0;
-            background-color: #001f3f;
-            transition: width 0.3s ease-in-out;
+        /* ── Header sticky (contient la bande bleue + la barre blanche) ── */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .nav-link:hover {
-            color: #001f3f;
-        }
-
-        .nav-link:hover::after {
+        /* ── Top band (maintenant DANS le header) ── */
+        .top-band {
+            background-color: #1a2a5e;
+            height: 6px;
             width: 100%;
         }
 
+        /* ── Barre blanche du header ── */
+        .header-bar {
+            background: #ffffff;
+            border-bottom: 3px solid #f97316;
+            box-shadow: 0 2px 16px rgba(26,42,94,0.10);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 48px;
+            height: 68px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .logo-img-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .logo-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: #1a2a5e;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .logo-tagline {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 32px;
+            background: #e2e8f0;
+            margin: 0 24px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #dc2626;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.07em;
+            text-decoration: none;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 7px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+        }
+
+        .nav-link:hover {
+            background-color: #b91c1c;
+            box-shadow: 0 4px 12px rgba(220,38,38,0.35);
+            transform: translateY(-1px);
+        }
+
+        .nav-link:active {
+            transform: translateY(0);
+        }
+
+        /* ── Section titre + image centrée ── */
+        .hero-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 52px 48px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 900;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.2;
+            color: #1a2a5e;
+            margin: 0 0 36px;
+        }
+
+        .hero-image-wrap {
+            display: inline-block;
+            max-width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(26,42,94,0.13);
+        }
+
+        .hero-image-wrap img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ── Article body ── */
+        .article-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 48px 80px;
+        }
+
         .article-card {
-            background-color: #fdfdfd;
-            border: 1px solid #cbd5e1;
-            padding: 3rem;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 52px 64px;
         }
 
         .article-body {
-            line-height: 1.8;
-            font-size: 1.2rem;
-            text-align: justify;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.85;
             color: #334155;
+            text-align: justify;
         }
 
-        .img-border {
-            border: 2px solid #001f3f;
-            padding: 10px;
-            background: white;
-            display: inline-block;
-            border-radius: 8px;
+        .article-body h2,
+        .article-body h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #1a2a5e;
+            margin-top: 2rem;
         }
 
-        .top-bar { background-color: #001f3f; }
+        .article-body p { margin: 0 0 1.2rem; }
+
+        .article-body a {
+            color: #f97316;
+            text-decoration: underline;
+        }
+
+        .article-body img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .article-body blockquote {
+            border-left: 4px solid #f97316;
+            margin: 1.5rem 0;
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        @media (max-width: 640px) {
+            .article-card { padding: 28px 20px; }
+            .header-inner { padding: 0 16px; height: 60px; }
+            .hero-section { padding: 32px 16px 0; }
+            .article-wrap { padding: 24px 16px 60px; }
+            .logo-tagline { display: none; }
+            .header-divider { display: none; }
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="w-full bg-white border-b-2 border-slate-200">
-        <div class="top-bar h-10 w-full"></div>
-        <div class="container mx-auto px-6 py-6 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-10 w-auto">
-                <span class="font-black text-2xl text-[#004d40] tracking-tight">TOUT HELP</span>
-            </div>
-            
-            <nav>
-                <a href="{{ url('/') }}" class="nav-link">
-                    <i class="fas fa-arrow-left mr-2"></i>Retour à l'accueil
+    <!-- Header sticky (contient la bande bleue + la barre blanche) -->
+    <header class="main-header">
+        <div class="top-band"></div>
+        <div class="header-bar">
+            <div class="header-inner">
+                <a href="{{ url('/') }}" class="logo-group">
+                    <div class="logo-img-wrap">
+                        <img src="{{ asset('images/logo.jpg') }}" alt="Logo TOUT HELP">
+                    </div>
+                    <div class="logo-text-block">
+                        <span class="logo-title">TOUT HELP</span>
+                        <span class="logo-tagline">Magazine & Actualités</span>
+                    </div>
                 </a>
-            </nav>
+
+                <div class="header-divider"></div>
+
+                <nav class="header-nav">
+                    <a href="{{ url('/') }}" class="nav-link">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        Retour à l'accueil
+                    </a>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <main class="py-16">
-        <div class="container mx-auto px-4 max-w-4xl">
-            
-            <div class="text-center mb-16">
-                <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-10 leading-tight">
-                    {{ $article->titre }}
-                </h1>
-                
-                <div class="img-border shadow-2xl">
-                    <img src="{{ asset('storage/'.$article->image_une) }}" class="max-h-80 w-auto rounded" alt="Couverture">
-                </div>
-            </div>
+    <!-- Titre + image centrée avec marges -->
+    <div class="hero-section">
+        <h1>{{ $article->titre }}</h1>
+        <div class="hero-image-wrap">
+            <img
+                src="{{ asset('storage/'.$article->image_une) }}"
+                alt="Illustration de l'article"
+            >
+        </div>
+    </div>
 
-            <div class="article-card">
+    <!-- Contenu de l'article -->
+    <main>
+        <div class="article-wrap">
+            <article class="article-card">
                 <div class="article-body">
                     {!! $article->contenu !!}
                 </div>
-            </div>
-
-            <footer class="mt-12 text-right italic text-slate-500 font-bold">
-                {{ $article->auteur ?? 'Auteur non renseigné' }}
-            </footer>
+            </article>
         </div>
     </main>
 

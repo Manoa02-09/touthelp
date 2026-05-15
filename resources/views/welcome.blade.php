@@ -7,7 +7,7 @@
     <title>Tout Help - Accueil</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://js.pusher.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://*.pusher.com; frame-ancestors 'none';">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://js.pusher.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://*.pusher.com ws://*.pusher.com wss://*.pusher.com; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Frame-Options" content="DENY">
@@ -18,11 +18,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <style>
-        /* === STYLES EXISTANTS CONSERVÉS === */
         * {
             margin: 0;
             padding: 0;
@@ -33,42 +32,136 @@
             scroll-behavior: smooth;
         }
 
+        /* Correction du décalage de défilement pour toutes les sections */
         .scroll-mt-header {
-            scroll-margin-top: 110px;
+            scroll-margin-top: 100px;
         }
 
-        header {
-            border-bottom: 4px solid #0a2e5a;
+        /* Pour les petits écrans */
+        @media (max-width: 768px) {
+            .scroll-mt-header {
+                scroll-margin-top: 90px;
+            }
+        }
+
+        .top-band {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1a2a5e !important;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            z-index: 60;
+        }
+
+        @media (min-width: 768px) {
+            .top-band {
+                height: 34px;
+            }
+        }
+
+        .main-header {
+            position: fixed;
+            top: 30px;
+            left: 0;
+            width: 100%;
+            background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            z-index: 50;
+            border-bottom: 3px solid #f97316;
+            padding: 8px 0;
+            transition: box-shadow 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .main-header {
+                top: 34px;
+                padding: 10px 0;
+            }
+        }
+
+        body {
+            overflow-x: hidden;
+            padding-top: 100px;
+            font-family: 'Open Sans', 'Outfit', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 90px;
+            }
+        }
+
+        /* Centrage parfait pour toutes les sections */
+        section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Styles spécifiques pour garder les styles existants tout en centrant */
+        #accueil, #apropos, #expertise, #catalogue, #blog, #contact {
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Ajustement pour la section partenaires qui n'a pas d'ID contact */
+        #partenaires-section {
+            width: 100%;
+            display: block;
+        }
+
+        #avis-section {
+            width: 100%;
+            display: block;
+        }
+
+        .logo-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-centered {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .nav-link {
             position: relative;
-            padding: 10px 0;
+            padding: 6px 0;
             transition: color 0.3s ease;
-            font-weight: 800 !important;
-            letter-spacing: 0.05em;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             color: #374151;
             text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .nav-link::after {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -4px;
             left: 0;
             width: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #2563eb, #1e3a8a);
+            height: 2px;
+            background: linear-gradient(90deg, #1a2a5e, #0f1a3d);
             border-radius: 3px;
             transition: width 0.3s ease;
         }
 
         .nav-link:hover::after {
             width: 100%;
+            background: #1a2a5e;
         }
 
         .nav-link:hover {
-            color: #1e3a8a !important;
+            color: #1a2a5e !important;
         }
 
         .nav-link.active {
@@ -77,11 +170,63 @@
 
         .nav-link.active::after {
             width: 100%;
-            background: linear-gradient(90deg, #f97316, #0a2e5a);
+            background: linear-gradient(90deg, #f97316, #f97316);
+        }
+
+        .nav-link[data-section="apropos"].active-section {
+            color: #f97316 !important;
+        }
+        
+        .nav-link[data-section="apropos"].active-section::after {
+            width: 100%;
+            background: linear-gradient(90deg, #f97316, #f97316);
+        }
+
+        .header-dots {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+
+        .header-dot:nth-child(1) {
+            background: #f97316;
+            animation-delay: 0s;
+        }
+
+        .header-dot:nth-child(2) {
+            background: #7c3aed;
+            animation-delay: 0.2s;
+        }
+
+        .header-dot:nth-child(3) {
+            background: #1a2a5e;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotBounce {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            40% {
+                transform: translateY(-6px);
+                opacity: 0.7;
+            }
+            60% {
+                transform: translateY(2px);
+                opacity: 1;
+            }
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #0a2e5a, #1e3a8a);
+            background: linear-gradient(135deg, #1a2a5e, #2a3a6e);
             color: white;
             padding: 14px 32px;
             border-radius: 40px;
@@ -93,13 +238,13 @@
             gap: 10px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(10, 46, 90, 0.25);
+            box-shadow: 0 8px 20px rgba(26, 42, 94, 0.25);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(10, 46, 90, 0.35);
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            box-shadow: 0 12px 28px rgba(26, 42, 94, 0.35);
+            background: linear-gradient(135deg, #2a3a6e, #3a4a7e);
         }
 
         .btn-secondary {
@@ -123,7 +268,38 @@
             gap: 12px;
         }
 
-        /* CHAT MODAL RESPONSIVE */
+        .hero-title-main {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-style: normal;
+            color: #1a2a5e !important;
+            line-height: 1.05;
+            font-size: clamp(2.5rem, 6vw, 5rem) !important;
+        }
+
+        .hero-title-performance {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: clamp(2.5rem, 6vw, 5rem) !important;
+        }
+
+        .hero-title-culture {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(90deg, #2563eb, #7c3aed, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: clamp(2.5rem, 6vw, 5rem) !important;
+        }
+
+        /* Styles chat existants */
         .chat-modal {
             display: none;
             position: fixed;
@@ -148,7 +324,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -479,12 +654,9 @@
         }
 
         @keyframes badgePulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
             }
-
             50% {
                 transform: scale(1.2);
                 background-color: #ef4444;
@@ -526,7 +698,6 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -538,16 +709,12 @@
         }
 
         @keyframes robotShake {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateX(0);
             }
-
             25% {
                 transform: translateX(-3px);
             }
-
             75% {
                 transform: translateX(3px);
             }
@@ -555,12 +722,6 @@
 
         .robot-notification {
             animation: robotShake 0.5s ease-in-out;
-        }
-
-        body {
-            overflow-x: hidden;
-            padding-top: 92px;
-            font-family: 'Outfit', sans-serif;
         }
 
         .line-clamp-2 {
@@ -609,16 +770,10 @@
 
         #accueil {
             background-color: #ffffff;
-            min-height: calc(100vh - 110px);
-            display: flex;
-            align-items: center;
         }
 
         #expertise {
             background-color: #ffffff;
-            min-height: calc(100vh - 110px);
-            display: flex;
-            align-items: center;
         }
 
         #catalogue {
@@ -627,130 +782,57 @@
 
         #partenaires-section {
             background-color: #ffffff !important;
+            overflow-x: hidden !important;
+            position: relative;
+            width: 100%;
         }
 
         #avis-section {
             background-color: #0a2e5a;
         }
 
-        .avis-slider-wrapper {
+        /* Styles existants pour catalogue et blog */
+        .catalogue-slider-container {
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0;
+            gap: 1rem;
+            overflow: visible !important;
         }
 
-        .avis-slider-btn {
-            flex-shrink: 0;
-            width: 48px;
-            height: 48px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            transition: transform 0.2s;
-        }
-
-        .avis-slider-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .avis-slider-btn svg {
-            width: 36px;
-            height: 36px;
-        }
-
-        .avis-slider-track-outer {
-            overflow: hidden;
+        .catalogue-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: visible !important;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
             flex: 1;
-            max-width: 100%;
+            border-radius: 2rem;
         }
 
-        .avis-slider-track {
+        .catalogue-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .catalogue-scroll-wrapper::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .catalogue-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #f97316;
+            border-radius: 10px;
+        }
+
+        .catalogue-scroll-track {
             display: flex;
-            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-            gap: 20px;
+            gap: 1.5rem;
+            padding: 2rem 0 3rem 0;
+            align-items: stretch;
         }
 
-        .avis-card-new {
-            flex: 0 0 calc((100% - 40px) / 3);
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(109, 40, 217, 0.08), 0 1px 6px rgba(109, 40, 217, 0.04);
-            padding: 1.6rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            border: 1.5px solid #e9e4ff;
-            min-width: 0;
-        }
-
-        .avis-card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .avis-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #7c3aed, #a78bfa);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-size: 1rem;
-        }
-
-        .avis-author-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .avis-author-name-new {
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .avis-author-role-new {
-            font-size: 0.78rem;
-            color: #6b7280;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .avis-stars-new {
-            color: #f59e0b;
-            font-size: 0.9rem;
-            display: flex;
-            gap: 2px;
-        }
-
-        .avis-text {
-            color: #4b5563;
-            font-size: 0.88rem;
-            line-height: 1.6;
-            font-style: italic;
-        }
-
-        .avis-date {
-            display: none;
-        }
-
-        .catalogue-card {
+        .catalogue-card-slider {
+            flex: 0 0 auto;
             background: white;
             border-radius: 1.5rem;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
@@ -759,29 +841,28 @@
             border: none;
             display: flex;
             flex-direction: column;
-            height: 100%;
         }
 
-        .catalogue-card:hover {
+        .catalogue-card-slider:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
         }
 
-        .catalogue-card img {
+        .catalogue-card-slider img {
             width: 100%;
             height: 220px;
             object-fit: cover;
             border-bottom: 3px solid #0a2e5a;
         }
 
-        .catalogue-card-body {
+        .catalogue-card-slider .catalogue-card-body {
             padding: 1.8rem;
             display: flex;
             flex-direction: column;
             flex: 1;
         }
 
-        .catalogue-card-title {
+        .catalogue-card-slider .catalogue-card-title {
             font-size: 1.35rem;
             font-weight: 800;
             color: #0a2e5a;
@@ -789,14 +870,14 @@
             line-height: 1.3;
         }
 
-        .catalogue-card-desc {
+        .catalogue-card-slider .catalogue-card-desc {
             color: #2d3a4b;
             font-size: 0.95rem;
             line-height: 1.5;
             flex: 1;
         }
 
-        .catalogue-card-link {
+        .catalogue-card-slider .catalogue-card-link {
             margin-top: 1.5rem;
             display: inline-flex;
             align-items: center;
@@ -813,20 +894,81 @@
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
-        .catalogue-card-link:hover {
+        .catalogue-card-slider .catalogue-card-link:hover {
             background: #2563eb;
             transform: scale(1.02);
             box-shadow: 0 6px 14px rgba(59, 130, 246, 0.4);
             color: white;
         }
 
-        .catalogue-card-link i {
+        .catalogue-card-slider .catalogue-card-link i {
             font-size: 0.8rem;
             transition: transform 0.2s;
         }
 
-        .catalogue-card-link:hover i {
+        .catalogue-card-slider .catalogue-card-link:hover i {
             transform: translateX(4px);
+        }
+
+        .catalogue-nav-btn {
+            width: 52px;
+            height: 52px;
+            background: white;
+            border: 2px solid #0a2e5a;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            color: #0f172a;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.9);
+            z-index: 10;
+        }
+
+        .catalogue-nav-btn i {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .catalogue-nav-btn:hover {
+            background: #f97316;
+            color: white;
+            transform: scale(1.08);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.95);
+        }
+
+        .catalogue-nav-btn:active {
+            transform: scale(0.96);
+        }
+
+        @media (min-width: 1024px) {
+            .catalogue-card-slider {
+                width: calc((100% - (2 * 1.5rem)) / 3);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .catalogue-card-slider {
+                width: calc((100% - (1 * 1.5rem)) / 2);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .catalogue-card-slider {
+                width: 100%;
+            }
+            .catalogue-scroll-track {
+                padding: 1rem 0 2rem 0;
+            }
+            .catalogue-nav-btn {
+                width: 44px;
+                height: 44px;
+            }
+            .catalogue-nav-btn i {
+                font-size: 1rem;
+            }
         }
 
         .section-badge {
@@ -886,362 +1028,53 @@
             color: #4c1d95;
         }
 
-        .scroll-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: white;
-            border-radius: 50%;
-            padding: 0.6rem 0.75rem;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
-            opacity: 0;
-            transition: opacity 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .group:hover .scroll-arrow {
-            opacity: 1;
-        }
-
-        .scroll-arrow.left {
-            left: 0;
-        }
-
-        .scroll-arrow.right {
-            right: 0;
-        }
-
-        /* === SECTION À PROPOS (styles existants) === */
-        #apropos {
-            background: #fff;
-            padding: 0;
-        }
-
-        .apropos-hero-banner {
-            position: relative;
-            width: 100%;
-            min-height: 340px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-        }
-
-        .apropos-bg-img {
-            position: absolute;
-            inset: 0;
-            background-image: url('{{ asset("images/apropos1.jpg") }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .apropos-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg,
-                    rgba(10, 46, 90, 0.95) 0%,
-                    rgba(10, 46, 90, 0.85) 40%,
-                    rgba(10, 46, 90, 0.5) 70%,
-                    rgba(10, 46, 90, 0.1) 100%);
-        }
-
-        .apropos-mini-cards {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .mini-card {
-            flex: 1;
-            min-width: 90px;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .mini-card:hover {
-            background: #0a2e5a;
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        .mini-card i {
-            font-size: 18px;
-            margin-bottom: 6px;
-            color: #0a2e5a;
-        }
-
-        .mini-card:hover i {
-            color: #fff;
-        }
-
-        .mini-card h4 {
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .apropos-hero-text {
-            position: relative;
-            z-index: 2;
-            padding: 72px 64px 88px;
-            max-width: 580px;
-        }
-
-        .apropos-hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(38px, 5.5vw, 66px);
-            font-weight: 900;
-            color: #fff;
-            line-height: 1.05;
-            margin-bottom: 18px;
-            letter-spacing: -0.01em;
-        }
-
-        .apropos-gold-bar {
-            width: 56px;
-            height: 3px;
-            background: #C8922A;
-            border-radius: 2px;
-            margin-bottom: 20px;
-        }
-
-        .apropos-hero-sub {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.72);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .apropos-main-card {
-            background: #fff;
-            margin: -36px 40px 0;
-            border-radius: 24px;
-            box-shadow: 0 8px 48px rgba(10, 46, 90, 0.13), 0 2px 12px rgba(10, 46, 90, 0.07);
-            padding: 52px 56px;
-            position: relative;
-            z-index: 3;
-        }
-
-        .apropos-two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 56px;
-            align-items: center;
-        }
-
-        .apropos-histoire-label {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .apropos-histoire-icon {
-            width: 52px;
-            height: 52px;
-            background: #0a2e5a;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .partenaire-item {
             flex-shrink: 0;
-        }
-
-        .apropos-histoire-icon i {
-            color: #fff;
-            font-size: 20px;
-        }
-
-        .apropos-histoire-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f2439;
-        }
-
-        .apropos-histoire-text {
+            width: 200px;
+            height: 110px;
+            background: white;
+            border-radius: 1rem;
             display: flex;
-            flex-direction: column;
-            gap: 18px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: help;
+            margin-right: 2rem;
         }
 
-        .apropos-histoire-text p {
-            font-size: 15px;
-            line-height: 1.78;
-            color: #4b5563;
-            font-weight: 300;
+        .partenaire-item:last-child {
+            margin-right: 0;
         }
 
-        .apropos-histoire-text strong {
-            color: #0a2e5a;
+        .partenaire-item img {
+            max-width: 150px;
+            max-height: 75px;
+            object-fit: contain;
+        }
+
+        .partenaire-item span {
+            font-size: 0.8rem;
             font-weight: 700;
+            color: #f97316;
+            text-align: center;
+            padding: 0 0.5rem;
         }
 
-        .apropos-img-quote {
-            position: relative;
-        }
-
-        .apropos-img-photo {
+        .partner-marquee-container {
             width: 100%;
-            height: 320px;
-            object-fit: cover;
-            border-radius: 16px;
-            display: block;
-        }
-
-        .apropos-citation-block {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, #0a2e5a 0%, #1a4580 100%);
-            border-radius: 0 0 16px 16px;
-            padding: 20px 24px 20px;
-        }
-
-        .apropos-quote-badge {
-            width: 38px;
-            height: 38px;
-            background: #C8922A;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: -38px auto 14px;
+            overflow: hidden;
             position: relative;
-            z-index: 1;
+            background: transparent;
         }
 
-        .apropos-quote-badge i {
-            color: #fff;
-            font-size: 14px;
-        }
-
-        .apropos-citation-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 13.5px;
-            font-style: italic;
-            font-weight: 600;
-            color: #fff;
-            text-align: center;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-
-        .apropos-citation-author {
-            text-align: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: #C8922A;
-            letter-spacing: 0.1em;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .apropos-sep {
-            text-align: center;
-            color: #d1d5db;
-            font-size: 13px;
-            letter-spacing: 0.2em;
-            padding: 36px 0 12px;
-        }
-
-        .apropos-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            padding: 0 40px 64px;
-        }
-
-        .apropos-pilier {
-            border-radius: 20px;
-            padding: 36px 28px;
-            text-align: center;
-            border: 1px solid #f1f1f1;
-            transition: box-shadow 0.3s;
-            cursor: default;
-        }
-
-        .apropos-pilier:hover {
-            box-shadow: 0 12px 36px rgba(10, 46, 90, 0.12);
-        }
-
-        .apropos-pilier.valeurs {
-            background: #f8f9fa;
-        }
-
-        .apropos-pilier.vision {
-            background: #fff;
-        }
-
-        .apropos-pilier.mission {
-            background: #eef2ff;
-            border-color: #e0e7ff;
-        }
-
-        .apropos-pilier-icon {
-            width: 64px;
-            height: 64px;
-            background: rgba(10, 46, 90, 0.07);
-            border-radius: 50%;
+        .partner-marquee-track {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
+            width: fit-content;
+            will-change: transform;
         }
 
-        .apropos-pilier-icon i {
-            font-size: 24px;
-            color: #0a2e5a;
-        }
-
-        .apropos-pilier h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 19px;
-            font-weight: 800;
-            color: #0f2439;
-            margin-bottom: 12px;
-        }
-
-        .apropos-pilier p {
-            font-size: 14px;
-            color: #6b7280;
-            line-height: 1.7;
-            font-weight: 300;
-        }
-
-        /* Partenaires infobulle */
-        .partenaire-item[title] {
-            position: relative;
-        }
-
-        .partenaire-item[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: -32px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0a2e5a;
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            white-space: nowrap;
-            z-index: 30;
-            pointer-events: none;
-            font-weight: normal;
-            letter-spacing: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Styles pour le slider des avis (responsive) */
         .avis-slider {
             position: relative;
             display: flex;
@@ -1319,76 +1152,165 @@
             font-style: italic;
         }
 
-        .partenaire-item {
+        .avis-slider-btn {
             flex-shrink: 0;
-            width: 150px;
-            height: 110px;
+            width: 48px;
+            height: 48px;
             background: white;
-            border-radius: 1rem;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #f0f0f0;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: help;
-            margin-right: 2rem;
+            z-index: 10;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .partenaire-item img {
-            max-width: 110px;
-            max-height: 75px;
-            object-fit: contain;
+        .avis-slider-btn:hover {
+            transform: scale(1.1);
+            background: #f0f0f0;
         }
 
-        .partenaire-item span {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #f97316;
+        .avis-slider-btn svg {
+            width: 28px;
+            height: 28px;
+            stroke: #4c1d95;
+        }
+
+        .blog-section {
+            background: #f8fafc;
+            position: relative;
+            overflow: visible !important;
+            padding-top: 4rem !important;
+            padding-bottom: 8rem !important;
+        }
+
+        @media (min-width: 768px) {
+            .blog-section {
+                padding-top: 5rem !important;
+                padding-bottom: 10rem !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .blog-section {
+                padding-top: 6rem !important;
+                padding-bottom: 12rem !important;
+            }
+        }
+
+        .blog-header {
             text-align: center;
-            padding: 0 0.5rem;
+            margin-bottom: 3rem;
         }
 
-        /* === STYLES POUR LE CARROUSEL BLOG === */
-        .blog-slider {
+        .blog-slider-container {
             position: relative;
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin: 2rem 0;
+            overflow: visible !important;
         }
 
-        .blog-slider-viewport {
-            overflow: hidden;
+        .blog-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: visible !important;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
             flex: 1;
             border-radius: 2rem;
         }
 
-        .blog-slider-track {
+        .blog-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .blog-scroll-wrapper::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .blog-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #f97316;
+            border-radius: 10px;
+        }
+
+        .blog-scroll-track {
             display: flex;
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             gap: 1.5rem;
+            padding: 2rem 0 3rem 0;
+            align-items: stretch;
         }
 
         .blog-card {
-            flex: 0 0 calc((100% - 4.5rem) / 4);
+            flex: 0 0 auto;
             background: white;
-            border-radius: 2rem;
-            overflow: hidden;
-            border: 2.5px solid #0f172a;
-            transition: all 0.3s ease;
+            border-radius: 2rem !important;
+            border: 2px solid #000000 !important;
+            overflow: visible !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex !important;
+            flex-direction: column !important;
         }
 
         .blog-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .blog-slider-btn {
-            width: 48px;
-            height: 48px;
+        .blog-card .relative {
+            border-radius: 2rem 2rem 0 0;
+            overflow: hidden;
+            margin: 0 !important;
+            flex-shrink: 0;
+        }
+
+        .blog-card .flex.flex-col.items-center {
+            flex: 1 0 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .blog-card .w-full.mt-auto {
+            margin-top: auto !important;
+        }
+
+        @media (min-width: 1280px) {
+            .blog-card {
+                width: calc((100% - (3 * 1.5rem)) / 4);
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1279px) {
+            .blog-card {
+                width: calc((100% - (2 * 1.5rem)) / 3);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .blog-card {
+                width: calc((100% - (1 * 1.5rem)) / 2);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .blog-card {
+                width: 100%;
+            }
+            .blog-scroll-track {
+                padding: 1rem 0 2rem 0;
+            }
+        }
+
+        .blog-nav-btn {
+            width: 52px;
+            height: 52px;
             background: white;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #000000;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -1396,212 +1318,164 @@
             justify-content: center;
             transition: all 0.2s;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             color: #0f172a;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.9);
+            z-index: 10;
         }
 
-        .blog-slider-btn:hover {
+        .blog-nav-btn i {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .blog-nav-btn:hover {
             background: #f97316;
             color: white;
-            transform: scale(1.05);
+            transform: scale(1.08);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.95);
         }
 
-        .blog-slider-btn:active {
-            transform: scale(0.95);
+        .blog-nav-btn:active {
+            transform: scale(0.96);
         }
 
         @media (max-width: 768px) {
-            .blog-card {
-                flex: 0 0 calc(100% - 0rem);
+            .blog-nav-btn {
+                width: 44px;
+                height: 44px;
             }
-            .blog-slider-track {
-                gap: 1rem;
+            .blog-nav-btn i {
+                font-size: 1rem;
             }
-            .blog-slider-btn {
-                width: 40px;
-                height: 40px;
-            }
-        }
-
-        /* === NOUVEAUX STYLES RESPONSIVES === */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-            }
-
-            header {
-                top: 28px;
-            }
-
-            .scroll-mt-header {
-                scroll-margin-top: 80px;
-            }
-
-            #accueil,
-            #expertise {
-                min-height: auto;
-                padding: 3rem 0;
-            }
-
-            .apropos-hero-text {
-                padding: 48px 24px 64px;
-                max-width: 100%;
-                text-align: center;
-            }
-
-            .apropos-hero-title {
-                font-size: clamp(32px, 8vw, 48px);
-            }
-
-            .apropos-main-card {
-                margin: -24px 16px 0;
-                padding: 32px 20px;
-            }
-
-            .apropos-two-col {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .apropos-cards-grid {
-                grid-template-columns: 1fr;
-                padding: 0 16px 48px;
-            }
-
-            .avis-slider-btn {
-                width: 36px;
-                height: 36px;
-            }
-
-            .avis-slider-btn svg {
-                width: 28px;
-                height: 28px;
-            }
-
-            .avis-card {
-                flex: 0 0 calc(100% - 1rem);
-                padding: 1.2rem;
-            }
-
-            .avis-card .avatar {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-
-            .catalogue-card img {
-                height: 180px;
-            }
-
-            .catalogue-card-body {
-                padding: 1.2rem;
-            }
-
-            .catalogue-card-title {
-                font-size: 1.2rem;
-            }
-
-            .partenaire-item {
-                width: 110px;
-                height: 90px;
-                margin-right: 1rem;
-            }
-
-            .partenaire-item img {
-                max-width: 90px;
-                max-height: 65px;
-            }
-
-            .chat-modal {
-                width: calc(100% - 20px);
-                right: 10px;
-                left: 10px;
-                bottom: 80px;
-                border-radius: 16px;
-            }
-
-            .chat-body {
-                max-height: 50vh;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+            .blog-card:hover {
+                transform: translateY(-6px);
             }
         }
 
-        @media (max-width: 640px) {
-            .grid-cols-3 {
-                grid-template-columns: repeat(1, minmax(0, 1fr));
-            }
+        /* Styles de la section À PROPOS */
+        #apropos {
+            background: #fff;
+            padding: 0;
+            flex-direction: column;
+        }
 
-            .text-5xl {
-                font-size: 2.5rem;
-            }
+        .apropos-hero-banner {
+            position: relative;
+            width: 100%;
+            min-height: 260px;
+            border-radius: 0;
+            overflow: hidden;
+        }
 
-            .text-6xl {
-                font-size: 3rem;
-            }
+        .apropos-bg-img {
+            position: absolute;
+            inset: 0;
+            background-image: url('{{ asset("images/aproposken.png") }}');
+            background-size: cover;
+            background-position: right center;
+            background-repeat: no-repeat;
+        }
 
-            .text-7xl {
-                font-size: 3.5rem;
-            }
+        .apropos-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #0a2e5a 0%, #0a2e5a 35%, rgba(10,46,90,0.75) 55%, rgba(10,46,90,0.2) 80%, rgba(10,46,90,0) 100%);
+        }
+
+        .apropos-mini-cards {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mini-card {
+            flex: 1;
+            min-width: 90px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mini-card:hover {
+            background: #0a2e5a;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .mini-card i {
+            font-size: 18px;
+            margin-bottom: 6px;
+            color: #0a2e5a;
+        }
+
+        .mini-card:hover i {
+            color: #fff;
+        }
+
+        .mini-card h4 {
+            font-size: 12px;
+            font-weight: 700;
         }
     </style>
 </head>
 
 <body class="bg-white">
 
-    <!-- Bande bleue marine avec email et téléphone -->
-    <div class="fixed top-0 left-0 w-full bg-[#0a2e5a] h-7 md:h-8 flex items-center z-60">
+    <div class="top-band">
         <div class="container mx-auto px-3 md:px-6 flex justify-between items-center w-full">
             <div class="flex items-center gap-2">
                 <i class="fas fa-envelope text-yellow-300 text-xs"></i>
                 <a href="mailto:info@touthelp.com"
-                    class="text-white text-[11px] md:text-xs hover:text-yellow-300 transition font-medium">info@touthelp.com</a>
+                    class="text-white text-[10px] md:text-[11px] hover:text-yellow-300 transition font-medium">info@touthelp.com</a>
             </div>
             <div class="flex items-center gap-2">
                 <i class="fas fa-phone-alt text-green-300 text-xs"></i>
                 <a href="tel:+261384839743"
-                    class="text-white text-[11px] md:text-xs hover:text-green-300 transition font-medium">038 48 397 43</a>
+                    class="text-white text-[10px] md:text-[11px] hover:text-green-300 transition font-medium">038 48 397 43</a>
             </div>
         </div>
     </div>
 
-    <header class="fixed top-7 md:top-8 left-0 w-full bg-white shadow-md z-50 py-2 md:py-3 border-b-4 border-[#0a2e5a]">
-        <div class="container mx-auto px-3 md:px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-2 md:space-x-3">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-8 md:h-12 lg:h-14 w-auto">
-                <span class="text-lg md:text-2xl font-bold text-green-900"
-                    style="font-family:'Playfair Display',serif;letter-spacing:0.05em;">TOUT HELP</span>
+    <header class="main-header">
+        <div class="container mx-auto px-3 md:px-6 flex items-center justify-between relative" style="min-height: 48px;">
+            <div class="flex items-center space-x-2 flex-shrink-0">
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-7 md:h-9 w-auto">
+                <span class="logo-title text-sm md:text-base text-green-900">TOUT HELP</span>
             </div>
-            <!-- Menu desktop -->
-            <nav class="hidden md:flex space-x-6 lg:space-x-10">
-                <a href="#accueil" class="nav-link text-gray-700 text-sm lg:text-base">ACCUEIL</a>
-                <a href="#apropos" class="nav-link text-gray-700 text-sm lg:text-base">À PROPOS</a>
-                <a href="#expertise" class="nav-link text-gray-700 text-sm lg:text-base">EXPERTISE</a>
-                <a href="#catalogue" class="nav-link text-gray-700 text-sm lg:text-base">CATALOGUE</a>
-                <a href="#blog" class="nav-link text-gray-700 text-sm lg:text-base">BLOG</a>
-                <a href="#contact" class="nav-link text-gray-700 text-sm lg:text-base">CONTACT</a>
+            <nav class="nav-centered hidden md:flex space-x-5 lg:space-x-8">
+                <a href="#accueil" class="nav-link" data-section="accueil">ACCUEIL</a>
+                <a href="#apropos" class="nav-link" data-section="apropos">À PROPOS</a>
+                <a href="#expertise" class="nav-link" data-section="expertise">EXPERTISE</a>
+                <a href="#catalogue" class="nav-link" data-section="catalogue">CATALOGUE</a>
+                <a href="#blog" class="nav-link" data-section="blog">BLOG</a>
+                <a href="#contact" class="nav-link" data-section="contact">CONTACT</a>
             </nav>
-            <!-- Bouton burger mobile -->
-            <button id="mobileMenuBtn" class="md:hidden text-gray-800 text-2xl focus:outline-none">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="header-dots hidden md:flex">
+                    <div class="header-dot"></div>
+                    <div class="header-dot"></div>
+                    <div class="header-dot"></div>
+                </div>
+                <button id="mobileMenuBtn" class="md:hidden text-gray-800 text-xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
-        <!-- Menu mobile déroulant -->
         <nav id="mobileMenu" class="hidden md:hidden absolute top-full left-0 w-full bg-white shadow-lg flex flex-col p-4 space-y-3 border-t border-gray-100 z-50">
-            <a href="#accueil" class="nav-link text-gray-700 text-sm">ACCUEIL</a>
-            <a href="#apropos" class="nav-link text-gray-700 text-sm">À PROPOS</a>
-            <a href="#expertise" class="nav-link text-gray-700 text-sm">EXPERTISE</a>
-            <a href="#catalogue" class="nav-link text-gray-700 text-sm">CATALOGUE</a>
-            <a href="#blog" class="nav-link text-gray-700 text-sm">BLOG</a>
-            <a href="#contact" class="nav-link text-gray-700 text-sm">CONTACT</a>
+            <a href="#accueil" class="nav-link text-gray-700 text-sm" data-section="accueil">ACCUEIL</a>
+            <a href="#apropos" class="nav-link text-gray-700 text-sm" data-section="apropos">À PROPOS</a>
+            <a href="#expertise" class="nav-link text-gray-700 text-sm" data-section="expertise">EXPERTISE</a>
+            <a href="#catalogue" class="nav-link text-gray-700 text-sm" data-section="catalogue">CATALOGUE</a>
+            <a href="#blog" class="nav-link text-gray-700 text-sm" data-section="blog">BLOG</a>
+            <a href="#contact" class="nav-link text-gray-700 text-sm" data-section="contact">CONTACT</a>
         </nav>
     </header>
 
-    <!-- SECTION ACCUEIL -->
     <section id="accueil" class="relative bg-white overflow-hidden scroll-mt-header py-12 md:py-0">
         <div class="container mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
             <div class="lg:w-1/2 z-10 text-center lg:text-left">
@@ -1610,14 +1484,16 @@
                     <i class="fas fa-shield-alt text-blue-500"></i>
                     <span>Formation • Accompagnement • Audit</span>
                 </div>
-                <h1
-                    class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-[#0f2439] leading-[1.1] mb-2">
-                    <span style="color: #0a2e5a;">ENSEMBLE<br>FAISONS DE LA</span><br>
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">PERFORMANCE</span><br>
-                    <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-500 to-orange-400">UNE
-                        CULTURE</span>
+                <h1 class="mb-2" style="line-height: 1.05;">
+                    <span class="hero-title-main block">
+                        ENSEMBLE<br>FAISONS DE LA
+                    </span>
+                    <span class="hero-title-performance block">
+                        PERFORMANCE
+                    </span>
+                    <span class="hero-title-culture block">
+                        UNE CULTURE
+                    </span>
                 </h1>
                 <p
                     class="text-base sm:text-lg md:text-xl text-gray-700 max-w-xl mx-auto lg:mx-0 mb-4 border-l-4 border-orange-500 pl-4 md:pl-6 leading-relaxed">
@@ -1640,100 +1516,96 @@
         </div>
     </section>
 
-    <!-- SECTION À PROPOS -->
     <section id="apropos" class="scroll-mt-header">
-        <div class="apropos-hero-banner"
-            style="position: relative; width: 100%; min-height: 450px; border-radius: 0; overflow: hidden;">
-            <div class="apropos-bg-img"
-                style="position: absolute; inset: 0; background-image: url('{{ asset('images/aproposken.jpg') }}'); background-size: cover; background-position: center 20%; background-repeat: no-repeat;">
-            </div>
-            <div class="apropos-overlay"
-                style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,46,90,0.95) 0%, rgba(10,46,90,0.7) 30%, rgba(10,46,90,0.2) 70%, rgba(10,46,90,0) 100%);">
-            </div>
-            <div class="apropos-hero-text"
-                style="position: relative; z-index: 2; margin-left: auto; margin-right: auto; text-align: center; max-width: 800px; padding: 100px 20px;">
-                <h2 class="apropos-hero-title"
-                    style="text-align: center; font-family: 'Playfair Display', serif; font-size: clamp(44px, 6vw, 78px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em;">
-                    À PROPOS<br>DE TOUT HELP
-                </h2>
-                <div class="apropos-gold-bar"
-                    style="width: 70px; height: 4px; background: #C8922A; border-radius: 2px; margin-left: auto; margin-right: auto; margin-bottom: 24px;">
+        <div class="apropos-hero-banner">
+            <div class="apropos-bg-img"></div>
+            <div class="apropos-overlay"></div>
+            <div style="position: relative; z-index: 2; width: 100%; min-height: 260px; display: flex; align-items: center; justify-content: center; padding: 40px 5%;">
+                <div style="text-align: center; max-width: 680px;">
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(44px, 6vw, 78px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em;">
+                        À PROPOS<br>DE TOUT HELP
+                    </h2>
+                    <div style="width: 70px; height: 4px; background: #C8922A; border-radius: 2px; margin: 0 auto 24px;"></div>
+                    <p style="font-size: 14px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.85);">
+                        Votre partenaire de confiance à Madagascar
+                    </p>
                 </div>
-                <p class="apropos-hero-sub"
-                    style="text-align: center; font-size: 14px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.85);">
-                    Votre partenaire de confiance à Madagascar
-                </p>
             </div>
         </div>
-
         <div style="margin-top: -36px; padding-bottom: 64px; width: 100%;">
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden"
-                style="box-shadow: 0 8px 48px rgba(10,46,90,0.13), 0 2px 12px rgba(10,46,90,0.07); margin: 0;">
-                <div class="flex flex-col lg:flex-row gap-6 p-6 md:p-12">
-                    <div class="lg:w-1/2">
-                        <div class="flex items-center gap-4 mb-5">
-                            <div class="w-14 h-14 bg-[#0a2e5a] rounded-xl flex items-center justify-center">
-                                <i class="fas fa-chart-line text-white text-2xl"></i>
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden" style="box-shadow: 0 20px 60px rgba(10,46,90,0.18), 0 4px 20px rgba(10,46,90,0.1); margin: 0;">
+                <div class="flex flex-col lg:flex-row gap-0">
+                    <div class="lg:w-1/2" style="padding: 3rem 3rem 3rem 3rem; border-right: 1px solid #f0f4f8;">
+                        <div style="display:flex;align-items:center;gap:0;margin-bottom:28px;">
+                            <div style="position:relative;flex-shrink:0;">
+                                <div style="width:60px;height:60px;background:linear-gradient(135deg,#0a2e5a,#1a4a8a);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(10,46,90,0.3);">
+                                    <i class="fas fa-chart-line text-white" style="font-size:22px;"></i>
+                                </div>
+                                <div style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:#C8922A;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-star" style="color:#fff;font-size:7px;"></i>
+                                </div>
                             </div>
-                            <span class="text-2xl md:text-3xl font-bold text-[#0f2439]"
-                                style="font-family: 'Playfair Display', serif;">Notre histoire</span>
+                            <div style="margin-left:16px;">
+                                <span style="font-family:'Playfair Display',serif;font-size:clamp(20px,2.5vw,28px);font-weight:900;color:#0f2439;line-height:1.1;">Notre histoire</span>
+                            </div>
                         </div>
-                        <div class="space-y-3 text-gray-600 leading-relaxed text-base md:text-lg">
-                            <p>
-                                Nous vivons dans un monde en constante évolution, où le succès repose sur la capacité à
-                                apprendre, s'adapter et innover.
-                                C'est pour répondre à ces défis que <strong class="text-[#0a2e5a]">TOUT-HELP</strong> a
-                                été fondée.
-                            </p>
-                            <p>
-                                Notre entreprise s'appuie sur l'expertise de <strong class="text-[#0a2e5a]">20
-                                    professionnels</strong> cumulant plus de <strong class="text-[#0a2e5a]">10 ans
-                                    d'expérience</strong> dans des secteurs variés.
+                        <div style="border-left:3px solid #0a2e5a;padding-left:18px;margin-bottom:32px;">
+                            <p style="font-size:15px;color:#4b5563;line-height:1.75;">
+                                Nous vivons dans un monde en constante évolution, où le succès repose sur la capacité à apprendre, s'adapter et innover. C'est pour répondre à ces défis que <strong style="color:#0a2e5a;">TOUT-HELP</strong> a été fondée. Notre entreprise s'appuie sur l'expertise de <strong style="color:#0a2e5a;">20 professionnels</strong> cumulant plus de <strong style="color:#0a2e5a;">10 ans d'expérience</strong> dans des secteurs variés.
                             </p>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                            <div style="background:#fff7ed; border:1px solid #fed7aa;" class="p-5 rounded-xl text-center">
-                                <i class="fas fa-handshake text-2xl mb-2" style="color:#c2410c;"></i>
-                                <h4 class="font-bold text-base" style="color:#9a3412;">Nos valeurs</h4>
-                                <p class="text-sm mt-1 leading-relaxed" style="color:#78350f;">
-                                    Promouvoir l'entraide et l'innovation dans tous les secteurs, au service de la
-                                    réussite individuelle et collective.
-                                </p>
+                        <div style="display:flex;flex-direction:column;gap:14px;">
+                            <div style="display:flex;align-items:flex-start;gap:14px;background:linear-gradient(135deg,#fff7ed,#fff3e0);border:1.5px solid #fed7aa;border-radius:16px;padding:16px 18px;">
+                                <div style="flex-shrink:0;width:42px;height:42px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(194,65,12,0.18);">
+                                    <i class="fas fa-handshake" style="color:#c2410c;font-size:17px;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight:800;font-size:14px;color:#9a3412;margin-bottom:4px;letter-spacing:0.03em;">Nos valeurs</h4>
+                                    <p style="font-size:13px;color:#78350f;line-height:1.6;">
+                                        Promouvoir l'entraide et l'innovation dans tous les secteurs, au service de la
+                                        réussite individuelle et collective.
+                                    </p>
+                                </div>
                             </div>
-                            <div style="background:#ecfdf5; border:1px solid #a7f3d0;" class="p-5 rounded-xl text-center">
-                                <i class="fas fa-eye text-2xl mb-2" style="color:#065f46;"></i>
-                                <h4 class="font-bold text-base" style="color:#065f46;">Notre vision</h4>
-                                <p class="text-sm mt-1 leading-relaxed" style="color:#064e3b;">
-                                    Faire de la progression de chaque participant le reflet de notre engagement et de
-                                    notre impact durable.
-                                </p>
+                            <div style="display:flex;align-items:flex-start;gap:14px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1.5px solid #a7f3d0;border-radius:16px;padding:16px 18px;">
+                                <div style="flex-shrink:0;width:42px;height:42px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(6,95,70,0.18);">
+                                    <i class="fas fa-eye" style="color:#065f46;font-size:17px;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight:800;font-size:14px;color:#065f46;margin-bottom:4px;letter-spacing:0.03em;">Notre vision</h4>
+                                    <p style="font-size:13px;color:#064e3b;line-height:1.6;">
+                                        Faire de la progression de chaque participant le reflet de notre engagement et de
+                                        notre impact durable.
+                                    </p>
+                                </div>
                             </div>
-                            <div style="background:#f5f3ff; border:1px solid #c4b5fd;" class="p-5 rounded-xl text-center">
-                                <i class="fas fa-rocket text-2xl mb-2" style="color:#6d28d9;"></i>
-                                <h4 class="font-bold text-base" style="color:#5b21b6;">Notre mission</h4>
-                                <p class="text-sm mt-1 leading-relaxed" style="color:#4c1d95;">
-                                    Concevoir des formations pratiques et immédiatement applicables pour permettre à nos
-                                    participants de développer leurs compétences et d'apporter une réelle valeur ajoutée
-                                    à leur entreprise.
-                                </p>
+                            <div style="display:flex;align-items:flex-start;gap:14px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1.5px solid #c4b5fd;border-radius:16px;padding:16px 18px;">
+                                <div style="flex-shrink:0;width:42px;height:42px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(109,40,217,0.18);">
+                                    <i class="fas fa-rocket" style="color:#6d28d9;font-size:17px;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight:800;font-size:14px;color:#5b21b6;margin-bottom:4px;letter-spacing:0.03em;">Notre mission</h4>
+                                    <p style="font-size:13px;color:#4c1d95;line-height:1.6;">
+                                        Concevoir des formations pratiques et immédiatement applicables pour permettre à nos
+                                        participants de développer leurs compétences et d'apporter une réelle valeur ajoutée
+                                        à leur entreprise.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="lg:w-1/2 relative">
+                    <div class="lg:w-1/2 relative" style="padding: 3rem;">
                         <img src="{{ asset('images/apropos2.jpg') }}" alt="Notre histoire"
-                            class="w-full h-80 object-cover rounded-2xl shadow-md" style="filter: brightness(0.85);">
-                        <div
-                            class="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#0a2e5a] to-[#1a4580] rounded-b-2xl p-6">
-                            <div
-                                class="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 -mt-11">
+                            class="w-full object-cover" style="height:340px;border-radius:20px;box-shadow:0 16px 48px rgba(10,46,90,0.2);filter:brightness(0.88);">
+                        <div style="position:absolute;bottom:3rem;left:3rem;right:3rem;background:linear-gradient(135deg,#0a2e5a 0%,#1a4580 100%);border-radius:0 0 20px 20px;padding:28px 28px 24px;">
+                            <div style="width:48px;height:48px;background:linear-gradient(135deg,#C8922A,#e0a83c);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:-48px auto 16px;box-shadow:0 8px 20px rgba(200,146,42,0.4);">
                                 <i class="fas fa-quote-right text-white text-base"></i>
                             </div>
                             <p class="text-white text-center text-base italic leading-relaxed font-medium">
                                 "Accélérer le développement grâce au potentiel humain et à des solutions adaptées aux
                                 défis actuels."
                             </p>
-                            <p class="text-amber-400 text-center text-sm font-semibold mt-3 tracking-wide">— Notre
-                                objectif</p>
+                            <p style="color:#e8c078;text-align:center;font-size:13px;font-weight:700;margin-top:14px;letter-spacing:0.08em;">— Notre objectif</p>
                         </div>
                     </div>
                 </div>
@@ -1741,7 +1613,6 @@
         </div>
     </section>
 
-    <!-- SECTION EXPERTISE -->
     <section id="expertise" class="bg-white scroll-mt-header py-12 md:py-20">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center mb-10 md:mb-16">
@@ -1756,9 +1627,7 @@
                     class="w-24 h-1 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 mx-auto mt-4 rounded-full">
                 </div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                <!-- Carte 1 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-green-500"></div>
@@ -1781,7 +1650,6 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-                <!-- Carte 2 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-500"></div>
@@ -1805,7 +1673,6 @@
                                 <i class="fas fa-arrow-right text-xs"></i></a></div>
                     </div>
                 </div>
-                <!-- Carte 3 -->
                 <div
                     class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-gray-100 h-full relative flex flex-col group transition-all duration-300 hover:shadow-2xl">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
@@ -1830,7 +1697,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mt-12 md:mt-20 rounded-[2rem] shadow-sm py-8 px-4 border border-amber-100"
                 style="background: linear-gradient(to right, #fdfbf7, #f5e6d3);">
                 <div
@@ -1872,8 +1738,7 @@
         </div>
     </section>
 
-    <!-- SECTION CATALOGUE -->
-    <section id="catalogue" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-[#0a2e5a]">
+    <section id="catalogue" class="py-8 md:py-16 lg:py-20 scroll-mt-header bg-[#0a2e5a]">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center max-w-3xl mx-auto mb-10 md:mb-16">
                 <span
@@ -1886,80 +1751,71 @@
                 <div class="w-20 h-1 bg-white/50 mx-auto mt-4 rounded-full"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                @forelse($catalogues as $catalogue)
-                    <div class="catalogue-card">
-                        @if($catalogue->image)<img src="{{ asset('storage/' . e($catalogue->image)) }}"
-                        alt="{{ e($catalogue->titre) }}" class="w-full h-56 object-cover">@else<div
-                                class="w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                            <i class="fas fa-image text-4xl text-gray-400"></i></div>@endif
-                        <div class="catalogue-card-body">
-                            <h3 class="catalogue-card-title">{{ e($catalogue->titre) }}</h3>
-                            <p class="catalogue-card-desc line-clamp-3">{{ Str::limit(e($catalogue->description), 140) }}
-                            </p>
-                            <a href="{{ route('catalogue.show', $catalogue->id) }}" class="catalogue-card-link">
-                                En savoir plus <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full text-center py-20 text-blue-100 text-lg md:text-xl"><i
-                            class="fas fa-folder-open text-4xl mb-3 opacity-70"></i><br>Aucun catalogue disponible pour le
-                        moment.</div>
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTION PARTENAIRES (défilement infini) -->
-    <section id="partenaires-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-white">
-        <div class="container mx-auto px-4 md:px-6">
-            <div class="text-center mb-10 md:mb-16">
-                <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4"
-                    style="background: #f97316; color: white; box-shadow: 0 2px 8px rgba(249,115,22,0.3);">🤝 Confiance
-                    & Excellence</span>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4"><span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500">Ils
-                        nous font confiance</span></h2>
-                <p class="text-orange-800 text-sm md:text-base uppercase tracking-wide mt-2 font-medium">Nos partenaires
-                    et clients</p>
-                <div
-                    class="w-24 h-1 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500 mx-auto mt-4 rounded-full">
-                </div>
-            </div>
-
-            @if(isset($partenaires) && $partenaires->count())
-                <div class="relative overflow-hidden">
-                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200/50">
-                        <div class="overflow-hidden w-full">
-                            <div id="marqueeContainer" class="relative w-full">
-                                <div id="marqueeTrack" class="flex" style="will-change: transform;">
-                                    @for ($i = 0; $i < 3; $i++)
-                                        @foreach($partenaires as $partenaire)
-                                            <div class="partenaire-item" title="{{ e($partenaire->nom_entreprise) }}">
-                                                @if($partenaire->logo)
-                                                    <img src="{{ asset('storage/' . e($partenaire->logo)) }}"
-                                                        alt="{{ e($partenaire->nom_entreprise) }}">
-                                                @else
-                                                    <span>{{ e($partenaire->nom_entreprise) }}</span>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    @endfor
+            @if(isset($catalogues) && $catalogues->count())
+                <div class="catalogue-slider-container">
+                    <button class="catalogue-nav-btn" id="cataloguePrevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="catalogue-scroll-wrapper" id="catalogueScrollWrapper">
+                        <div class="catalogue-scroll-track" id="catalogueTrack">
+                            @foreach($catalogues as $catalogue)
+                                <div class="catalogue-card-slider">
+                                    @if($catalogue->image)
+                                        <img src="{{ asset('storage/' . e($catalogue->image)) }}" alt="{{ e($catalogue->titre) }}">
+                                    @else
+                                        <div class="w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                            <i class="fas fa-image text-4xl text-gray-400"></i>
+                                        </div>
+                                    @endif
+                                    <div class="catalogue-card-body">
+                                        <h3 class="catalogue-card-title">{{ e($catalogue->titre) }}</h3>
+                                        <p class="catalogue-card-desc line-clamp-3">{{ Str::limit(e($catalogue->description), 140) }}</p>
+                                        <a href="{{ route('catalogue.show', $catalogue->id) }}" class="catalogue-card-link">
+                                            En savoir plus <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
+                    <button class="catalogue-nav-btn" id="catalogueNextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             @else
-                <div class="text-center py-12 md:py-20 bg-gray-50 rounded-2xl border border-gray-200">
-                    <p class="text-orange-600 text-base md:text-xl">Aucun partenaire pour le moment.</p>
+                <div class="text-center py-20 text-blue-100 text-lg md:text-xl">
+                    <i class="fas fa-folder-open text-4xl mb-3 opacity-70"></i><br>Aucun catalogue disponible pour le moment.
                 </div>
             @endif
         </div>
     </section>
 
-    <!-- SECTION AVIS (slider horizontal) -->
+    <section id="partenaires-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header bg-white">
+        <div class="text-center mb-10 md:mb-16 px-4">
+            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4"
+                style="background: #f97316; color: white; box-shadow: 0 2px 8px rgba(249,115,22,0.3);">🤝 Confiance
+                & Excellence</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4"><span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500">Ils
+                    nous font confiance</span></h2>
+            <p class="text-orange-800 text-sm md:text-base uppercase tracking-wide mt-2 font-medium">Nos partenaires
+                et clients</p>
+            <div
+                class="w-24 h-1 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-pink-500 to-purple-500 mx-auto mt-4 rounded-full">
+            </div>
+        </div>
+
+        @if(isset($partenaires) && $partenaires->count())
+            <div class="partner-marquee-container" id="partnerMarqueeContainer">
+                <div class="partner-marquee-track" id="partnerMarqueeTrack"></div>
+            </div>
+        @else
+            <div class="text-center py-12 md:py-20 bg-gray-50 rounded-2xl border border-gray-200 mx-4">
+                <p class="text-orange-600 text-base md:text-xl">Aucun partenaire pour le moment.</p>
+            </div>
+        @endif
+    </section>
+
     <section id="avis-section" class="py-12 md:py-24 lg:py-32 scroll-mt-header"
         style="background: linear-gradient(135deg, #4c1d95 0%, #2e1065 100%);">
         <div class="container mx-auto px-4 md:px-6">
@@ -1973,11 +1829,10 @@
                     clients et partenaires</p>
                 <div class="w-16 h-0.5 bg-purple-300 mx-auto mt-4 rounded-full"></div>
             </div>
-
             @if(isset($avis) && $avis->count())
                 <div class="avis-slider">
                     <button class="avis-slider-btn prev" id="avisPrevBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
                             <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -1997,7 +1852,11 @@
                                     <div class="role">{{ $a->contact_fonction ?? 'Client' }}</div>
                                     <div class="stars">
                                         @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= $a->note) <i class="fas fa-star"></i> @else <i class="far fa-star"></i> @endif
+                                            @if($i <= $a->note)
+                                                <i class="fas fa-star"></i>
+                                            @else
+                                                <i class="far fa-star"></i>
+                                            @endif
                                         @endfor
                                     </div>
                                     <p class="quote">"{{ Str::limit($a->contenu, 180) }}"</p>
@@ -2006,7 +1865,7 @@
                         </div>
                     </div>
                     <button class="avis-slider-btn next" id="avisNextBtn">
-                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none" color="white">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="white" fill="none">
                             <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" />
                         </svg>
                     </button>
@@ -2019,10 +1878,9 @@
         </div>
     </section>
 
-    <!-- SECTION BLOG (CARROUSEL HORIZONTAL) -->
-    <section id="blog" class="py-12 md:py-24 lg:py-32 scroll-mt-header" style="background: #f8fafc;">
+    <section id="blog" class="scroll-mt-header blog-section">
         <div class="container mx-auto px-4 md:px-8">
-            <div class="text-center mb-12 md:mb-20">
+            <div class="blog-header">
                 <h2 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tighter inline-block">
                     <span class="text-slate-900">BLOG & </span>
                     <span
@@ -2034,17 +1892,16 @@
                     actualités</p>
                 <div class="w-20 h-1.5 bg-orange-500 mx-auto mt-6 rounded-full"></div>
             </div>
-
             @if(isset($articles) && $articles->count())
-                <div class="blog-slider">
-                    <button class="blog-slider-btn" id="blogPrevBtn">
-                        <i class="fas fa-chevron-left text-xl"></i>
+                <div class="blog-slider-container">
+                    <button class="blog-nav-btn" id="blogPrevBtn">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
-                    <div class="blog-slider-viewport">
-                        <div class="blog-slider-track" id="blogTrack">
+                    <div class="blog-scroll-wrapper" id="blogScrollWrapper">
+                        <div class="blog-scroll-track" id="blogTrack">
                             @foreach($articles as $article)
                                 <article class="blog-card group">
-                                    <div class="relative h-64 m-4 overflow-hidden rounded-[2.2rem] border-[1.5px] border-slate-900">
+                                    <div class="relative h-64 overflow-hidden rounded-t-2xl">
                                         @if($article->image_une)
                                             <img src="{{ asset('storage/' . e($article->image_une)) }}"
                                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -2060,7 +1917,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="p-6 pt-2 flex flex-col items-center">
+                                    <div class="p-6 pt-4 flex flex-col items-center flex-1">
                                         <div
                                             class="flex items-center gap-2 text-orange-600 text-xs font-black mb-5 bg-orange-50/50 px-4 py-2 rounded-xl border border-orange-100">
                                             <i class="far fa-calendar-alt"></i>
@@ -2085,8 +1942,8 @@
                             @endforeach
                         </div>
                     </div>
-                    <button class="blog-slider-btn" id="blogNextBtn">
-                        <i class="fas fa-chevron-right text-xl"></i>
+                    <button class="blog-nav-btn" id="blogNextBtn">
+                        <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             @else
@@ -2097,8 +1954,7 @@
         </div>
     </section>
 
-    <!-- FOOTER / CONTACT -->
-    <footer id="contact" class="scroll-mt-header">
+   <footer id="contact" class="scroll-mt-header">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2rem 2rem 0 0;"
             class="text-white pt-12 pb-8">
             <div class="container mx-auto px-4">
@@ -2108,15 +1964,29 @@
                             class="max-h-[350px] w-auto drop-shadow-2xl">
                     </div>
                     <div class="lg:w-1/2 w-full">
-                        <h3 class="text-2xl md:text-3xl font-black mb-6 text-center lg:text-left">Contactez-nous</h3>
+                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6">
+                            <h3 class="text-2xl md:text-3xl font-black">Contactez-nous</h3>
+                            <div class="flex items-center gap-3">
+                                <a href="https://www.facebook.com/touthelp" target="_blank" rel="noopener noreferrer" 
+                                   class="flex items-center gap-2 bg-white/20 hover:bg-white/30 rounded-full px-3 py-1.5 transition-all duration-300 hover:scale-105">
+                                    <i class="fab fa-facebook-f text-sm"></i>
+                                    <span class="text-xs font-semibold">Tout help</span>
+                                </a>
+                                <a href="mailto:info@touthelp.com" 
+                                   class="flex items-center gap-2 bg-white/20 hover:bg-white/30 rounded-full px-3 py-1.5 transition-all duration-300 hover:scale-105">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                    <span class="text-xs font-semibold">info@touthelp.com</span>
+                                </a>
+                            </div>
+                        </div>
                         <div class="w-full">
                             <form id="footerContactForm" class="space-y-4">
                                 @csrf
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input type="text" name="nom" id="footer_nom" placeholder="Nom complet *"
+                                    <input type="text" name="nom" id="footer_nom" placeholder="Nom complet"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                         required>
-                                    <input type="email" name="email" id="footer_email" placeholder="Email *"
+                                    <input type="email" name="email" id="footer_email" placeholder="Email"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                         required>
                                 </div>
@@ -2124,7 +1994,7 @@
                                     <input type="tel" name="telephone" id="footer_telephone" placeholder="Téléphone"
                                         class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition">
                                 </div>
-                                <textarea name="message" rows="3" id="footer_message" placeholder="Votre message *"
+                                <textarea name="message" rows="3" id="footer_message" placeholder="Votre message"
                                     class="w-full px-5 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:bg-white/30 outline-none transition"
                                     required></textarea>
                                 <button type="submit" id="footerSubmitBtn"
@@ -2139,12 +2009,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="border-t border-gray-700 pt-6 mt-8 text-center">
-                    <p class="text-gray-500 text-xs">&copy; {{ date('Y') }} Tout Help. Tous droits réservés.</p>
-                </div>
             </div>
         </div>
-
         <div style="background: #11131f;" class="py-12 border-t border-white/5">
             <div class="container mx-auto px-4">
                 <div class="flex flex-col items-center">
@@ -2175,14 +2041,13 @@
                         </a>
                     </div>
                     <p class="text-gray-600 text-[10px] uppercase tracking-widest">
-                        &copy; {{ date('Y') }} Tout Help Madagascar &bull; Tous droits réservés
+                        &copy; {{ date('Y') }} Tout Help &bull; Tous droits réservés
                     </p>
                 </div>
             </div>
         </div>
     </footer>
-
-    <!-- CHAT MODAL -->
+    
     <div class="robot-icon" id="robotIcon" role="button" aria-label="Ouvrir le support">
         <i class="fas fa-robot"></i>
         <span id="robotBadge" class="robot-badge" style="display:none;" aria-live="polite">0</span>
@@ -2358,7 +2223,6 @@
             });
         })();
 
-        /* Slider avis */
         (function () {
             function initSlider() {
                 const track = document.getElementById('avisTrack');
@@ -2397,140 +2261,240 @@
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSlider); else initSlider();
         })();
 
-        /* Marquee partenaires */
-        (function () {
-            const track = document.getElementById('marqueeTrack');
-            if (!track) return;
-            let speed = 1;
-            let position = 0;
-            let animationId = null;
-            let isHovering = false;
-            function startMarquee() {
-                if (animationId) cancelAnimationFrame(animationId);
-                function step() {
-                    if (!isHovering) {
-                        position -= speed;
-                        const trackWidth = track.scrollWidth;
-                        const containerWidth = track.parentElement.clientWidth;
-                        if (Math.abs(position) >= trackWidth / 3) { position = 0; }
-                        track.style.transform = `translateX(${position}px)`;
-                    }
-                    animationId = requestAnimationFrame(step);
-                }
-                step();
-            }
-            const container = document.querySelector('#partenaires-section .overflow-hidden');
-            if (container) {
-                container.addEventListener('mouseenter', () => { isHovering = true; });
-                container.addEventListener('mouseleave', () => { isHovering = false; });
-            }
-            startMarquee();
-        })();
-
-        /* Carrousel Blog */
         (function () {
             function initBlogSlider() {
-                const track = document.getElementById('blogTrack');
-                if (!track) return;
-                const cards = Array.from(track.children);
-                if (cards.length === 0) return;
+                const wrapper = document.getElementById('blogScrollWrapper');
                 const prevBtn = document.getElementById('blogPrevBtn');
                 const nextBtn = document.getElementById('blogNextBtn');
-                if (!prevBtn || !nextBtn) return;
 
-                let currentIndex = 0;
-                let visibleCount = 4;
-                let cardWidth = 0;
-                let gap = 24;
+                if (!wrapper || !prevBtn || !nextBtn) return;
 
-                function updateLayout() {
-                    const container = track.parentElement;
-                    const containerWidth = container.clientWidth;
-                    if (window.innerWidth < 768) {
-                        visibleCount = 1;
-                        gap = 16;
-                    } else if (window.innerWidth < 1024) {
-                        visibleCount = 2;
-                        gap = 20;
-                    } else {
-                        visibleCount = 4;
-                        gap = 24;
-                    }
-                    cardWidth = (containerWidth - (gap * (visibleCount - 1))) / visibleCount;
-                    for (let i = 0; i < cards.length; i++) {
-                        cards[i].style.flex = `0 0 ${cardWidth}px`;
-                    }
+                function getScrollAmount() {
+                    const firstCard = wrapper.querySelector('.blog-card');
+                    if (!firstCard) return 300;
+                    const track = document.getElementById('blogTrack');
+                    const trackStyle = track ? getComputedStyle(track) : null;
+                    const gap = trackStyle ? parseFloat(trackStyle.gap) : 24;
+                    return firstCard.offsetWidth + gap;
                 }
 
-                function slideToIndex() {
-                    const offset = -currentIndex * (cardWidth + gap);
-                    track.style.transform = `translateX(${offset}px)`;
-                    const maxIndex = Math.max(0, cards.length - visibleCount);
-                    prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
-                    prevBtn.style.cursor = currentIndex === 0 ? 'not-allowed' : 'pointer';
-                    nextBtn.style.opacity = currentIndex >= maxIndex ? '0.4' : '1';
-                    nextBtn.style.cursor = currentIndex >= maxIndex ? 'not-allowed' : 'pointer';
+                function scrollLeft() { wrapper.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); }
+                function scrollRight() { wrapper.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }); }
+
+                prevBtn.addEventListener('click', scrollLeft);
+                nextBtn.addEventListener('click', scrollRight);
+
+                function updateButtons() {
+                    const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+                    prevBtn.style.opacity = wrapper.scrollLeft <= 10 ? '0.4' : '1';
+                    prevBtn.style.cursor = wrapper.scrollLeft <= 10 ? 'not-allowed' : 'pointer';
+                    nextBtn.style.opacity = wrapper.scrollLeft >= maxScroll - 10 ? '0.4' : '1';
+                    nextBtn.style.cursor = wrapper.scrollLeft >= maxScroll - 10 ? 'not-allowed' : 'pointer';
                 }
 
-                function next() {
-                    const maxIndex = Math.max(0, cards.length - visibleCount);
-                    if (currentIndex < maxIndex) {
-                        currentIndex++;
-                        slideToIndex();
-                    }
-                }
-
-                function prev() {
-                    if (currentIndex > 0) {
-                        currentIndex--;
-                        slideToIndex();
-                    }
-                }
-
-                prevBtn.addEventListener('click', prev);
-                nextBtn.addEventListener('click', next);
-
-                // Swipe sur mobile
-                let touchStartX = 0;
-                let touchEndX = 0;
-                track.addEventListener('touchstart', (e) => {
-                    touchStartX = e.changedTouches[0].screenX;
-                });
-                track.addEventListener('touchend', (e) => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    if (touchEndX < touchStartX - 50) next();
-                    if (touchEndX > touchStartX + 50) prev();
-                });
-
-                updateLayout();
-                slideToIndex();
-
-                window.addEventListener('resize', () => {
-                    updateLayout();
-                    slideToIndex();
-                });
+                wrapper.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', () => setTimeout(updateButtons, 100));
+                setTimeout(updateButtons, 200);
             }
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initBlogSlider);
-            } else {
-                initBlogSlider();
-            }
+            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initBlogSlider); } else { initBlogSlider(); }
         })();
 
-        /* Menu burger mobile */
-        document.addEventListener('DOMContentLoaded', function() {
+        (function () {
+            function initCatalogueSlider() {
+                const wrapper = document.getElementById('catalogueScrollWrapper');
+                const prevBtn = document.getElementById('cataloguePrevBtn');
+                const nextBtn = document.getElementById('catalogueNextBtn');
+
+                if (!wrapper || !prevBtn || !nextBtn) return;
+
+                function getScrollAmount() {
+                    const firstCard = wrapper.querySelector('.catalogue-card-slider');
+                    if (!firstCard) return 350;
+                    const track = document.getElementById('catalogueTrack');
+                    const trackStyle = track ? getComputedStyle(track) : null;
+                    const gap = trackStyle ? parseFloat(trackStyle.gap) : 24;
+                    return firstCard.offsetWidth + gap;
+                }
+
+                function scrollLeft() { wrapper.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); }
+                function scrollRight() { wrapper.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }); }
+
+                prevBtn.addEventListener('click', scrollLeft);
+                nextBtn.addEventListener('click', scrollRight);
+
+                function updateButtons() {
+                    const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+                    prevBtn.style.opacity = wrapper.scrollLeft <= 10 ? '0.4' : '1';
+                    prevBtn.style.cursor = wrapper.scrollLeft <= 10 ? 'not-allowed' : 'pointer';
+                    nextBtn.style.opacity = wrapper.scrollLeft >= maxScroll - 10 ? '0.4' : '1';
+                    nextBtn.style.cursor = wrapper.scrollLeft >= maxScroll - 10 ? 'not-allowed' : 'pointer';
+                }
+
+                wrapper.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', () => setTimeout(updateButtons, 100));
+                setTimeout(updateButtons, 200);
+            }
+
+            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initCatalogueSlider); } else { initCatalogueSlider(); }
+        })();
+
+        (function () {
+            const container = document.getElementById('partnerMarqueeContainer');
+            const track = document.getElementById('partnerMarqueeTrack');
+
+            if (!container || !track) return;
+
+            const partenaires = @json($partenaires ?? []);
+            if (partenaires.length === 0) return;
+
+            function esc(str) {
+                if (!str) return '';
+                return str.replace(/[&<>"']/g, function (m) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+                });
+            }
+
+            function buildGroup() {
+                const frag = document.createDocumentFragment();
+                partenaires.forEach(function (p) {
+                    const div = document.createElement('div');
+                    div.className = 'partenaire-item';
+                    div.title = p.nom_entreprise || '';
+                    if (p.logo) {
+                        const img = document.createElement('img');
+                        img.src = (p.logo.startsWith('http') ? '' : '/storage/') + esc(p.logo);
+                        img.alt = esc(p.nom_entreprise || '');
+                        div.appendChild(img);
+                    } else {
+                        const span = document.createElement('span');
+                        span.textContent = p.nom_entreprise || '';
+                        div.appendChild(span);
+                    }
+                    frag.appendChild(div);
+                });
+                return frag;
+            }
+
+            track.innerHTML = '';
+            track.appendChild(buildGroup());
+            track.appendChild(buildGroup());
+            track.appendChild(buildGroup());
+
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    function getGroupWidth() {
+                        var items = track.children;
+                        var count = partenaires.length;
+                        var total = 0;
+                        for (var i = 0; i < count && i < items.length; i++) {
+                            var s = getComputedStyle(items[i]);
+                            total += items[i].offsetWidth
+                                + parseFloat(s.marginLeft || 0)
+                                + parseFloat(s.marginRight || 0);
+                        }
+                        return total;
+                    }
+
+                    var groupWidth = getGroupWidth();
+                    var position = 0;
+                    var animationId = null;
+                    var speed = 0.6;
+
+                    function animate() {
+                        position -= speed;
+                        if (position <= -groupWidth) {
+                            position += groupWidth;
+                        }
+                        track.style.transform = 'translateX(' + position + 'px)';
+                        animationId = requestAnimationFrame(animate);
+                    }
+
+                    container.addEventListener('mouseenter', function () {
+                        if (animationId) {
+                            cancelAnimationFrame(animationId);
+                            animationId = null;
+                        }
+                    });
+
+                    container.addEventListener('mouseleave', function () {
+                        if (!animationId) {
+                            animationId = requestAnimationFrame(animate);
+                        }
+                    });
+
+                    window.addEventListener('resize', function () {
+                        var newWidth = getGroupWidth();
+                        if (newWidth !== groupWidth) {
+                            if (groupWidth > 0) {
+                                var ratio = position / groupWidth;
+                                position = ratio * newWidth;
+                            }
+                            groupWidth = newWidth;
+                        }
+                    });
+
+                    animationId = requestAnimationFrame(animate);
+                });
+            });
+        })();
+
+        document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('mobileMenuBtn');
             const menu = document.getElementById('mobileMenu');
             if (btn && menu) {
-                btn.addEventListener('click', function() {
-                    menu.classList.toggle('hidden');
-                });
-                menu.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => menu.classList.add('hidden'));
-                });
+                btn.addEventListener('click', function () { menu.classList.toggle('hidden'); });
+                menu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => menu.classList.add('hidden')); });
             }
         });
+
+        (function () {
+            function initActiveNav() {
+                const sections = ['accueil', 'apropos', 'expertise', 'catalogue', 'blog', 'contact'];
+                const navLinks = document.querySelectorAll('.nav-link[data-section]');
+
+                function setActive(sectionId) {
+                    navLinks.forEach(link => {
+                        if (link.dataset.section === sectionId) {
+                            link.classList.add('active');
+                            link.classList.add('active-section');
+                        } else {
+                            link.classList.remove('active');
+                            link.classList.remove('active-section');
+                        }
+                    });
+                }
+
+                const headerOffset = 100;
+                const options = { root: null, rootMargin: `-${headerOffset}px 0px -40% 0px`, threshold: 0 };
+                const visibleSections = new Set();
+
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const obs = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) { 
+                                visibleSections.add(id); 
+                            } else { 
+                                visibleSections.delete(id); 
+                            }
+                            let active = null;
+                            for (const s of sections) { 
+                                if (visibleSections.has(s)) { 
+                                    active = s; 
+                                    break; 
+                                } 
+                            }
+                            if (active) setActive(active);
+                        });
+                    }, options);
+                    obs.observe(el);
+                });
+                setActive('accueil');
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initActiveNav); else initActiveNav();
+        })();
     </script>
 </body>
 

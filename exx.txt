@@ -22,8 +22,13 @@
     $repondues   = $convsEnriched->where('closed', false)->filter(fn($c) => $c->_has_response)->count();
 @endphp
 
+{{--
+    ✅ PAS de "defer" — Pusher doit être chargé AVANT le script inline
+    defer = race condition garantie sur WAMP/Windows
+--}}
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 
+{{-- ── PERMISSION NOTIFS ── --}}
 <div class="ms-perm" id="msPerm" style="display:none" role="alert">
     <div class="ms-perm-inner">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -35,6 +40,7 @@
     </div>
 </div>
 
+{{-- ── STATS ── --}}
 <div class="ms-stats" role="region" aria-label="Statistiques messages">
     <div class="ms-stat">
         <div class="ms-stat-icon" style="--ic:#2563a8;--ib:rgba(37,99,168,.12)">
@@ -79,8 +85,10 @@
     </div>
 </div>
 
+{{-- ── MESSENGER SHELL ── --}}
 <div class="ms-shell" id="msShell">
 
+    {{-- SIDEBAR --}}
     <div class="ms-panel" id="msPanel" role="complementary" aria-label="Liste des conversations">
         <div class="ms-panel-head">
             <span class="ms-panel-title">
@@ -157,6 +165,7 @@
         </div>
     </div>
 
+    {{-- ZONE CHAT --}}
     <div class="ms-chat" id="msChat" role="main">
         <div class="ms-idle" id="msIdle">
             <div class="ms-idle-orbs" aria-hidden="true">
@@ -222,6 +231,7 @@
     </div>
 </div>
 
+{{-- ── FICHE CLIENT ── --}}
 <div class="ms-info-panel" id="msInfoPanel" role="dialog" aria-modal="true" aria-label="Fiche client">
     <div class="ms-info-header">
         <span>Fiche client</span>
@@ -249,6 +259,7 @@
 </div>
 <div class="ms-veil" id="msVeil" aria-hidden="true"></div>
 
+{{-- ── TOAST ── --}}
 <div class="ms-toast" id="msToast" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="ms-toast-glow" aria-hidden="true"></div>
     <div class="ms-toast-body">
@@ -268,6 +279,7 @@
     <div class="ms-toast-progress" id="toastProgress" aria-hidden="true"></div>
 </div>
 
+{{-- ══════════════ STYLES (identiques, inchangés) ══════════════ --}}
 <style>
 :root {
     --ms-blue: #2563a8; --ms-blue2: #3b82c4; --ms-pink: #d63384;
@@ -371,6 +383,7 @@
 .ms-thread { display:flex; flex-direction:column; height:100%; }
 .ms-thread-head { display:flex; align-items:center; gap:10px; padding:12px 18px; background:var(--bg-surface,#fff); border-bottom:1px solid var(--border-color,#e2e8f0); flex-shrink:0; box-shadow:0 1px 6px rgba(0,0,0,.04); }
 
+/* Bouton retour : caché desktop, visible mobile via media query */
 .ms-back { width:34px; height:34px; background:var(--bg-surface-2,#f8fafc); border:1.5px solid var(--border-color,#e2e8f0); border-radius:10px; cursor:pointer; color:var(--text-secondary,#4a5568); display:none; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
 .ms-back:hover { background:var(--border-color,#e2e8f0); color:var(--text-primary,#0f1923); }
 
@@ -467,6 +480,7 @@
     .ms-shell { border-radius:14px; }
     .ms-panel { position:absolute; top:0; left:0; bottom:0; width:100%; height:100%; z-index:10; }
     .ms-panel.slide-out { transform:translateX(-100%); }
+    /* ✅ Bouton retour visible UNIQUEMENT sur mobile via CSS — jamais via JS */
     .ms-back { display:flex !important; }
     .ms-info-panel { width:100%; }
     .ms-hint { display:none; }
@@ -481,13 +495,21 @@
 }
 </style>
 
+{{-- ══════════════════════════════════════════
+     JAVASCRIPT — VERSION FINALE CORRIGÉE
+     Fixes : defer retiré, pas de SSL forcé,
+     loadConv appelé dans conv active,
+     polling rapide fallback Pusher KO
+══════════════════════════════════════════ --}}
 <script>
 (function () {
 'use strict';
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    CONFIG BLADE → JS
-   ════════════════════════════════════════ */
+   Variables injectées ici pour éviter
+   tout problème de timing/scope
+────────────────────────────────────── */
 var CFG = {
     pusherKey:    '{{ env("PUSHER_APP_KEY","") }}',
     pusherCluster:'{{ env("PUSHER_APP_CLUSTER","mt1") }}',
@@ -498,12 +520,16 @@ var CFG = {
     pageUrl:      window.location.href
 };
 
-/* ════════════════════════════════════════
-   ÉTAT GLOBAL
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   ÉTAT
+────────────────────────────────────── */
 var cEmail = '', cArc = false, cInit = '', cC1 = '#2563a8', cC2 = '#3b82c4', cPhone = '';
-var arcSet = new Set(), newSet = new Set();
-var soundOn = true, browserNot = false, audioCtx = null;
+var arcSet = new Set();
+var newSet = new Set();
+
+var soundOn    = true;
+var browserNot = false;
+var audioCtx   = null;
 
 /* Anti-spam */
 var COOLDOWN = 1400, BURST = 5;
@@ -512,19 +538,18 @@ var lastSend = 0, sendCnt = 0, cntReset = null, inFlight = false;
 /* Refresh */
 var refreshing = false, refreshPend = false;
 
-/* Polling adaptatif */
-var pollTimer = null, POLL_FAST = 4000, POLL_SLOW = 30000;
-var pusherAlive = false, pusherReady = false;
+/* Polling */
+var pollTimer    = null;
+var POLL_FAST    = 4000;   /* quand Pusher KO */
+var POLL_SLOW    = 30000;  /* quand Pusher OK */
+var pusherAlive  = false;
 
 /* Toast */
 var toastTimer = null;
 
-/* Notification Service Worker */
-var swRegistration = null;
-
-/* ════════════════════════════════════════
-   UTILITIES
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   UTILS
+────────────────────────────────────── */
 function esc(s) {
     if (s == null) return '';
     var d = document.createElement('div');
@@ -536,10 +561,7 @@ function clean(s, max) {
     return String(s || '').replace(/<[^>]*>/g,'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').substring(0, max||2000).trim();
 }
 
-function validMsg(s) { 
-    var t = clean(s);
-    return t.length >= 1 && t.length <= 2000;
-}
+function validMsg(s) { var t=clean(s); return t.length>=1 && t.length<=2000; }
 
 function cssEsc(s) {
     try { return CSS.escape(s); } catch(e) { return s.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g,'\\$&'); }
@@ -553,851 +575,543 @@ function fmtTime(d) {
 function fmtDate(d) {
     if (!d) return '';
     try {
-        var dt = new Date(d), now = new Date(), diff = (now - dt) / 86400000;
-        if (diff < 1) return "Aujourd'hui";
-        if (diff < 2) return "Hier";
+        var dt=new Date(d), now=new Date(), diff=(now-dt)/86400000;
+        if (diff<1) return "Aujourd'hui";
+        if (diff<2) return "Hier";
         return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'long'});
     } catch(e) { return ''; }
 }
 
-function nowHHMM() { 
-    return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
+function nowHHMM() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
 function gel(id) { return document.getElementById(id); }
 
-function setTxt(id, val) { 
-    var el = gel(id);
-    if(el) el.textContent = val;
-}
+function setTxt(id, val) { var el=gel(id); if(el) el.textContent=val; }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    REALTIME BADGE
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function setRT(state) {
-    var b = gel('rtBadge'), l = gel('rtLabel');
-    if(!b || !l) return;
-    var cls = {connected:'on', disconnected:'off', connecting:'', poll:'poll'};
-    b.className = 'ms-rt-badge ' + (cls[state] || '');
-    var lbl = {
-        connected:'Temps réel',
-        disconnected:'Déconnecté',
-        connecting:'Connexion…',
-        poll:'Polling actif'
-    };
-    l.textContent = lbl[state] || state;
+    var b=gel('rtBadge'), l=gel('rtLabel');
+    if(!b||!l) return;
+    var cls = {connected:'on',disconnected:'off',connecting:'',poll:'poll'};
+    b.className = 'ms-rt-badge ' + (cls[state]||'');
+    var lbl = {connected:'Temps réel',disconnected:'Déconnecté',connecting:'Connexion…',poll:'Polling actif'};
+    l.textContent = lbl[state]||state;
 }
 
-/* ════════════════════════════════════════
-   AUDIO WEB (Optimisé)
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   AUDIO
+────────────────────────────────────── */
 function initAudio() {
     if (audioCtx) return;
-    try {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AC();
-    } catch(e) {
-        console.warn('[Audio] Initialisation échouée:', e.message);
-    }
+    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e) {}
 }
-
 document.addEventListener('click', initAudio, {once:true});
-document.addEventListener('touchstart', initAudio, {once:true});
 
 function playSound(type) {
     if (!soundOn) return;
     try {
-        initAudio();
-        if(!audioCtx) return;
-        
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume().catch(function(e) {
-                console.warn('[Audio] Resume échoué:', e.message);
-            });
-        }
-
+        initAudio(); if(!audioCtx) return;
+        if (audioCtx.state==='suspended') audioCtx.resume();
         var t = audioCtx.currentTime;
-        
-        if (type === 'receive') {
-            [[880, t, 0.16, t + 0.24], [1100, t + 0.14, 0.11, t + 0.36]].forEach(function(n) {
-                var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-                o.connect(g);
-                g.connect(audioCtx.destination);
-                o.type = 'sine';
-                o.frequency.value = n[0];
-                g.gain.setValueAtTime(0, n[1]);
-                g.gain.linearRampToValueAtTime(n[2], n[1] + 0.03);
-                g.gain.exponentialRampToValueAtTime(0.0001, n[3]);
-                o.start(n[1]);
-                o.stop(n[3] + 0.05);
+        if (type==='receive') {
+            [[880,t,0.16,t+0.24],[1100,t+0.14,0.11,t+0.36]].forEach(function(n) {
+                var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+                o.connect(g); g.connect(audioCtx.destination);
+                o.type='sine'; o.frequency.value=n[0];
+                g.gain.setValueAtTime(0,n[1]);
+                g.gain.linearRampToValueAtTime(n[2],n[1]+0.03);
+                g.gain.exponentialRampToValueAtTime(0.0001,n[3]);
+                o.start(n[1]); o.stop(n[3]+0.05);
             });
-        } else if (type === 'send') {
-            var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-            o.connect(g);
-            g.connect(audioCtx.destination);
-            o.type = 'sine';
-            o.frequency.value = 620;
-            g.gain.setValueAtTime(0, t);
-            g.gain.linearRampToValueAtTime(0.07, t + 0.02);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
-            o.start(t);
-            o.stop(t + 0.14);
+        } else {
+            var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.type='sine'; o.frequency.value=620;
+            g.gain.setValueAtTime(0,t);
+            g.gain.linearRampToValueAtTime(0.07,t+0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+            o.start(t); o.stop(t+0.14);
         }
-    } catch(e) {
-        console.warn('[Audio] Erreur:', e.message);
-    }
+    } catch(e) {}
 }
 
-/* ════════════════════════════════════════
-   NOTIFICATIONS NAVIGATEUR (Multi-Platform)
-   ════════════════════════════════════════ */
-function requestNotifPerm() {
-    if (!('Notification' in window)) {
-        console.warn('[Notif] API non disponible');
-        return;
-    }
-
-    if (Notification.permission === 'granted') {
-        browserNot = true;
-        initServiceWorker();
-        return;
-    }
-
-    if (Notification.permission !== 'denied') {
-        var b = gel('msPerm');
-        if (b) b.style.display = 'block';
-    }
-}
-
-function initServiceWorker() {
-    if (!('serviceWorker' in navigator)) {
-        console.warn('[SW] Non supporté');
-        return;
-    }
-
-    navigator.serviceWorker.register('/js/notification-sw.js', {scope:'/'})
-        .then(function(reg) {
-            swRegistration = reg;
-            console.log('[SW] Enregistré:', reg.scope);
-        })
-        .catch(function(e) {
-            console.warn('[SW] Erreur:', e.message);
-        });
-}
-
-function showBrowserNotif(name, msg, tag, badge) {
-    if (!browserNot || document.hasFocus()) return;
-
-    if (Notification.permission !== 'granted') return;
-
-    var options = {
-        body: String(msg || '').substring(0, 100),
-        tag: tag || 'message',
-        badge: badge || '/images/logo.jpg',
-        icon: '/images/logo.jpg',
-        requireInteraction: false,
-        silent: false,
-        actions: [
-            {action: 'open', title: 'Ouvrir'},
-            {action: 'close', title: 'Fermer'}
-        ]
-    };
-
-    try {
-        if (swRegistration && swRegistration.showNotification) {
-            swRegistration.showNotification('💬 ' + String(name || '').substring(0, 40), options);
-        } else if ('Notification' in window) {
-            new Notification('💬 ' + String(name || '').substring(0, 40), options);
-        }
-    } catch(e) {
-        console.warn('[Notif] Erreur:', e.message);
-    }
-}
-
-gel('permAllow') && gel('permAllow').addEventListener('click', function() {
-    Notification.requestPermission().then(function(p) {
-        if (p === 'granted') {
-            browserNot = true;
-            initServiceWorker();
-        }
-        var b = gel('msPerm');
-        if (b) b.style.display = 'none';
-    }).catch(function(e) {
-        console.warn('[Notif] Erreur:', e.message);
-    });
-});
-
-gel('permDismiss') && gel('permDismiss').addEventListener('click', function() {
-    var b = gel('msPerm');
-    if (b) b.style.display = 'none';
-});
-
-/* ════════════════════════════════════════
-   TOAST (Fiable & Optimisé)
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   TOAST
+────────────────────────────────────── */
 function showToast(name, msg, c1, c2) {
-    var el = gel('msToast');
-    if (!el) return;
-
-    setTxt('toastName', String(name || '').substring(0, 40));
-    setTxt('toastMsg', String(msg || '').substring(0, 80));
+    var el=gel('msToast'); if(!el) return;
+    setTxt('toastName', String(name||'').substring(0,40));
+    setTxt('toastMsg',  String(msg||'').substring(0,80));
     setTxt('toastTime', nowHHMM());
-
-    var av = gel('toastAv');
-    if (av) {
-        av.textContent = String(name || '?').substring(0, 2).toUpperCase();
-        av.style.background = 'linear-gradient(140deg,' + c1 + ',' + c2 + ')';
-    }
-
-    var prog = gel('toastProgress');
-    if (prog) {
-        prog.className = 'ms-toast-progress';
-        void prog.offsetWidth;
-        prog.className = 'ms-toast-progress go';
-    }
-
+    var av=gel('toastAv');
+    if(av) { av.textContent=String(name||'?').substring(0,2).toUpperCase(); av.style.background='linear-gradient(140deg,'+c1+','+c2+')'; }
+    var prog=gel('toastProgress');
+    if(prog) { prog.className='ms-toast-progress'; void prog.offsetWidth; prog.className='ms-toast-progress go'; }
     el.classList.add('show');
     playSound('receive');
-
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(hideToast, 5500);
+    toastTimer=setTimeout(hideToast,5500);
 }
+function hideToast() { var el=gel('msToast'); if(el) el.classList.remove('show'); }
+window.hideToast=hideToast;
 
-function hideToast() {
-    var el = gel('msToast');
-    if (el) el.classList.remove('show');
-}
+gel('toastClose')&&gel('toastClose').addEventListener('click',hideToast);
 
-window.hideToast = hideToast;
-
-gel('toastClose') && gel('toastClose').addEventListener('click', hideToast);
-
-gel('msToast') && gel('msToast').addEventListener('click', function(e) {
-    if (e.target.closest && e.target.closest('.ms-toast-close')) return;
-    var name = gel('toastName') ? gel('toastName').textContent : '';
-    if (!name) return;
-    var convs = document.querySelectorAll('.ms-conv');
-    for (var i = 0; i < convs.length; i++) {
-        if (convs[i].dataset.name === name) {
-            selectConv(convs[i]);
-            break;
-        }
-    }
+gel('msToast')&&gel('msToast').addEventListener('click',function(e) {
+    if(e.target.closest&&e.target.closest('.ms-toast-close')) return;
+    var name=gel('toastName')?gel('toastName').textContent:'';
+    if(!name) return;
+    var convs=document.querySelectorAll('.ms-conv');
+    for(var i=0;i<convs.length;i++) { if(convs[i].dataset.name===name) { selectConv(convs[i]); break; } }
     hideToast();
 });
 
-/* ════════════════════════════════════════
-   ANTI-SPAM
-   ════════════════════════════════════════ */
-function warn(txt) {
-    var el = gel('msWarn'), t = gel('msWarnTxt');
-    if (!el || !t) return;
-    t.textContent = txt;
-    el.style.display = 'flex';
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = '';
-    clearTimeout(el._t);
-    el._t = setTimeout(function() { el.style.display = 'none'; }, 4000);
+/* ──────────────────────────────────────
+   NOTIFICATIONS NAVIGATEUR
+────────────────────────────────────── */
+function initBrowserNotif() {
+    if(!('Notification' in window)) return;
+    if(Notification.permission==='granted') { browserNot=true; return; }
+    if(Notification.permission!=='denied') { var b=gel('msPerm'); if(b) b.style.display='block'; }
+}
+gel('permAllow')&&gel('permAllow').addEventListener('click',function() {
+    Notification.requestPermission().then(function(p) { if(p==='granted') browserNot=true; var b=gel('msPerm'); if(b) b.remove(); });
+});
+gel('permDismiss')&&gel('permDismiss').addEventListener('click',function() { var b=gel('msPerm'); if(b) b.remove(); });
+function notifBrowser(name,msg) {
+    if(!browserNot||document.hasFocus()) return;
+    try { new Notification('💬 '+name,{body:String(msg||'').substring(0,100),icon:'/images/logo.jpg'}); } catch(e) {}
 }
 
+/* ──────────────────────────────────────
+   ANTI-SPAM
+────────────────────────────────────── */
+function warn(txt) {
+    var el=gel('msWarn'),t=gel('msWarnTxt'); if(!el||!t) return;
+    t.textContent=txt; el.style.display='flex';
+    el.style.animation='none'; void el.offsetWidth; el.style.animation='';
+    clearTimeout(el._t); el._t=setTimeout(function(){el.style.display='none';},4000);
+}
 function checkRL() {
-    var now = Date.now();
-    if (!cntReset) cntReset = setTimeout(function() { sendCnt = 0; cntReset = null; }, 30000);
-    if (now - lastSend < COOLDOWN) {
-        warn('Attendez ' + ((COOLDOWN - (now - lastSend)) / 1000).toFixed(1) + 's.');
-        return false;
-    }
-    if (sendCnt >= BURST) {
-        warn('Trop de messages. Patientez 30 secondes.');
-        return false;
-    }
+    var now=Date.now();
+    if(!cntReset) cntReset=setTimeout(function(){sendCnt=0;cntReset=null;},30000);
+    if(now-lastSend<COOLDOWN) { warn('Attendez '+((COOLDOWN-(now-lastSend))/1000).toFixed(1)+'s.'); return false; }
+    if(sendCnt>=BURST)        { warn('Trop de messages. Patientez 30 secondes.'); return false; }
     return true;
 }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    UNREAD MARKERS
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function markNew(email) {
     newSet.add(email);
-    var it = document.querySelector('.ms-conv[data-email="' + cssEsc(email) + '"]');
-    if (!it) return;
+    var it=document.querySelector('.ms-conv[data-email="'+cssEsc(email)+'"]'); if(!it) return;
     it.classList.add('new-flash');
-    if (!it.querySelector('.ms-conv-badge')) {
-        var b = document.createElement('div');
-        b.className = 'ms-conv-badge';
-        var av = it.querySelector('.ms-conv-av');
-        if (av) av.appendChild(b);
+    if(!it.querySelector('.ms-conv-badge')) {
+        var b=document.createElement('div'); b.className='ms-conv-badge';
+        var av=it.querySelector('.ms-conv-av'); if(av) av.appendChild(b);
     }
 }
-
 function clearNew(email) {
     newSet.delete(email);
-    var it = document.querySelector('.ms-conv[data-email="' + cssEsc(email) + '"]');
-    if (!it) return;
-    var b = it.querySelector('.ms-conv-badge');
-    if (b) b.remove();
-    it.classList.remove('unread', 'new-flash');
+    var it=document.querySelector('.ms-conv[data-email="'+cssEsc(email)+'"]'); if(!it) return;
+    var b=it.querySelector('.ms-conv-badge'); if(b) b.remove();
+    it.classList.remove('unread','new-flash');
 }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    CHARGER MESSAGES
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function loadConv(email) {
-    if (!email) return;
-    var box = gel('msMessages');
-    if (!box) return;
+    if(!email) return;
+    var box=gel('msMessages'); if(!box) return;
 
-    box.innerHTML = '<div class="ms-loader"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Chargement…</div>';
+    box.innerHTML='<div class="ms-loader"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Chargement…</div>';
 
-    fetch(CFG.convUrl + encodeURIComponent(email), {
-        cache: 'no-store',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
+    fetch(CFG.convUrl+encodeURIComponent(email), {
+        cache:'no-store',
+        headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}
     })
-    .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-    })
+    .then(function(r) { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
     .then(function(msgs) {
-        if (!Array.isArray(msgs) || !msgs.length) {
-            box.innerHTML = '<div style="text-align:center;padding:60px;font-size:13px;color:var(--text-muted)">Aucun message</div>';
+        if(!Array.isArray(msgs)||!msgs.length) {
+            box.innerHTML='<div style="text-align:center;padding:60px;font-size:13px;color:var(--text-muted)">Aucun message</div>';
             return;
         }
-        var tel = (msgs[0] && (msgs[0].telephone || msgs[0].phone)) || '';
-        if (tel) {
-            cPhone = tel;
-            setTxt('infoPhone', tel);
-        }
-        renderMsgs(msgs, box);
+        var tel=(msgs[0]&&(msgs[0].telephone||msgs[0].phone))||'';
+        if(tel) { cPhone=tel; setTxt('infoPhone',tel); }
+        renderMsgs(msgs,box);
     })
     .catch(function(e) {
-        box.innerHTML = '<div style="text-align:center;padding:60px;font-size:13px;color:#ef4444">Erreur de chargement.</div>';
-        console.warn('[loadConv]', e.message);
+        box.innerHTML='<div style="text-align:center;padding:60px;font-size:13px;color:#ef4444">Erreur de chargement.</div>';
+        console.warn('loadConv:',e.message);
     });
 }
 
-function renderMsgs(msgs, box) {
-    var html = '', lastDate = '';
-    for (var i = 0; i < msgs.length; i++) {
-        var m = msgs[i];
-        var ds = fmtDate(m.created_at);
-        if (ds !== lastDate) {
-            html += '<div class="ms-date-sep"><span>' + esc(ds) + '</span></div>';
-            lastDate = ds;
-        }
-        var hasA = m.reponse_admin && m.reponse_admin.trim();
-        var hasC = m.message && m.message.trim();
-        if (!hasC && hasA) {
-            html += bubR(m.reponse_admin, m.created_at);
-        } else if (hasC) {
-            html += bubL(m.nom_complet || 'Client', m.message, m.created_at);
-            if (hasA) html += bubR(m.reponse_admin, m.updated_at);
+function renderMsgs(msgs,box) {
+    var html='', lastDate='';
+    for(var i=0;i<msgs.length;i++) {
+        var m=msgs[i];
+        var ds=fmtDate(m.created_at);
+        if(ds!==lastDate) { html+='<div class="ms-date-sep"><span>'+esc(ds)+'</span></div>'; lastDate=ds; }
+        var hasA=m.reponse_admin&&m.reponse_admin.trim();
+        var hasC=m.message&&m.message.trim();
+        if(!hasC&&hasA) { html+=bubR(m.reponse_admin,m.created_at); }
+        else if(hasC) {
+            html+=bubL(m.nom_complet||'Client',m.message,m.created_at);
+            if(hasA) html+=bubR(m.reponse_admin,m.updated_at);
         }
     }
-    box.innerHTML = html;
-    box.scrollTop = box.scrollHeight;
+    box.innerHTML=html;
+    box.scrollTop=box.scrollHeight;
 }
 
-function bubL(sender, text, time) {
-    return '<div class="ms-row-l"><div class="ms-bub-l"><div class="ms-sender">' + esc(sender) + '</div><div class="ms-txt">' + esc(text) + '</div><div class="ms-time">' + fmtTime(time) + '</div></div></div>';
+function bubL(sender,text,time) {
+    return '<div class="ms-row-l"><div class="ms-bub-l"><div class="ms-sender">'+esc(sender)+'</div><div class="ms-txt">'+esc(text)+'</div><div class="ms-time">'+fmtTime(time)+'</div></div></div>';
+}
+function bubR(text,time) {
+    return '<div class="ms-row-r"><div class="ms-bub-r"><div class="ms-sender-r">Vous</div><div class="ms-txt-r">'+esc(text)+'</div><div class="ms-time-r"><span>'+fmtTime(time)+'</span><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div></div></div>';
 }
 
-function bubR(text, time) {
-    return '<div class="ms-row-r"><div class="ms-bub-r"><div class="ms-sender-r">Vous</div><div class="ms-txt-r">' + esc(text) + '</div><div class="ms-time-r"><span>' + fmtTime(time) + '</span><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div></div></div>';
-}
-
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    ENVOI — Optimistic UI
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function sendMsg() {
-    if (!cEmail || arcSet.has(cEmail) || inFlight) return;
-    var ta = gel('msInput'), raw = ta ? ta.value : '', msg = clean(raw);
-    if (!validMsg(msg)) {
-        if (msg.length > 0) warn('Message invalide.');
-        return;
-    }
-    if (!checkRL()) return;
+    if(!cEmail||arcSet.has(cEmail)||inFlight) return;
+    var ta=gel('msInput'), raw=ta?ta.value:'', msg=clean(raw);
+    if(!validMsg(msg)) { if(msg.length>0) warn('Message invalide.'); return; }
+    if(!checkRL()) return;
 
-    inFlight = true;
-    lastSend = Date.now();
-    sendCnt++;
-    var btn = gel('msSend');
-    if (btn) {
-        btn.disabled = true;
-        btn.classList.add('loading');
-    }
+    inFlight=true; lastSend=Date.now(); sendCnt++;
+    var btn=gel('msSend'); if(btn){btn.disabled=true;btn.classList.add('loading');}
 
-    var box = gel('msMessages'), optId = 'opt-' + Date.now();
-    if (box) {
+    var box=gel('msMessages'), optId='opt-'+Date.now();
+    if(box) {
         box.insertAdjacentHTML('beforeend',
-            '<div class="ms-row-r optimistic" id="' + optId + '"><div class="ms-bub-r"><div class="ms-sender-r">Vous</div><div class="ms-txt-r">' + esc(msg) + '</div><div class="ms-time-r"><span>Envoi…</span></div></div></div>');
-        box.scrollTop = box.scrollHeight;
+            '<div class="ms-row-r optimistic" id="'+optId+'"><div class="ms-bub-r"><div class="ms-sender-r">Vous</div><div class="ms-txt-r">'+esc(msg)+'</div><div class="ms-time-r"><span>Envoi…</span></div></div></div>');
+        box.scrollTop=box.scrollHeight;
     }
-    if (ta) {
-        ta.value = '';
-        ta.style.height = 'auto';
-    }
-    updateCount(0);
-    playSound('send');
+    if(ta){ta.value='';ta.style.height='auto';}
+    updateCount(0); playSound('send');
 
     fetch(CFG.replyUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': CFG.csrf,
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({email_client: cEmail, reponse_admin: msg})
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CFG.csrf,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},
+        body:JSON.stringify({email_client:cEmail,reponse_admin:msg})
     })
-    .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-    })
+    .then(function(r){if(!r.ok) throw new Error('HTTP '+r.status); return r.json();})
     .then(function(data) {
-        var optEl = gel(optId);
-        if (data.success !== false) {
-            if (optEl) optEl.remove();
-            loadConv(cEmail);
-            scheduleRefresh();
+        var optEl=gel(optId);
+        if(data.success!==false) {
+            if(optEl) optEl.remove();
+            loadConv(cEmail);   /* ✅ recharge les messages immédiatement */
+            scheduleRefresh();  /* ✅ met à jour la liste en parallèle */
         } else {
-            if (optEl) {
-                var b = optEl.querySelector('.ms-bub-r');
-                if (b) b.classList.add('err');
-            }
-            if (ta) {
-                ta.value = raw;
-                updateCount(raw.length);
-            }
-            warn(data.message || "Erreur d'envoi.");
+            if(optEl){var b=optEl.querySelector('.ms-bub-r');if(b)b.classList.add('err');}
+            if(ta) ta.value=raw; updateCount(raw.length);
+            warn(data.message||"Erreur d'envoi.");
         }
     })
     .catch(function(e) {
-        var optEl = gel(optId);
-        if (optEl) {
-            var b = optEl.querySelector('.ms-bub-r');
-            if (b) b.classList.add('err');
-        }
-        if (ta) {
-            ta.value = raw;
-            updateCount(raw.length);
-        }
+        var optEl=gel(optId);
+        if(optEl){var b=optEl.querySelector('.ms-bub-r');if(b)b.classList.add('err');}
+        if(ta) ta.value=raw; updateCount(raw.length);
         warn('Erreur réseau.');
-        console.error('[sendMsg]', e.message);
+        console.error('sendMsg:',e.message);
     })
     .finally(function() {
-        inFlight = false;
-        if (btn) {
-            btn.disabled = false;
-            btn.classList.remove('loading');
-        }
+        inFlight=false;
+        if(btn){btn.disabled=false;btn.classList.remove('loading');}
     });
 }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    CHAR COUNT & AUTORESIZE
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function updateCount(n) {
-    var el = gel('msCount');
-    if (!el) return;
-    el.textContent = n;
-    el.style.color = n > 1900 ? '#ef4444' : n > 1500 ? 'var(--ms-orange)' : '';
+    var el=gel('msCount'); if(!el) return;
+    el.textContent=n;
+    el.style.color=n>1900?'#ef4444':n>1500?'var(--ms-orange)':'';
 }
-
-var ta = gel('msInput');
-if (ta) {
-    ta.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 140) + 'px';
-        var n = this.value.length;
-        updateCount(n);
-        if (n > 2000) this.value = this.value.substring(0, 2000);
+var ta=gel('msInput');
+if(ta) {
+    ta.addEventListener('input',function(){
+        this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,140)+'px';
+        var n=this.value.length; updateCount(n);
+        if(n>2000) this.value=this.value.substring(0,2000);
     });
-    ta.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMsg();
-        }
-    });
+    ta.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
 }
+gel('msSend')&&gel('msSend').addEventListener('click',sendMsg);
 
-gel('msSend') && gel('msSend').addEventListener('click', sendMsg);
-
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    BOUTON RETOUR MOBILE
-   ════════════════════════════════════════ */
-gel('msBack') && gel('msBack').addEventListener('click', function() {
-    var p = gel('msPanel');
-    if (p) p.classList.remove('slide-out');
+────────────────────────────────────── */
+gel('msBack')&&gel('msBack').addEventListener('click',function(){
+    var p=gel('msPanel'); if(p) p.classList.remove('slide-out');
 });
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    SON
-   ════════════════════════════════════════ */
-gel('btnSound') && gel('btnSound').addEventListener('click', function() {
-    soundOn = !soundOn;
-    this.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
-    this.classList.toggle('s-off', !soundOn);
-    this.title = soundOn ? 'Son activé' : 'Son désactivé';
-    var on = gel('soundIconOn'), off = gel('soundIconOff');
-    if (on) on.style.display = soundOn ? '' : 'none';
-    if (off) off.style.display = soundOn ? 'none' : '';
-    localStorage.setItem('ms-sound', soundOn ? '1' : '0');
+────────────────────────────────────── */
+gel('btnSound')&&gel('btnSound').addEventListener('click',function(){
+    soundOn=!soundOn;
+    this.setAttribute('aria-pressed',soundOn?'true':'false');
+    this.classList.toggle('s-off',!soundOn);
+    this.title=soundOn?'Son activé':'Son désactivé';
+    var on=gel('soundIconOn'),off=gel('soundIconOff');
+    if(on)  on.style.display=soundOn?'':'none';
+    if(off) off.style.display=soundOn?'none':'';
 });
 
-/* Restaurer la préférence son */
-if (localStorage.getItem('ms-sound') === '0') {
-    soundOn = false;
-    var btn = gel('btnSound');
-    if (btn) {
-        btn.classList.add('s-off');
-        gel('soundIconOn').style.display = 'none';
-        gel('soundIconOff').style.display = '';
-    }
-}
-
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    ARCHIVE
-   ════════════════════════════════════════ */
-gel('btnArchive') && gel('btnArchive').addEventListener('click', function() {
-    if (cEmail) doArchive(cEmail, !cArc);
-});
-
+────────────────────────────────────── */
+gel('btnArchive')&&gel('btnArchive').addEventListener('click',function(){if(cEmail) doArchive(cEmail,!cArc);});
 function updateArchBtn() {
-    var b = gel('btnArchive');
-    if (!b) return;
-    b.title = cArc ? 'Désarchiver' : 'Archiver';
-    b.classList.toggle('arc-on', cArc);
-    b.setAttribute('aria-pressed', cArc ? 'true' : 'false');
+    var b=gel('btnArchive'); if(!b) return;
+    b.title=cArc?'Désarchiver':'Archiver';
+    b.classList.toggle('arc-on',cArc);
+    b.setAttribute('aria-pressed',cArc?'true':'false');
 }
-
-function doArchive(email, arc) {
-    fetch(CFG.archiveUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': CFG.csrf
-        },
-        body: JSON.stringify({email_client: email, closed: arc})
-    })
-    .then(function(r) { return r.json(); })
-    .then(function() {
-        if (arc) arcSet.add(email);
-        else arcSet.delete(email);
-        if (cEmail === email) {
-            cArc = arc;
-            var c = gel('msCompose');
-            if (c) c.style.display = arc ? 'none' : 'flex';
-            updateArchBtn();
-        }
+function doArchive(email,arc) {
+    fetch(CFG.archiveUrl,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CFG.csrf},body:JSON.stringify({email_client:email,closed:arc})})
+    .then(function(r){return r.json();})
+    .then(function(){
+        if(arc) arcSet.add(email); else arcSet.delete(email);
+        if(cEmail===email) { cArc=arc; var c=gel('msCompose'); if(c) c.style.display=arc?'none':'flex'; updateArchBtn(); }
         scheduleRefresh();
-    })
-    .catch(function(e) { console.warn('[archive]', e.message); });
+    }).catch(function(e){console.warn('archive:',e.message);});
 }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    INFO PANEL
-   ════════════════════════════════════════ */
-gel('btnInfo') && gel('btnInfo').addEventListener('click', function() {
-    var p = gel('msInfoPanel'), v = gel('msVeil');
-    if (p) p.classList.add('open');
-    if (v) v.classList.add('open');
-});
+────────────────────────────────────── */
+gel('btnInfo')&&gel('btnInfo').addEventListener('click',function(){var p=gel('msInfoPanel'),v=gel('msVeil');if(p)p.classList.add('open');if(v)v.classList.add('open');});
+gel('msInfoClose')&&gel('msInfoClose').addEventListener('click',closeInfo);
+gel('msVeil')&&gel('msVeil').addEventListener('click',closeInfo);
+function closeInfo(){var p=gel('msInfoPanel'),v=gel('msVeil');if(p)p.classList.remove('open');if(v)v.classList.remove('open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeInfo();hideToast();}});
 
-gel('msInfoClose') && gel('msInfoClose').addEventListener('click', closeInfo);
-gel('msVeil') && gel('msVeil').addEventListener('click', closeInfo);
-
-function closeInfo() {
-    var p = gel('msInfoPanel'), v = gel('msVeil');
-    if (p) p.classList.remove('open');
-    if (v) v.classList.remove('open');
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeInfo();
-        hideToast();
-    }
-});
-
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    TABS
-   ════════════════════════════════════════ */
-document.querySelectorAll('.ms-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-        document.querySelectorAll('.ms-tab').forEach(function(t) {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-        });
-        this.classList.add('active');
-        this.setAttribute('aria-selected', 'true');
-        var f = this.dataset.filter;
-        document.querySelectorAll('.ms-conv').forEach(function(it) {
-            var arc = it.dataset.archived === '1';
-            it.style.display = (f === 'all' && !arc) || (f === 'archived' && arc) ? '' : 'none';
+────────────────────────────────────── */
+document.querySelectorAll('.ms-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+        document.querySelectorAll('.ms-tab').forEach(function(t){t.classList.remove('active');t.setAttribute('aria-selected','false');});
+        this.classList.add('active'); this.setAttribute('aria-selected','true');
+        var f=this.dataset.filter;
+        document.querySelectorAll('.ms-conv').forEach(function(it){
+            var arc=it.dataset.archived==='1';
+            it.style.display=(f==='all'&&!arc)||(f==='archived'&&arc)?'':'none';
         });
     });
 });
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    SÉLECTION CONVERSATION
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function selectConv(el) {
-    document.querySelectorAll('.ms-conv').forEach(function(i) { i.classList.remove('sel'); });
+    document.querySelectorAll('.ms-conv').forEach(function(i){i.classList.remove('sel');});
     el.classList.add('sel');
-    cEmail = el.dataset.email;
-    cInit = el.dataset.initials || '?';
-    cC1 = el.dataset.c1 || '#2563a8';
-    cC2 = el.dataset.c2 || '#3b82c4';
-    cPhone = el.dataset.phone || '';
-    cArc = arcSet.has(cEmail);
+    cEmail=el.dataset.email; cInit=el.dataset.initials||'?';
+    cC1=el.dataset.c1||'#2563a8'; cC2=el.dataset.c2||'#3b82c4';
+    cPhone=el.dataset.phone||''; cArc=arcSet.has(cEmail);
     clearNew(cEmail);
 
-    var tav = gel('threadAv');
-    if (tav) {
-        tav.textContent = cInit;
-        tav.style.background = 'linear-gradient(145deg,' + cC1 + ',' + cC2 + ')';
-    }
-    setTxt('threadName', el.dataset.name);
-    setTxt('threadEmail', cEmail);
+    var tav=gel('threadAv');
+    if(tav){tav.textContent=cInit;tav.style.background='linear-gradient(145deg,'+cC1+','+cC2+')';}
+    setTxt('threadName',el.dataset.name); setTxt('threadEmail',cEmail);
 
-    var iav = gel('infoAv');
-    if (iav) {
-        iav.textContent = cInit;
-        iav.style.background = 'linear-gradient(145deg,' + cC1 + ',' + cC2 + ')';
-    }
-    setTxt('infoName', el.dataset.name);
-    setTxt('infoEmail', cEmail);
-    setTxt('infoPhone', cPhone || 'Non renseigné');
+    var iav=gel('infoAv');
+    if(iav){iav.textContent=cInit;iav.style.background='linear-gradient(145deg,'+cC1+','+cC2+')';}
+    setTxt('infoName',el.dataset.name); setTxt('infoEmail',cEmail); setTxt('infoPhone',cPhone||'Non renseigné');
 
-    var isArc = arcSet.has(cEmail), hasRes = el.dataset.responded === '1';
-    var infoSt = gel('infoStatus');
-    if (infoSt) {
-        infoSt.className = 'ms-tag ' + (isArc ? 'arc' : (hasRes ? 'ok' : 'wait'));
-        infoSt.textContent = isArc ? 'Archivé' : (hasRes ? 'Répondu' : 'En attente');
-    }
+    var isArc=arcSet.has(cEmail), hasRes=el.dataset.responded==='1';
+    var infoSt=gel('infoStatus');
+    if(infoSt){infoSt.className='ms-tag '+(isArc?'arc':(hasRes?'ok':'wait'));infoSt.textContent=isArc?'Archivé':(hasRes?'Répondu':'En attente');}
 
-    var idle = gel('msIdle'), thread = gel('msThread'), compose = gel('msCompose'), warnEl = gel('msWarn');
-    if (idle) idle.style.display = 'none';
-    if (thread) thread.style.display = 'flex';
-    if (compose) compose.style.display = cArc ? 'none' : 'flex';
-    if (warnEl) warnEl.style.display = 'none';
+    var idle=gel('msIdle'),thread=gel('msThread'),compose=gel('msCompose'),warnEl=gel('msWarn');
+    if(idle)    idle.style.display='none';
+    if(thread)  thread.style.display='flex';
+    if(compose) compose.style.display=cArc?'none':'flex';
+    if(warnEl)  warnEl.style.display='none';
 
     updateArchBtn();
-    loadConv(cEmail);
+    loadConv(cEmail);   /* ✅ charge les messages */
 
-    if (window.innerWidth <= 768) {
-        var p = gel('msPanel');
-        if (p) p.classList.add('slide-out');
-    }
+    if(window.innerWidth<=768) { var p=gel('msPanel'); if(p) p.classList.add('slide-out'); }
 }
 
-/* ════════════════════════════════════════
+/* ──────────────────────────────────────
    ATTACH CONV EVENTS
-   ════════════════════════════════════════ */
+────────────────────────────────────── */
 function attachConvEvents() {
-    document.querySelectorAll('.ms-conv').forEach(function(el) {
-        var ne = el.cloneNode(true);
-        el.parentNode.replaceChild(ne, el);
-        ne.addEventListener('click', function() { selectConv(this); });
-        ne.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                selectConv(this);
-            }
-        });
+    document.querySelectorAll('.ms-conv').forEach(function(el){
+        var ne=el.cloneNode(true);
+        el.parentNode.replaceChild(ne,el);
+        ne.addEventListener('click',function(){selectConv(this);});
+        ne.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selectConv(this);}});
     });
 }
 
-/* ════════════════════════════════════════
-   REFRESH LISTE
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   REFRESH LISTE (HTML)
+────────────────────────────────────── */
 function scheduleRefresh() {
-    if (refreshing) {
-        refreshPend = true;
-        return;
-    }
+    if(refreshing){refreshPend=true;return;}
     doRefresh();
 }
-
 function doRefresh() {
-    if (refreshing) return;
-    refreshing = true;
-    refreshPend = false;
+    if(refreshing) return;
+    refreshing=true; refreshPend=false;
 
-    fetch(CFG.pageUrl, {
-        cache: 'no-store',
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-    })
-    .then(function(r) { return r.text(); })
-    .then(function(html) {
-        var doc = new DOMParser().parseFromString(html, 'text/html');
-        var newL = doc.getElementById('msConvList'), oldL = gel('msConvList');
-        if (!newL || !oldL) return;
-        var sy = oldL.scrollTop;
-        oldL.innerHTML = newL.innerHTML;
+    fetch(CFG.pageUrl,{cache:'no-store',headers:{'X-Requested-With':'XMLHttpRequest'}})
+    .then(function(r){return r.text();})
+    .then(function(html){
+        var doc=new DOMParser().parseFromString(html,'text/html');
+        var newL=doc.getElementById('msConvList'), oldL=gel('msConvList');
+        if(!newL||!oldL) return;
+        var sy=oldL.scrollTop;
+        oldL.innerHTML=newL.innerHTML;
         attachConvEvents();
-        if (cEmail) {
-            var sel = oldL.querySelector('.ms-conv[data-email="' + cssEsc(cEmail) + '"]');
-            if (sel) sel.classList.add('sel');
-        }
-        oldL.querySelectorAll('.ms-conv').forEach(function(el) {
-            var em = el.dataset.email;
-            if (el.dataset.archived === '1') arcSet.add(em);
-            else arcSet.delete(em);
-            if (newSet.has(em)) markNew(em);
+        if(cEmail){var sel=oldL.querySelector('.ms-conv[data-email="'+cssEsc(cEmail)+'"]');if(sel)sel.classList.add('sel');}
+        oldL.querySelectorAll('.ms-conv').forEach(function(el){
+            var em=el.dataset.email;
+            if(el.dataset.archived==='1') arcSet.add(em); else arcSet.delete(em);
+            if(newSet.has(em)) markNew(em);
         });
-        oldL.scrollTop = sy;
+        oldL.scrollTop=sy;
     })
-    .catch(function(e) { console.warn('[doRefresh]', e.message); })
-    .finally(function() {
-        refreshing = false;
-        if (refreshPend) doRefresh();
-    });
+    .catch(function(e){console.warn('doRefresh:',e.message);})
+    .finally(function(){refreshing=false;if(refreshPend) doRefresh();});
 }
 
-/* ════════════════════════════════════════
-   POLLING ADAPTATIF (FIABLE)
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   POLLING ADAPTATIF
+   - Pusher KO → 4s
+   - Pusher OK → 30s (sécurité)
+────────────────────────────────────── */
 function startPoll(fast) {
-    if (pollTimer) clearInterval(pollTimer);
+    if(pollTimer) clearInterval(pollTimer);
     var delay = fast ? POLL_FAST : POLL_SLOW;
     pollTimer = setInterval(function() {
         scheduleRefresh();
-        if (cEmail) loadConvSilent(cEmail);
+        /* ✅ Si conv active ouverte, vérifier aussi les nouveaux messages */
+        if(cEmail) loadConvSilent(cEmail);
     }, delay);
-    if (fast) setRT('poll');
+    if(fast) setRT('poll');
 }
 
+/*
+  loadConvSilent : recharge les messages SANS afficher le spinner.
+  Comparaison du nb de lignes pour éviter les rechargements inutiles.
+*/
 function loadConvSilent(email) {
-    if (!email || inFlight) return;
-    fetch(CFG.convUrl + encodeURIComponent(email), {
-        cache: 'no-store',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
+    if(!email||inFlight) return;
+    fetch(CFG.convUrl+encodeURIComponent(email),{
+        cache:'no-store',
+        headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}
     })
-    .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-    })
+    .then(function(r){if(!r.ok) throw new Error('HTTP '+r.status); return r.json();})
     .then(function(msgs) {
-        if (!Array.isArray(msgs) || !msgs.length) return;
-        var box = gel('msMessages');
-        if (!box) return;
+        if(!Array.isArray(msgs)||!msgs.length) return;
+        var box=gel('msMessages'); if(!box) return;
+        /* Compte les bulles actuelles vs reçues pour détecter un changement */
         var currentCount = box.querySelectorAll('.ms-row-l,.ms-row-r').length;
         var incomingCount = 0;
-        msgs.forEach(function(m) {
-            if (m.message && m.message.trim()) incomingCount++;
-            if (m.reponse_admin && m.reponse_admin.trim()) incomingCount++;
+        msgs.forEach(function(m){
+            if(m.message&&m.message.trim()) incomingCount++;
+            if(m.reponse_admin&&m.reponse_admin.trim()) incomingCount++;
         });
-        if (incomingCount !== currentCount) {
-            renderMsgs(msgs, box);
+        if(incomingCount!==currentCount) {
+            renderMsgs(msgs,box); /* ✅ recharge uniquement si changement */
         }
     })
-    .catch(function() {});
+    .catch(function(){/* silencieux */});
 }
 
 function onPusherConnected() {
-    pusherAlive = true;
-    pusherReady = true;
-    setRT('connected');
-    startPoll(false);
+    pusherAlive=true; setRT('connected');
+    startPoll(false); /* 30s fallback */
+}
+function onPusherFailed() {
+    pusherAlive=false; setRT('disconnected');
+    startPoll(true);  /* 4s fallback actif */
 }
 
-function onPusherDisconnected() {
-    pusherAlive = false;
-    setRT('disconnected');
-    startPoll(true);
-}
-
-/* ════════════════════════════════════════
-   PUSHER (Robust & Professional)
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   PUSHER
+   ✅ forceTLS:false → pas de SSL forcé
+   ✅ Pas d'enabledTransports → Pusher choisit seul
+   ✅ Pas de defer sur le script Pusher
+────────────────────────────────────── */
 function initPusher() {
-    if (typeof Pusher === 'undefined') {
+    if(typeof Pusher==='undefined') {
         console.warn('[Pusher] Bibliothèque non chargée — fallback polling');
-        onPusherDisconnected();
-        return;
+        onPusherFailed(); return;
     }
-    if (!CFG.pusherKey) {
+    if(!CFG.pusherKey) {
         console.warn('[Pusher] Clé manquante — fallback polling');
-        onPusherDisconnected();
-        return;
+        onPusherFailed(); return;
     }
 
     var pusher;
     try {
         pusher = new Pusher(CFG.pusherKey, {
-            cluster: CFG.pusherCluster,
-            forceTLS: false,
-            maxReconnectDelay: 10000,
-            enabledTransports: ['websocket', 'sockjs']
+            cluster:   CFG.pusherCluster,
+            forceTLS:  false,   /* ✅ pas de SSL forcé — critique pour WAMP */
+            /* enabledTransports non défini → Pusher choisit automatiquement */
         });
     } catch(e) {
-        console.warn('[Pusher] Init échouée:', e.message);
-        onPusherDisconnected();
-        return;
+        console.warn('[Pusher] Init échouée:',e.message);
+        onPusherFailed(); return;
     }
 
-    pusher.connection.bind('connected', onPusherConnected);
-    pusher.connection.bind('disconnected', onPusherDisconnected);
-    pusher.connection.bind('connecting', function() { setRT('connecting'); });
-    pusher.connection.bind('unavailable', onPusherDisconnected);
-    pusher.connection.bind('failed', onPusherDisconnected);
-    pusher.connection.bind('error', function(e) {
-        console.warn('[Pusher] Erreur:', e);
-        onPusherDisconnected();
-    });
+    pusher.connection.bind('connected',    onPusherConnected);
+    pusher.connection.bind('disconnected', onPusherFailed);
+    pusher.connection.bind('connecting',   function(){setRT('connecting');});
+    pusher.connection.bind('unavailable',  onPusherFailed);
+    pusher.connection.bind('failed',       onPusherFailed);
+    pusher.connection.bind('error',        function(e){console.warn('[Pusher]',e);onPusherFailed();});
 
     var channel = pusher.subscribe('new-messages');
 
     channel.bind('App\\Events\\NewMessageReceived', function(data) {
-        if (!data || !data.email_client) return;
+        if(!data||!data.email_client) return;
+        var email=data.email_client, name=data.nom_complet||email, msg=data.message||'Nouveau message';
 
-        var email = data.email_client;
-        var name = data.nom_complet || email;
-        var msg = data.message || 'Nouveau message';
-        var c1 = '#2563a8', c2 = '#60a5fa';
-
+        /* ✅ Toujours rafraîchir la liste */
         scheduleRefresh();
 
-        if (email !== cEmail) {
-            var it = document.querySelector('.ms-conv[data-email="' + cssEsc(email) + '"]');
-            if (it) {
-                c1 = it.dataset.c1 || c1;
-                c2 = it.dataset.c2 || c2;
-            }
-
+        if(email!==cEmail) {
+            /* Autre conversation → badge + toast + notif */
             markNew(email);
-            showToast(name, msg, c1, c2);
-            showBrowserNotif(name, msg, 'msg-' + email, '/images/logo.jpg');
+            var it=document.querySelector('.ms-conv[data-email="'+cssEsc(email)+'"]');
+            var c1=it?it.dataset.c1:'#2563a8', c2=it?it.dataset.c2:'#3b82c4';
+            showToast(name,msg,c1,c2);
+            notifBrowser(name,msg);
         } else {
+            /* ✅ Conversation ACTIVE → recharger les messages IMMÉDIATEMENT */
             loadConv(cEmail);
         }
     });
-
-    /* Cleanup on disconnect */
-    channel.bind('pusher:subscription_error', function(status) {
-        console.warn('[Pusher] Subscription erreur:', status);
-    });
 }
 
-/* ════════════════════════════════════════
-   INIT (ORDRE CRITIQUE)
-   ════════════════════════════════════════ */
+/* ──────────────────────────────────────
+   INIT
+────────────────────────────────────── */
 attachConvEvents();
-requestNotifPerm();
+initBrowserNotif();
 
-/* Démarrer avec polling fast */
-startPoll(true);
-
-/* Puis essayer Pusher */
-setTimeout(initPusher, 500);
+/*
+  ✅ On démarre le polling rapide immédiatement (garantit le fallback),
+  puis on tente Pusher. Si Pusher se connecte, on ralentit le polling.
+*/
+startPoll(true);   /* polling 4s par défaut */
+initPusher();      /* tente Pusher — appellera onPusherConnected si succès */
 
 })();
 </script>
